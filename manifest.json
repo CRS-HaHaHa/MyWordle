@@ -8,6 +8,11 @@
   "icons": [
     {
       "src": "https://assets-prd.ignimgs.com/2022/04/15/wordle-1650045194490.jpg",
+      "sizes": "192x192",
+      "type": "image/jpg"
+    },
+    {
+      "src": "https://assets-prd.ignimgs.com/2022/04/15/wordle-1650045194490.jpg",
       "sizes": "512x512",
       "type": "image/jpg"
     }
