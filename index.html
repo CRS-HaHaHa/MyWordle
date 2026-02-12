@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="words_data.js"></script>
+    <link rel="manifest" href="manifest.json">
     <title>MyWordle</title>
     <style>
         :root {
@@ -884,6 +885,10 @@
             setLanguage(currentLang);
             updateHomeStats();
         };
+
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('./sw.js');
+        }
     </script>
     <div id="end-popup" style="display:none">
         <div id="popup-content"></div>
