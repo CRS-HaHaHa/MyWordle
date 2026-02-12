@@ -1,4 +1,4 @@
-const CACHE_NAME = 'MyWordle-v1';
+const CACHE_NAME = 'MyWordle-v1.0';
 const ASSETS = [
   './',
   './index.html',
@@ -14,4 +14,5 @@ self.addEventListener('install', (e) => {
 // Risponde anche se sei offline
 self.addEventListener('fetch', (e) => {
   e.respondWith(caches.match(e.request).then(res => res || fetch(e.request)));
+
 });
