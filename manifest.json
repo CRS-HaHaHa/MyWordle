@@ -8,16 +8,14 @@
   "theme_color": "#667eea",
   "icons": [
     {
-      "src": "https://assets-prd.ignimgs.com/2022/04/15/wordle-1650045194490.jpg",
+      "src": "https://raw.githubusercontent.com/CRS-HaHaHa/MyWordle/refs/heads/main/MyWordle.png",
       "sizes": "192x192",
-      "type": "image/jpg"
+      "type": "image/png"
     },
     {
-      "src": "https://assets-prd.ignimgs.com/2022/04/15/wordle-1650045194490.jpg",
+      "src": "https://raw.githubusercontent.com/CRS-HaHaHa/MyWordle/refs/heads/main/MyWordle.png",
       "sizes": "512x512",
-      "type": "image/jpg"
+      "type": "image/png"
     }
   ]
 }
-
-
