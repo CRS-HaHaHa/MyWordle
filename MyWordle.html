@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="words_data.js"></script>
+    <title>MyWordle</title>
+    <style>
+        :root {
+            --green: #4CAF50;
+            --yellow: #FFB703;
+            --gray: #9E9E9E;
+            --bg1: #667eea;
+            --bg2: #764ba2;
+            --card: rgba(255,255,255,0.92);
+            --text-dark: #1f2937;
+            --accent: #ff6b6b;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, var(--bg1), var(--bg2));
+            margin: 0;
+            height: 100dvh;
+            display: flex;
+            justify-content: center;
+            color: var(--text-dark);
+            overflow: hidden;
+        }
+
+        #home-screen {
+            width: 100%;
+            max-width: 900px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-sizing: border-box;
+            height: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: clamp(3rem, 6vw, 4.5rem);
+            font-weight: 900;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #ff6b6b, #ffd93d, #6bcB77);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 6px 20px rgba(0,0,0,.25);
+        }
+
+        /* Card contenitori */
+        .lang-section {
+            background: var(--card);
+            border-radius: 24px;
+            padding: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,.25);
+            margin-top: 25px;
+        }
+
+        #length-title {
+            text-align: center;
+            margin-top: 5px;
+
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        /* --- STILE GENERALE BOTTONI (Numeri, Gioca, Back) --- */
+        button {
+            flex: 1;
+            padding: 14px;
+            font-size: 1.1rem;
+            background: #e5e7eb;
+            color: var(--text-dark);
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            font-weight: 700;
+            /* Solo qui mettiamo la transizione di movimento */
+            transition: transform .15s, box-shadow .15s, background .15s;
+        }
+
+        /* Effetto movimento SOLO per i bottoni normali */
+        button:not(#lang-it):not(#lang-en):hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,.15);
+        }
+
+        button.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* --- FIX TOTALE BANDIERE --- */
+        /* Usiamo gli ID per vincere su qualsiasi altra regola */
+        #lang-it, #lang-en {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 16px;
+            border: 4px solid white;
+            /* BLOCCO TOTALE MOVIMENTO */
+            transform: none !important; 
+            transition: border-color 0.2s, box-shadow 0.2s !important;
+            margin-top: 0 !important;
+        }
+
+        /* Stato Hover/Active delle bandiere: SOLO LUCE, NO MOVIMENTO */
+        #lang-it:hover, #lang-en:hover,
+        #lang-it:active, #lang-en:active {
+            transform: none !important; /* Sicurezza doppia */
+            box-shadow: 0 0 20px rgba(255,255,255,0.6) !important;
+            filter: brightness(1.1);
+            border-color: white;
+        }
+
+        #lang-it.active, #lang-en.active {
+            border-color: #ffd93d; /* Bordo dorato quando attivo */
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.5) !important;
+            filter: brightness(1.0);
+        }
+
+        #lang-it { background-image: url("https://flagcdn.com/w320/it.png"); }
+        #lang-en { background-image: url("https://flagcdn.com/w320/gb.png"); }
+
+        /* --- NUOVI STILI BOTTONI LUNGHEZZA --- */
+
+        /* Serve per distanziare i bottoni affinché i badge non si sovrappongano */
+        .length-group {
+            gap: 25px; 
+            padding-right: 15px; /* Spazio extra a destra per l'ultimo badge */
+        }
+
+        .len-btn {
+            position: relative; /* Fondamentale per posizionare il badge */
+            overflow: visible;  /* Fondamentale per far uscire il badge dal bordo */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 80px; /* Più alti per contenere il testo */
+            background: #f3f4f6;
+            border: 2px solid transparent;
+        }
+
+        .len-btn.active {
+            background: white;
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.2);
+        }
+
+        .num-large {
+            font-size: 1.8rem;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .text-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            opacity: 0.8;
+            text-transform: uppercase;
+        }
+
+        /* --- IL BADGE "MEZZO DENTRO MEZZO FUORI" --- */
+        .stat-badge {
+            position: absolute;
+            top: 50%;
+            right: -12px; /* Esce fuori a destra */
+            transform: translateY(-50%); /* Centrato verticalmente */
+            
+            background: #2d3436;
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            white-space: pre; /* Mantiene l'a capo nel testo \n */
+            text-align: center;
+            border: 2px solid white; /* Bordo bianco per staccare */
+            z-index: 10;
+            line-height: 1.2;
+        }
+
+        /* Colora il badge del bottone attivo diversamente */
+        .len-btn.active .stat-badge {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        /* --- PLAY BUTTON --- */
+        #play-btn {
+            margin: 30px auto 0;
+            margin-bottom: 18px;
+            padding: 18px 50px;
+            width: auto;
+            font-size: 1.6rem;
+            background: linear-gradient(135deg, #FFD93D, #ff6b6b);
+            color: white;
+            border-radius: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            box-shadow: 0 10px 25px rgba(255,107,107,0.4);
+        }
+
+        /* --- SCHERMATA GIOCO --- */
+        #game-screen {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            min-height: 100dvh; /* Forza lo schermo a occupare tutta l'altezza */
+            max-width: 800px;
+            padding-top: 80px;
+            box-sizing: border-box;
+            align-items: center;
+            position: relative; /* Questo crea il "muro" su cui si attacca la bandiera */
+            z-index: 1; /* Alza tutto lo schermo di gioco sopra il body */
+        }
+
+        #stats-display {
+            position: absolute;
+            top: 14px;
+            right: 16px;
+            font-size: 1.5rem;
+            font-weight: 900;
+            background: rgba(255,255,255,.85);
+            padding: 8px 14px;
+            border-radius: 999px;
+            box-shadow: 0 6px 15px rgba(0,0,0,.25);
+        }
+
+        #back-btn {
+            position: absolute;
+            left: 12px;
+            top: 12px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 6px 15px rgba(0,0,0,.25);
+            padding: 0;
+        }
+
+        /* GRIGLIA */
+        .grid {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 0;
+        }
+
+        .row {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .tile {
+            width: 52px;
+            height: 52px;
+            background: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 800;
+            box-shadow: 0 4px 10px rgba(0,0,0,.15);
+            text-transform: uppercase;
+            border: 2px solid transparent;
+        }
+
+        /* --- TASTIERA A "V" (PIRAMIDE) --- */
+        #keyboard {
+            position: relative;
+            z-index: 10; /* Molto più alto della bandiera (che è 2) */
+            width: 100%;
+            max-width: 900px;
+            padding: 5px;
+            margin-top: auto; /* Spinge la tastiera verso il basso */
+            margin-bottom: 10px;
+        }
+
+        .kb-row {
+            display: flex;
+            justify-content: center; /* Questo crea la forma a V centrando le righe più corte */
+            width: 100%;
+            gap: 6px; /* Spazio tra i tasti */
+            margin-bottom: 8px;
+        }
+
+        .key {
+            background: white;
+            height: 56px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: 700;
+            box-shadow: 0 4px 0 rgba(0,0,0,.15);
+            font-size: 1.2rem;
+            user-select: none;
+            
+            /* TRUCCO PER LARGHEZZA UGUALE */
+            width: 8.5%; /* Percentuale fissa per tutti i tasti */
+            max-width: 50px; /* Limite per non diventare enormi */
+            flex: none; /* Disabilita il riempimento automatico */
+        }
+
+        .key:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 rgba(0,0,0,.15);
+        }
+
+        /* Tasti speciali (Enter/Back) un po' più larghi */
+        .key-big {
+            width: 13%; 
+            max-width: 80px;
+            font-size: 1rem;
+            background: #f0f0f0;
+        }
+
+        #end-popup {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            display: none;
+        }
+
+        #popup-content {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 25px;
+            font-size: 1.8rem;
+            font-weight: 900;
+            text-align: center;
+        }
+
+        /* --- BANDIERA SFONDO TASTIERA --- */
+        #keyboard-bg-flag {
+            position: absolute;
+            bottom: 0; /* Attaccata al fondo */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100vw; /* Larga tutto lo schermo di base */
+            height: 250px; /* Altezza di base, la regoleremo */
+            z-index: 2; /* Dietro la tastiera */
+            background-size: cover;
+            background-position: center;
+            opacity: 0.8; /* Molto soffusa per non disturbare la vista dei tasti */
+            filter: blur(5px); /* Leggermente sfocata per un effetto elegante */
+            pointer-events: none; /* Non deve bloccare i click sui tasti */
+            transition: background-image 0.5s ease;
+        }
+
+        /* Regolazione per Computer (schermi larghi) */
+        @media (min-width: 900px) {
+            #keyboard-bg-flag {
+                width: 650px; /* Poco più larga della tastiera (che è 700px) */
+                height: 220px; /* Poco più alta della tastiera */
+                border-radius: 40px 40px 0 0; /* Arrotondata solo sopra */
+                bottom: 10px; /* Sollevata leggermente dal fondo */
+            }
+        }
+
+        /* --- MOBILE --- */
+        @media (max-width: 600px) {
+            #lang-it, #lang-en {
+            height: 100px;
+            }
+            /* 1. Riduzione spazio sopra "Scegli la lunghezza" */
+            .lang-section {
+                margin-top: 20px; /* Ridotto da 20px */
+                padding: 15px;    /* Leggermente più compatto */
+            }
+
+            /* 2. Pulsanti lunghezza uno sotto l'altro */
+            .length-group {
+                flex-direction: column; /* Stack verticale */
+                gap: 15px;              /* Spazio tra i pulsanti */
+                padding-right: 0;       /* Reset padding extra */
+            }
+
+            .len-btn {
+                height: 65px; /* Altezza ridotta per mobile */
+                width: 100%;  /* Prendono tutta la larghezza disponibile */
+            }
+
+            /* Sistemazione badge per la versione verticale */
+            .stat-badge {
+                right: 10px; /* Portiamo il badge un po' più dentro per non farlo uscire dallo schermo */
+            }
+
+            /* 3. Riduzione pulsante GIOCA */
+            #play-btn {
+                margin-top: 25px;    /* Ridotto da 40px */
+                padding: 12px 40px;  /* Più basso e meno largo */
+                font-size: 1.3rem;   /* Testo leggermente più piccolo */
+            }
+
+            /* Altri aggiustamenti griglia/tastiera (già presenti nel tuo codice) */
+            .tile { width: 44px; height: 44px; font-size: 1.6rem; }
+            #keyboard { width: 98%; padding: 2px; margin-bottom: 10px;}
+            .kb-row { gap: 3px; margin-bottom: 15px; }
+            .key { 
+                height: 52px; 
+                font-size: 1rem; 
+                width: 8.8%; 
+                max-width: none;
+            }
+            .key-big { width: 14%; font-size: 0.8rem; }
+            #keyboard-bg-flag {
+                width: 100%;
+                height: 240px;
+                bottom: 0;
+                border-radius: 0;
+                filter: blur(3px);
+            }
+            #game-screen {
+                justify-content: space-between; /* Aiuta a distribuire gli elementi tra top e tastiera */
+            }
+
+            /* Regola per rimpicciolire i quadratini se la parola è lunga */
+            .grid-7-letters .tile {
+                width: 38px;  /* Più piccoli dei 44px standard */
+                height: 38px;
+                font-size: 1.4rem;
+            }
+            
+            .grid-7-letters .row {
+                gap: 4px; /* Stringiamo anche lo spazio tra le lettere */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="home-screen">
+        <h1>MyWordle</h1>
+
+        <!-- Toggle lingua -->
+        <div class="btn-group">
+            <button id="lang-it" class="lang-btn active" onclick="setLanguage('it')"></button>
+            <button id="lang-en" class="lang-btn" onclick="setLanguage('en')"></button>
+        </div>
+
+        <!-- Lunghezza parole -->
+        <div class="lang-section">
+            <h2 id="length-title">Scegli la lunghezza</h2>
+            <div class="btn-group length-group">
+                <button class="len-btn active" onclick="setLength(5)">
+                    <span class="num-large">5</span> 
+                    <span class="text-label">Lettere</span>
+                    <div class="stat-badge" id="badge-5">🔥0 🏆0</div>
+                </button>
+
+                <button class="len-btn" onclick="setLength(6)">
+                    <span class="num-large">6</span> 
+                    <span class="text-label">Lettere</span>
+                    <div class="stat-badge" id="badge-6">🔥0 🏆0</div>
+                </button>
+
+                <button class="len-btn" onclick="setLength(7)">
+                    <span class="num-large">7</span> 
+                    <span class="text-label">Lettere</span>
+                    <div class="stat-badge" id="badge-7">🔥0 🏆0</div>
+                </button>
+            </div>
+        </div>
+
+        <button id="play-btn" onclick="startGame()">GIOCA</button>
+    </div>
+
+    <div id="game-screen">
+        <button id="back-btn" onclick="goHome()">&#x1F3E0</button>
+        
+        <div id="stats-display">🔥 0  🏆 0</div>
+
+        <div class="grid" id="grid"></div>
+
+        <div id="keyboard-bg-flag"></div>
+
+        <div id="keyboard"></div>
+    </div>
+
+    <script>
+        // Configurazione Globale
+        let currentLang = 'it';
+        let currentLen = 5;
+        let targetWord = "";
+        let dictionary = [];
+        let currentRow = 0;
+        let currentCol = 0;
+        let guesses = [];
+
+        function setLanguage(lang) {
+            currentLang = lang;
+
+            // Toggle classi attive bandiere
+            document.getElementById('lang-it').classList.toggle('active', lang === 'it');
+            document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+
+            // Aggiorna titolo
+            document.getElementById('length-title').innerText =
+                lang === 'it' ? 'Scegli la lunghezza' : 'Choose word length';
+
+            // Aggiorna testo pulsanti (Lettere vs Letters)
+            const labelText = lang === 'it' ? 'Lettere' : 'Letters';
+            document.querySelectorAll('.text-label').forEach(el => el.innerText = labelText);
+
+            // Aggiorna testo pulsante GIOCA
+            document.getElementById('play-btn').innerText =
+                lang === 'it' ? 'GIOCA' : 'PLAY';
+
+            const bgFlag = document.getElementById('keyboard-bg-flag');
+            if (lang === 'it') {
+                bgFlag.style.backgroundImage = 'url("https://flagcdn.com/w1280/it.png")';
+            } else {
+                bgFlag.style.backgroundImage = 'url("https://flagcdn.com/w1280/gb.png")';
+            }
+
+            // Ricalcola le statistiche (i badge)
+            updateHomeStats();
+        }
+
+        function setLength(len) {
+            currentLen = len;
+            
+            // Gestione classe active sui bottoni lunghezza
+            document.querySelectorAll('.len-btn').forEach(b => b.classList.remove('active'));
+            // Trova il bottone cliccato e attivalo. 
+            // Nota: event.currentTarget è più sicuro di event.target quando ci sono elementi figli
+            event.currentTarget.classList.add('active');
+
+            updateHomeStats();
+        }
+
+        function updateHomeStats() {
+            // Aggiorniamo i badge di TUTTI i pulsanti (5, 6, 7)
+            [5, 6, 7].forEach(len => {
+                const streakKey = `streak_${currentLang}_${len}`;
+                const bestKey = `best_${currentLang}_${len}`;
+                
+                const streak = localStorage.getItem(streakKey) || 0;
+                const best = localStorage.getItem(bestKey) || 0;
+                
+                // Inseriamo i dati nel badge specifico
+                const badge = document.getElementById(`badge-${len}`);
+                if(badge) {
+                    // \n crea l'a capo visivo grazie a white-space: pre nel CSS
+                    badge.innerText = `🔥 ${streak}\n🏆 ${best}`;
+                }
+            });
+
+            // Aggiorniamo anche il display in alto nella schermata di gioco (quello attuale)
+            const currentStreak = localStorage.getItem(`streak_${currentLang}_${currentLen}`) || 0;
+            const currentBest = localStorage.getItem(`best_${currentLang}_${currentLen}`) || 0;
+            document.getElementById('stats-display').innerText = `🔥 ${currentStreak}  🏆 ${currentBest}`;
+        }
+
+        function selectConfig(lang, len, btn) {
+            currentLang = lang;
+            currentLen = len;
+            // Rimuove classe active da tutti e la aggiunge al premuto
+            document.querySelectorAll('.btn-group button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function startGame() {
+            // Recuperiamo le liste direttamente dall'oggetto in memoria
+            const solKey = `${currentLang}_${currentLen}_sol`;
+            const dictKey = `${currentLang}_${currentLen}_dict`;
+            
+            // Controlliamo se i dati esistono
+            if (!WORD_DATA[solKey] || !WORD_DATA[dictKey]) {
+                alert("Errore: Dati non trovati nel file words_data.js");
+                return;
+            }
+
+            const solutions = WORD_DATA[solKey];
+            dictionary = WORD_DATA[dictKey];
+            
+            // Scegliamo la parola target
+            targetWord = solutions[Math.floor(Math.random() * solutions.length)].toLowerCase();
+            
+            // Reset interfaccia e avvio
+            document.getElementById('home-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'flex';
+            
+            initGrid();
+            initKeyboard();
+            
+            // Carica streak
+            const streakKey = `streak_${currentLang}_${currentLen}`;
+            const bestKey = `best_${currentLang}_${currentLen}`;
+
+            const streak = localStorage.getItem(streakKey) || 0;
+            const best = localStorage.getItem(bestKey) || 0;
+
+            document.getElementById('stats-display').innerText = `🔥 ${streak}  🏆 ${best}`;
+
+        }
+
+        function initGrid() {
+            const grid = document.getElementById('grid');
+            const isMobile = window.innerWidth <= 600;
+            
+            // Rimuoviamo eventuali classi di layout precedenti
+            grid.classList.remove('grid-7-letters');
+            grid.style.marginTop = "0"; // Reset iniziale
+
+            // 1. GESTIONE MARGINI (PC vs MOBILE)
+            if (isMobile) {
+                // Parametri per Telefono
+                if (currentLen === 5) grid.style.marginTop = "20px";
+                else if (currentLen === 6) grid.style.marginTop = "10px";
+                else if (currentLen === 7) {
+                    grid.style.marginTop = "5px";
+                    grid.classList.add('grid-7-letters'); // Attiva i quadratini piccoli
+                }
+            } else {
+                // Parametri per PC (quelli che avevi prima)
+                if (currentLen <= 5) grid.style.marginTop = "-10px";
+                else if (currentLen === 6) grid.style.marginTop = "-55px";
+                else grid.style.marginTop = "60px";
+            }
+
+            // 2. LOGICA DI CREAZIONE GRIGLIA (il resto rimane simile)
+            grid.innerHTML = '';
+            const maxTries = currentLen + 1;
+
+            // Gestione speciale PC per 7 lettere (due colonne)
+            if (!isMobile && currentLen === 7) {
+                grid.style.flexDirection = 'row';
+                grid.style.gap = '40px';
+                const col1 = document.createElement('div');
+                const col2 = document.createElement('div');
+                [col1, col2].forEach(col => {
+                    col.style.display = 'flex';
+                    col.style.flexDirection = 'column';
+                    col.style.gap = '10px';
+                });
+
+                for (let i = 0; i < maxTries; i++) {
+                    const row = document.createElement('div');
+                    row.className = 'row';
+                    for (let j = 0; j < currentLen; j++) {
+                        const tile = document.createElement('div');
+                        tile.className = 'tile';
+                        tile.id = `tile-${i}-${j}`;
+                        row.appendChild(tile);
+                    }
+                    (i < 4 ? col1 : col2).appendChild(row);
+                }
+                grid.append(col1, col2);
+            } else {
+                // Layout standard (una colonna) per 5, 6 lettere e per 7 su Mobile
+                grid.style.flexDirection = 'column';
+                grid.style.gap = isMobile ? '6px' : '8px';
+
+                for (let i = 0; i < maxTries; i++) {
+                    const row = document.createElement('div');
+                    row.className = 'row';
+                    for (let j = 0; j < currentLen; j++) {
+                        const tile = document.createElement('div');
+                        tile.className = 'tile';
+                        tile.id = `tile-${i}-${j}`;
+                        row.appendChild(tile);
+                    }
+                    grid.appendChild(row);
+                }
+            }
+        }
+
+        function initKeyboard() {
+            const layout = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
+            const kb = document.getElementById('keyboard');
+            kb.innerHTML = '';
+
+            layout.forEach((rowStr, i) => {
+                const row = document.createElement('div');
+                row.className = 'kb-row';
+                
+                // Terza riga: aggiungi tasto ENTER a sinistra
+                if(i === 2) { 
+                    const btn = document.createElement('div');
+                    btn.className = 'key key-big'; // Classe speciale per larghezza
+                    btn.innerText = 'ENTER';
+                    btn.onclick = submitWord;
+                    row.appendChild(btn);
+                }
+
+                rowStr.split('').forEach(char => {
+                    const btn = document.createElement('div');
+                    btn.className = 'key'; // Classe standard (larghezza fissa)
+                    btn.innerText = char;
+                    btn.id = `key-${char.toLowerCase()}`;
+                    btn.onclick = () => handleInput(char.toLowerCase());
+                    row.appendChild(btn);
+                });
+
+                // Terza riga: aggiungi tasto DELETE a destra
+                if(i === 2) { 
+                    const btn = document.createElement('div');
+                    btn.className = 'key key-big'; // Classe speciale per larghezza
+                    btn.innerText = '⌫';
+                    btn.onclick = () => handleInput('backspace');
+                    row.appendChild(btn);
+                }
+                kb.appendChild(row);
+            });
+        }
+
+        function handleInput(key) {
+            if (key === 'backspace') {
+                if (currentCol > 0) {
+                    currentCol--;
+                    document.getElementById(`tile-${currentRow}-${currentCol}`).innerText = '';
+                }
+            } else if (/^[a-z]$/.test(key)) {
+                if (currentCol < currentLen) {
+                    document.getElementById(`tile-${currentRow}-${currentCol}`).innerText = key.toUpperCase();
+                    currentCol++;
+                }
+            }
+        }
+
+        function submitWord() {
+            let guess = "";
+            for(let i=0; i<currentLen; i++) {
+                guess += document.getElementById(`tile-${currentRow}-${i}`).innerText.toLowerCase();
+            }
+
+            if (guess.length !== currentLen) return;
+            if (!dictionary.includes(guess)) {
+                showPopup(TEXT[currentLang].notInList);
+                for (let i = 0; i < currentLen; i++) {
+                    if (currentCol > 0) {
+                        currentCol--;
+                        document.getElementById(`tile-${currentRow}-${currentCol}`).innerText = '';
+                    }
+                }
+                return;
+            }
+
+            checkWord(guess);
+        }
+
+        function checkWord(guess) {
+            const rowTiles = [];
+            for(let i=0; i<currentLen; i++) rowTiles.push(document.getElementById(`tile-${currentRow}-${i}`));
+            
+            let targetArr = targetWord.split('');
+            let statuses = Array(currentLen).fill('gray');
+
+            // Primo pass: Verdi
+            for(let i=0; i<currentLen; i++) {
+                if(guess[i] === targetArr[i]) {
+                    statuses[i] = 'green';
+                    targetArr[i] = null;
+                }
+            }
+
+            // Secondo pass: Gialli
+            for(let i=0; i<currentLen; i++) {
+                if(statuses[i] !== 'green' && targetArr.includes(guess[i])) {
+                    statuses[i] = 'yellow';
+                    targetArr[targetArr.indexOf(guess[i])] = null;
+                }
+            }
+
+            // Applica colori
+            statuses.forEach((s, i) => {
+                rowTiles[i].style.backgroundColor = `var(--${s})`;
+                rowTiles[i].style.borderColor = `var(--${s})`;
+                // Update tastiera
+                const key = document.getElementById(`key-${guess[i]}`);
+                if (s === 'green') key.style.backgroundColor = 'var(--green)';
+                else if (s === 'yellow' && key.style.backgroundColor !== 'var(--green)') key.style.backgroundColor = 'var(--yellow)';
+                else if (s === 'gray' && !key.style.backgroundColor) key.style.backgroundColor = 'gray';
+            });
+
+            if (guess === targetWord) {
+                updateStreak(true);
+                showEndPopup(true);
+            } else if (currentRow === currentLen) {
+                updateStreak(false);
+                showEndPopup(false);
+            } else {
+                currentRow++;
+                currentCol = 0;
+            }
+        }
+
+        const TEXT = {
+            it: {
+                win: "🎉 HAI VINTO!",
+                lose: "😭 ERA ",
+                notInList: "❌ Parola non in elenco"
+            },
+            en: {
+                win: "🎉 YOU WON!",
+                lose: "😭 IT WAS ",
+                notInList: "❌ Word not in list"
+            }
+        };
+
+        function showPopup(message) {
+            const popup = document.getElementById('end-popup');
+            const content = document.getElementById('popup-content');
+
+            content.innerText = message;
+            popup.style.display = 'flex';
+
+            setTimeout(() => popup.style.display = 'none', 1800);
+        }
+
+        function showEndPopup(win) {
+            const msg = win
+                ? TEXT[currentLang].win
+                : TEXT[currentLang].lose + targetWord.toUpperCase();
+
+            showPopup(msg);
+
+            setTimeout(startGame, 2200);
+        }
+
+        function updateStreak(win) {
+            const streakKey = `streak_${currentLang}_${currentLen}`;
+            const bestKey = `best_${currentLang}_${currentLen}`;
+
+            let streak = parseInt(localStorage.getItem(streakKey)) || 0;
+            let best = parseInt(localStorage.getItem(bestKey)) || 0;
+
+            if (win) {
+                streak++;
+                if (streak > best) best = streak;
+            } else {
+                streak = 0;
+            }
+
+            localStorage.setItem(streakKey, streak);
+            localStorage.setItem(bestKey, best);
+        }
+
+        function goHome() {
+            document.getElementById('game-screen').style.display = 'none';
+            document.getElementById('home-screen').style.display = 'flex';
+            currentRow = 0; currentCol = 0;
+            updateHomeStats();
+        }
+
+        // Ascolto tastiera fisica
+        window.addEventListener('keydown', (e) => {
+            if(document.getElementById('game-screen').style.display === 'flex') {
+                if(e.key === 'Enter') submitWord();
+                else if(e.key === 'Backspace') handleInput('backspace');
+                else handleInput(e.key.toLowerCase());
+            }
+        });
+
+        // Questo codice viene eseguito automaticamente all'apertura della pagina
+        window.onload = () => {
+            // Inizializza i record basandosi sulla lingua e lunghezza predefinite
+            setLanguage(currentLang);
+            updateHomeStats();
+        };
+    </script>
+    <div id="end-popup" style="display:none">
+        <div id="popup-content"></div>
+    </div>
+
+</body>
+</html>
