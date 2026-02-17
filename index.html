@@ -575,6 +575,7 @@
         let currentCol = 0;
         let guesses = [];
         let knownLetters = [];  // Memorizza le lettere corrette nelle posizioni esatte
+        let wrongPositions = {}; // Memorizza le lettere presenti nella parola ma nella posizione sbagliata
         let absentLetters = new Set(); // Memorizza le lettere che NON esistono nella parola
 
         function setLanguage(lang) {
@@ -670,6 +671,7 @@
             currentRow = 0;
             currentCol = 0;
             knownLetters = Array(currentLen).fill(null); // Reset conoscenza posizioni
+            wrongPositions = {}; // Reset conoscenza posizioni
             absentLetters = new Set(); // Reset lettere inesistenti
 
             // Recuperiamo le liste direttamente dall'oggetto in memoria
@@ -827,6 +829,8 @@
                     // LOGICA DI COLORAZIONE ANTEPRIMA
                     if (knownLetters[currentCol] === key) {
                         tile.classList.add('preview-green');
+                    } else if (wrongPositions[key] && wrongPositions[key].includes(currentCol)) {
+                    tile.classList.add('preview-gray')
                     } else if (absentLetters.has(key)) {
                         tile.classList.add('preview-gray');
                     }
@@ -848,7 +852,9 @@
                 for (let i = 0; i < currentLen; i++) {
                     if (currentCol > 0) {
                         currentCol--;
-                        document.getElementById(`tile-${currentRow}-${currentCol}`).innerText = '';
+                        const tile = document.getElementById(`tile-${currentRow}-${currentCol}`);
+                        tile.innerText = '';
+                        tile.classList.remove('preview-green', 'preview-gray');
                     }
                 }
                 return;
@@ -882,13 +888,17 @@
 
             // Aggiorna conoscenza
             statuses.forEach((s, i) => {
-                const tile = document.getElementById(`tile-${currentRow}-${i}`);
-                tile.classList.remove('preview-green', 'preview-gray'); // Pulisce il velo
-
+                const char = guess[i];
                 if (s === 'green') {
-                    knownLetters[i] = guess[i];
+                    knownLetters[i] = char;
+                } else if (s === 'yellow') {
+                    // Se è gialla, aggiungiamo l'indice corrente a quelli "vietati" per questa lettera
+                    if (!wrongPositions[char]) wrongPositions[char] = [];
+                    if (!wrongPositions[char].includes(i)) {
+                        wrongPositions[char].push(i);
+                    }
                 } else if (s === 'gray') {
-                    absentLetters.add(guess[i]);
+                    absentLetters.add(char);
                 }
             });
 
