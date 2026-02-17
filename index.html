@@ -1014,16 +1014,16 @@
         };
 
         if ('serviceWorker' in navigator) {
-            // 1. Registra il Service Worker
-            navigator.serviceWorker.register('./sw.js');
+            navigator.serviceWorker.register('./sw.js').then(reg => {
 
-            // 2. Ascolta quando un nuovo Service Worker prende il comando
-            navigator.serviceWorker.addEventListener('controllerchange', () => {
-                // Questo scatta solo quando il nuovo sw.js è attivo e pronto
-                // Facciamo un refresh per mostrare le modifiche (es. nuovo index.html)
+                // se c'è già un SW in attesa → ricarica quando prende controllo
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
                 window.location.reload();
+                });
+
             });
         }
+        
     </script>
     <div id="end-popup" style="display:none">
         <div id="popup-content"></div>
@@ -1031,3 +1031,4 @@
 
 </body>
 </html>
+
