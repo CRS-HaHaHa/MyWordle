@@ -1,4 +1,4 @@
-const VERSION = 'v1.0.1'; // <--- Cambia questo numero per forzare l'aggiornamento!
+const VERSION = 'v1.0.2'; // <--- Cambia questo numero per forzare l'aggiornamento!
 const CACHE_NAME = `MyWordle-cache-${VERSION}`;
 
 const ASSETS = [
@@ -6,7 +6,11 @@ const ASSETS = [
   './index.html',
   './words_data.js',
   './manifest.json',
-  './MyWordle.png'
+  './MyWordle.png',
+  './Flags/it.png',
+  './Flags/en.png',
+  './Flags/fr.png',
+  './Flags/es.png'
   // Aggiungi qui anche i tuoi file CSS o immagini se ne hai
 ];
 
