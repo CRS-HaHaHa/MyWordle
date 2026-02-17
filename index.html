@@ -900,6 +900,8 @@
                 } else if (s === 'gray') {
                     absentLetters.add(char);
                 }
+                const tile = document.getElementById(`tile-${currentRow}-${i}`);
+                tile.classList.remove('preview-green', 'preview-gray'); // Pulisce il velo
             });
 
             // Applica colori
@@ -1031,4 +1033,5 @@
 
 </body>
 </html>
+
 
