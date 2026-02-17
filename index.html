@@ -109,6 +109,7 @@
         /* Usiamo gli ID per vincere su qualsiasi altra regola */
         #lang-it, #lang-en, #lang-fr, #lang-es {
             height: 160px;
+            width: 320px;
             background-size: cover;
             background-position: center;
             border-radius: 16px;
@@ -134,10 +135,10 @@
             filter: brightness(1.0);
         }
 
-        #lang-it { background-image: url("https://flagcdn.com/w320/it.png"); }
-        #lang-en { background-image: url("https://flagcdn.com/w320/gb.png"); }
-        #lang-fr { background-image: url("https://flagcdn.com/w320/fr.png"); }
-        #lang-es { background-image: url("https://flagcdn.com/w320/es.png"); }
+        #lang-it { background-image: url("Flags/it.png"); }
+        #lang-en { background-image: url("Flags/gb.png"); }
+        #lang-fr { background-image: url("Flags/fr.png"); }
+        #lang-es { background-image: url("Flags/es.png"); }
 
         /* --- NUOVI STILI BOTTONI LUNGHEZZA --- */
 
@@ -383,6 +384,24 @@
             transition: background-image 0.5s ease;
         }
 
+        /* Colori sfumati per l'anteprima durante la digitazione */
+        .tile.preview-green {
+            background: 
+                linear-gradient(rgba(76, 175, 80, 0.4), rgba(76, 175, 80, 0.4)), 
+                linear-gradient(#ffffff, #ffffff) !important;
+            border: 2px solid var(--green) !important;
+            color: var(--text-dark);
+        }
+
+        /* Anteprima: Velo grigio uniforme su base bianca */
+        .tile.preview-gray {
+            background: 
+                linear-gradient(rgba(158, 158, 158, 0.4), rgba(158, 158, 158, 0.4)), 
+                linear-gradient(#ffffff, #ffffff) !important;
+            border: 2px solid var(--gray) !important;
+            color: var(--text-dark);
+        }
+
         /* Regolazione per Computer (schermi larghi) */
         @media (min-width: 900px) {
             #keyboard-bg-flag {
@@ -555,6 +574,8 @@
         let currentRow = 0;
         let currentCol = 0;
         let guesses = [];
+        let knownLetters = [];  // Memorizza le lettere corrette nelle posizioni esatte
+        let absentLetters = new Set(); // Memorizza le lettere che NON esistono nella parola
 
         function setLanguage(lang) {
             currentLang = lang;
@@ -567,22 +588,22 @@
             
             const bgFlag = document.getElementById('keyboard-bg-flag');
             if (lang === 'it') {
-                bgFlag.style.backgroundImage = 'url("https://flagcdn.com/w1280/it.png")';
+                bgFlag.style.backgroundImage = 'url("Flags/it.png")';
                 difficulty = 'Scegli la difficoltà';
                 labelText = 'Lettere';
                 playButton = 'Gioca';
             } else if (lang === 'en') {
-                bgFlag.style.backgroundImage = 'url("https://flagcdn.com/w1280/gb.png")';
+                bgFlag.style.backgroundImage = 'url("Flags/gb.png")';
                 difficulty = 'Choose the difficulty';
                 labelText = 'Letters';
                 playButton = 'Play';
             } else if (lang === 'fr') {
-                bgFlag.style.backgroundImage = 'url("https://flagcdn.com/w1280/fr.png")';
+                bgFlag.style.backgroundImage = 'url("Flags/fr.png")';
                 difficulty = 'Choisis la difficulté';
                 labelText = 'Lettres';
                 playButton = 'Jouer';
             } else if (lang === 'es') {
-                bgFlag.style.backgroundImage = 'url("https://flagcdn.com/w1280/es.png")';
+                bgFlag.style.backgroundImage = 'url("Flags/es.png")';
                 difficulty = 'Elige la dificultad';
                 labelText = 'Letras';
                 playButton = 'Jugar';
@@ -645,13 +666,19 @@
         }
 
         function startGame() {
+            // RESET DELLO STATO: Fondamentale per far ricominciare il puntatore da zero
+            currentRow = 0;
+            currentCol = 0;
+            knownLetters = Array(currentLen).fill(null); // Reset conoscenza posizioni
+            absentLetters = new Set(); // Reset lettere inesistenti
+
             // Recuperiamo le liste direttamente dall'oggetto in memoria
             const solKey = `${currentLang}_${currentLen}_sol`;
             const dictKey = `${currentLang}_${currentLen}_dict`;
             
             // Controlliamo se i dati esistono
             if (!WORD_DATA[solKey] || !WORD_DATA[dictKey]) {
-                alert("Errore: Dati non trovati nel file words_data.js");
+                alert(TEXT[currentLang].dataError); // Usa la traduzione dinamica
                 return;
             }
 
@@ -669,14 +696,7 @@
             initKeyboard();
             
             // Carica streak
-            const streakKey = `streak_${currentLang}_${currentLen}`;
-            const bestKey = `best_${currentLang}_${currentLen}`;
-
-            const streak = localStorage.getItem(streakKey) || 0;
-            const best = localStorage.getItem(bestKey) || 0;
-
-            document.getElementById('stats-display').innerText = `🔥 ${streak}  🏆 ${best}`;
-
+            updateHomeStats();
         }
 
         function initGrid() {
@@ -793,11 +813,24 @@
             if (key === 'backspace') {
                 if (currentCol > 0) {
                     currentCol--;
-                    document.getElementById(`tile-${currentRow}-${currentCol}`).innerText = '';
+                    const tile = document.getElementById(`tile-${currentRow}-${currentCol}`);
+                    tile.innerText = '';
+                    tile.classList.remove('preview-green', 'preview-gray'); // Rimuove ogni colore di anteprima quando cancelli
                 }
             } else if (/^[a-z]$/.test(key)) {
                 if (currentCol < currentLen) {
-                    document.getElementById(`tile-${currentRow}-${currentCol}`).innerText = key.toUpperCase();
+                    const tile = document.getElementById(`tile-${currentRow}-${currentCol}`);
+                    tile.innerText = key.toUpperCase();
+
+                    tile.classList.remove('preview-green', 'preview-gray');
+
+                    // LOGICA DI COLORAZIONE ANTEPRIMA
+                    if (knownLetters[currentCol] === key) {
+                        tile.classList.add('preview-green');
+                    } else if (absentLetters.has(key)) {
+                        tile.classList.add('preview-gray');
+                    }
+                    
                     currentCol++;
                 }
             }
@@ -847,6 +880,18 @@
                 }
             }
 
+            // Aggiorna conoscenza
+            statuses.forEach((s, i) => {
+                const tile = document.getElementById(`tile-${currentRow}-${i}`);
+                tile.classList.remove('preview-green', 'preview-gray'); // Pulisce il velo
+
+                if (s === 'green') {
+                    knownLetters[i] = guess[i];
+                } else if (s === 'gray') {
+                    absentLetters.add(guess[i]);
+                }
+            });
+
             // Applica colori
             statuses.forEach((s, i) => {
                 rowTiles[i].style.backgroundColor = `var(--${s})`;
@@ -874,22 +919,26 @@
             it: {
                 win: "🎉 HAI VINTO!",
                 lose: "😭 LA PAROLA ERA ",
-                notInList: "❌ Parola non in elenco"
+                notInList: "❌ Parola non in elenco",
+                dataError: "⚠️ Errore: Dati non trovati nel file words_data.js"
             },
             en: {
                 win: "🎉 YOU WON!",
                 lose: "😭 THE WORD WAS ",
-                notInList: "❌ Word not in list"
+                notInList: "❌ Word not in list",
+                dataError: "⚠️ Error: Data not found in words_data.js"
             },
             fr: {
                 win: "🎉 VOUS AVEZ GAGNÉ!",
                 lose: "😭 LE MOT ÉTAIT ",
-                notInList: "❌ Mot absent de la liste"
+                notInList: "❌ Mot absent de la liste",
+                dataError: "⚠️ Erreur : Données non trouvées nel file words_data.js"
             },
             es: {
                 win: "🎉 ¡GANASTE!",
                 lose: "😭 LA PALABRA ERA ",
-                notInList: "❌ Palabra no en la lista"
+                notInList: "❌ Palabra no en la lista",
+                dataError: "⚠️ Error: Datos no encontrados en words_data.js"
             }
         };
 
@@ -972,10 +1021,3 @@
 
 </body>
 </html>
-
-
-
-
-
-
-
