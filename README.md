@@ -8,7 +8,7 @@ Il progetto è nato per offrire una sfida dinamica, permettendo di giocare in di
 
 ## ✨ Caratteristiche Principali
 
-* **🌍 Multilingua:** Supporto completo per Italiano e Inglese.
+* **🌍 Multilingua:** Supporto completo per Italiano, Inglese, Francese e Spagnolo.
 * **📏 Difficoltà Variabile:** Scegli tra parole di 5, 6 o 7 lettere.
 * **🔥 Sistema di Streak:** Il gioco tiene traccia delle tue vittorie consecutive e del tuo record migliore per ogni categoria (salvati localmente nel browser).
 * **📱 Design Responsive:** Interfaccia ottimizzata per PC e dispositivi mobile con tastiera virtuale integrata.
