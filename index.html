@@ -62,15 +62,15 @@
         .lang-section {
             background: var(--card);
             border-radius: 24px;
-            padding: 15px;
+            padding: 25px;
             box-shadow: 0 20px 40px rgba(0,0,0,.25);
             margin-top: 25px;
         }
 
         #length-title {
             text-align: center;
-            margin-top: 5px;
-
+            margin-top: 2px;
+            margin-bottom: 20px;
         }
 
         .btn-group {
@@ -107,8 +107,8 @@
 
         /* --- FIX TOTALE BANDIERE --- */
         /* Usiamo gli ID per vincere su qualsiasi altra regola */
-        #lang-it, #lang-en {
-            height: 200px;
+        #lang-it, #lang-en, #lang-fr, #lang-es {
+            height: 160px;
             background-size: cover;
             background-position: center;
             border-radius: 16px;
@@ -120,15 +120,15 @@
         }
 
         /* Stato Hover/Active delle bandiere: SOLO LUCE, NO MOVIMENTO */
-        #lang-it:hover, #lang-en:hover,
-        #lang-it:active, #lang-en:active {
+        #lang-it:hover, #lang-en:hover, #lang-fr:hover, #lang-es:hover,
+        #lang-it:active, #lang-en:active, #lang-fr:active, #lang-es:active {
             transform: none !important; /* Sicurezza doppia */
             box-shadow: 0 0 20px rgba(255,255,255,0.6) !important;
             filter: brightness(1.1);
             border-color: white;
         }
 
-        #lang-it.active, #lang-en.active {
+        #lang-it.active, #lang-en.active, #lang-fr.active, #lang-es.active {
             border-color: #ffd93d; /* Bordo dorato quando attivo */
             box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.5) !important;
             filter: brightness(1.0);
@@ -136,6 +136,8 @@
 
         #lang-it { background-image: url("https://flagcdn.com/w320/it.png"); }
         #lang-en { background-image: url("https://flagcdn.com/w320/gb.png"); }
+        #lang-fr { background-image: url("https://flagcdn.com/w320/fr.png"); }
+        #lang-es { background-image: url("https://flagcdn.com/w320/es.png"); }
 
         /* --- NUOVI STILI BOTTONI LUNGHEZZA --- */
 
@@ -206,9 +208,12 @@
 
         /* --- PLAY BUTTON --- */
         #play-btn {
+            flex: none;
             margin: 30px auto 0;
             margin-bottom: 18px;
             padding: 18px 50px;
+            height: 80px;
+            line-height: 20px;
             width: auto;
             font-size: 1.6rem;
             background: linear-gradient(135deg, #FFD93D, #ff6b6b);
@@ -390,25 +395,48 @@
 
         /* --- MOBILE --- */
         @media (max-width: 600px) {
-            #lang-it, #lang-en {
-            height: 100px;
+            h1 {
+                margin-top: 20px;
+                margin-bottom: 15px;
+            }
+            /* 1. MODIFICA CONTENITORE: Permette ai bottoni di andare a capo */
+            .btn-group:not(.length-group) {
+                flex-wrap: wrap;
+            }
+
+            /* 2. MODIFICA BANDIERE: 2 per riga */
+            #lang-it, #lang-en, #lang-fr, #lang-es {
+                height: 100px;
+                /* flex-grow: 1, flex-shrink: 1, flex-basis: 40% */
+                /* Il 40% forza il browser a metterne solo 2 per riga (perché 40+40+gap < 100, ma 40+40+40 sforerebbe) */
+                flex: 1 1 40%; 
             }
             /* 1. Riduzione spazio sopra "Scegli la lunghezza" */
             .lang-section {
-                margin-top: 20px; /* Ridotto da 20px */
-                padding: 15px;    /* Leggermente più compatto */
+                margin-top: 15px; /* Ridotto da 20px */
+                padding: 10px;    /* Leggermente più compatto */
+            }
+
+            #length-title {
+                margin-bottom: 15px;
             }
 
             /* 2. Pulsanti lunghezza uno sotto l'altro */
             .length-group {
                 flex-direction: column; /* Stack verticale */
-                gap: 15px;              /* Spazio tra i pulsanti */
+                gap: 7px;              /* Spazio tra i pulsanti */
                 padding-right: 0;       /* Reset padding extra */
             }
 
             .len-btn {
-                height: 65px; /* Altezza ridotta per mobile */
+                flex: none;
+                height: 60px; /* Altezza ridotta per mobile */
                 width: 100%;  /* Prendono tutta la larghezza disponibile */
+            }
+
+            .btn-group {
+                gap: 8px;
+                margin-top: 8px;
             }
 
             /* Sistemazione badge per la versione verticale */
@@ -418,7 +446,10 @@
 
             /* 3. Riduzione pulsante GIOCA */
             #play-btn {
-                margin-top: 25px;    /* Ridotto da 40px */
+                flex: none;
+                margin-top: 15px;    /* Ridotto da 40px */
+                height: 60px;
+                line-height: 30px;
                 padding: 12px 40px;  /* Più basso e meno largo */
                 font-size: 1.3rem;   /* Testo leggermente più piccolo */
             }
@@ -467,11 +498,13 @@
         <div class="btn-group">
             <button id="lang-it" class="lang-btn active" onclick="setLanguage('it')"></button>
             <button id="lang-en" class="lang-btn" onclick="setLanguage('en')"></button>
+            <button id="lang-fr" class="lang-btn" onclick="setLanguage('fr')"></button>
+            <button id="lang-es" class="lang-btn" onclick="setLanguage('es')"></button>
         </div>
 
         <!-- Lunghezza parole -->
         <div class="lang-section">
-            <h2 id="length-title">Scegli la lunghezza</h2>
+            <h2 id="length-title">Scegli la difficoltà</h2>
             <div class="btn-group length-group">
                 <button class="len-btn active" onclick="setLength(5)">
                     <span class="num-large">5</span> 
@@ -524,25 +557,40 @@
             // Toggle classi attive bandiere
             document.getElementById('lang-it').classList.toggle('active', lang === 'it');
             document.getElementById('lang-en').classList.toggle('active', lang === 'en');
-
-            // Aggiorna titolo
-            document.getElementById('length-title').innerText =
-                lang === 'it' ? 'Scegli la lunghezza' : 'Choose word length';
-
-            // Aggiorna testo pulsanti (Lettere vs Letters)
-            const labelText = lang === 'it' ? 'Lettere' : 'Letters';
-            document.querySelectorAll('.text-label').forEach(el => el.innerText = labelText);
-
-            // Aggiorna testo pulsante GIOCA
-            document.getElementById('play-btn').innerText =
-                lang === 'it' ? 'GIOCA' : 'PLAY';
-
+            document.getElementById('lang-fr').classList.toggle('active', lang === 'fr');
+            document.getElementById('lang-es').classList.toggle('active', lang === 'es');
+            
             const bgFlag = document.getElementById('keyboard-bg-flag');
             if (lang === 'it') {
                 bgFlag.style.backgroundImage = 'url("https://flagcdn.com/w1280/it.png")';
-            } else {
+                difficulty = 'Scegli la difficoltà';
+                labelText = 'Lettere';
+                playButton = 'Gioca';
+            } else if (lang === 'en') {
                 bgFlag.style.backgroundImage = 'url("https://flagcdn.com/w1280/gb.png")';
+                difficulty = 'Choose the difficulty';
+                labelText = 'Letters';
+                playButton = 'Play';
+            } else if (lang === 'fr') {
+                bgFlag.style.backgroundImage = 'url("https://flagcdn.com/w1280/fr.png")';
+                difficulty = 'Choisis la difficulté';
+                labelText = 'Lettres';
+                playButton = 'Jouer';
+            } else if (lang === 'es') {
+                bgFlag.style.backgroundImage = 'url("https://flagcdn.com/w1280/es.png")';
+                difficulty = 'Elige la dificultad';
+                labelText = 'Letras';
+                playButton = 'Jugar';
             }
+
+            // Aggiorna titolo
+            document.getElementById('length-title').innerText = difficulty;
+
+            // Aggiorna testo pulsanti (Lettere vs Letters)
+            document.querySelectorAll('.text-label').forEach(el => el.innerText = labelText);
+
+            // Aggiorna testo pulsante GIOCA
+            document.getElementById('play-btn').innerText = playButton;
 
             // Ricalcola le statistiche (i badge)
             updateHomeStats();
@@ -820,13 +868,23 @@
         const TEXT = {
             it: {
                 win: "🎉 HAI VINTO!",
-                lose: "😭 ERA ",
+                lose: "😭 LA PAROLA ERA ",
                 notInList: "❌ Parola non in elenco"
             },
             en: {
                 win: "🎉 YOU WON!",
-                lose: "😭 IT WAS ",
+                lose: "😭 THE WORD WAS ",
                 notInList: "❌ Word not in list"
+            },
+            fr: {
+                win: "🎉 VOUS AVEZ GAGNÉ!",
+                lose: "😭 LE MOT ÉTAIT ",
+                notInList: "❌ Mot absent de la liste"
+            },
+            es: {
+                win: "🎉 ¡GANASTE!",
+                lose: "😭 LA PALABRA ERA ",
+                notInList: "❌ Palabra no en la lista"
             }
         };
 
@@ -901,5 +959,3 @@
 
 </body>
 </html>
-
-
