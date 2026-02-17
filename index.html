@@ -950,7 +950,15 @@
         };
 
         if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.register('./sw.js');
+            // 1. Registra il Service Worker
+            navigator.serviceWorker.register('./sw.js');
+
+            // 2. Ascolta quando un nuovo Service Worker prende il comando
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                // Questo scatta solo quando il nuovo sw.js è attivo e pronto
+                // Facciamo un refresh per mostrare le modifiche (es. nuovo index.html)
+                window.location.reload();
+            });
         }
     </script>
     <div id="end-popup" style="display:none">
@@ -959,3 +967,4 @@
 
 </body>
 </html>
+
