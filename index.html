@@ -773,7 +773,20 @@
         }
 
         function initKeyboard() {
-            const layout = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
+            // 1. Definiamo il layout base
+            let row1 = "QWERTYUIOP";
+            let row2 = "ASDFGHJKL";
+            let row3 = "ZXCVBNM";
+
+            // 2. Aggiungiamo il carattere speciale alla seconda riga in base alla lingua
+            // Assumo che currentLang sia 'es' per spagnolo e 'fr' per francese
+            if (currentLang === 'es') {
+                row2 += "Ñ";
+            } else if (currentLang === 'fr') {
+                row2 += "Ç";
+            }
+
+            const layout = [row1, row2, row3];
             const kb = document.getElementById('keyboard');
             kb.innerHTML = '';
 
@@ -784,7 +797,7 @@
                 // Terza riga: aggiungi tasto ENTER a sinistra
                 if(i === 2) { 
                     const btn = document.createElement('div');
-                    btn.className = 'key key-big'; // Classe speciale per larghezza
+                    btn.className = 'key key-big';
                     btn.innerText = 'ENTER';
                     btn.onclick = submitWord;
                     row.appendChild(btn);
@@ -792,8 +805,9 @@
 
                 rowStr.split('').forEach(char => {
                     const btn = document.createElement('div');
-                    btn.className = 'key'; // Classe standard (larghezza fissa)
+                    btn.className = 'key'; 
                     btn.innerText = char;
+                    // Usiamo il carattere originale per l'ID (gestisce correttamente ñ e ç)
                     btn.id = `key-${char.toLowerCase()}`;
                     btn.onclick = () => handleInput(char.toLowerCase());
                     row.appendChild(btn);
@@ -802,7 +816,7 @@
                 // Terza riga: aggiungi tasto DELETE a destra
                 if(i === 2) { 
                     const btn = document.createElement('div');
-                    btn.className = 'key key-big'; // Classe speciale per larghezza
+                    btn.className = 'key key-big';
                     btn.innerText = '⌫';
                     btn.onclick = () => handleInput('backspace');
                     row.appendChild(btn);
@@ -943,13 +957,13 @@
             fr: {
                 win: "🎉 VOUS AVEZ GAGNÉ!",
                 lose: "😭 LE MOT ÉTAIT ",
-                notInList: "❌ Mot absent de la liste",
+                notInList: "❌ Ce mot n'est pas dans la liste",
                 dataError: "⚠️ Erreur : Données non trouvées nel file words_data.js"
             },
             es: {
-                win: "🎉 ¡GANASTE!",
+                win: "🎉 ¡HAS GANADO!",
                 lose: "😭 LA PALABRA ERA ",
-                notInList: "❌ Palabra no en la lista",
+                notInList: "❌ Esta palabra no está en la lista",
                 dataError: "⚠️ Error: Datos no encontrados en words_data.js"
             }
         };
@@ -1025,7 +1039,7 @@
 
             });
         }
-        
+
     </script>
     <div id="end-popup" style="display:none">
         <div id="popup-content"></div>
@@ -1033,5 +1047,3 @@
 
 </body>
 </html>
-
-
