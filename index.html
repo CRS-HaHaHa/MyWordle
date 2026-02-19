@@ -224,6 +224,28 @@
             box-shadow: 0 10px 25px rgba(255,107,107,0.4);
         }
 
+        .github-link {
+            position: absolute;
+            bottom: 15px;
+            right: 20px;
+            font-size: 0.8rem;
+            color: white;
+            text-decoration: none;
+            opacity: 0.6;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        .github-link:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        /* Nascondilo quando il gioco è attivo per non distrarre */
+        #game-screen ~ .github-link {
+            display: none;
+        }
+
         /* --- SCHERMATA GIOCO --- */
         #game-screen {
             display: none;
@@ -551,6 +573,9 @@
         </div>
 
         <button id="play-btn" onclick="startGame()">GIOCA</button>
+        <a href="https://github.com/crs-hahaha/MyWordle" target="_blank" class="github-link">
+        GitHub
+    </a>
     </div>
 
     <div id="game-screen">
@@ -833,7 +858,7 @@
                     tile.innerText = '';
                     tile.classList.remove('preview-green', 'preview-gray'); // Rimuove ogni colore di anteprima quando cancelli
                 }
-            } else if (/^[a-z]$/.test(key)) {
+            } else if (/^[a-zñç]$/.test(key)) {
                 if (currentCol < currentLen) {
                     const tile = document.getElementById(`tile-${currentRow}-${currentCol}`);
                     tile.innerText = key.toUpperCase();
