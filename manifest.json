@@ -8,14 +8,15 @@
   "theme_color": "#667eea",
   "icons": [
     {
-      "src": "https://raw.githubusercontent.com/CRS-HaHaHa/MyWordle/refs/heads/main/MyWordle.png",
+      "src": "https://crs-hahaha.github.io/MyWordle/MyWordle.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://raw.githubusercontent.com/CRS-HaHaHa/MyWordle/refs/heads/main/MyWordle.png",
+      "src": "https://crs-hahaha.github.io/MyWordle/MyWordle.png",
       "sizes": "512x512",
       "type": "image/png"
     }
   ]
 }
+
