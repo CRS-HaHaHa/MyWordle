@@ -12,6 +12,10 @@ Il progetto offre una sfida dinamica adattabile a diversi livelli di competenza 
     * Gestione nativa di caratteri speciali: **Ñ** per lo spagnolo e **Ç** per il francese.
     * Normalizzazione automatica degli accenti (es: *perché* diventa *perche*) per garantire una giocabilità fluida.
 * **📏 Difficoltà Variabile:** Possibilità di sfidarsi con parole di **5, 6 o 7 lettere**.
+* **💡 Sistema di Aiuti:** Guadagna un aiuto 💡 ogni 5 vittorie totali (indipendentemente da lingua/lunghezza).
+    * Usa l'aiuto per rivelare una lettera mancante nella sua posizione corretta.
+* **✨ Feedback Visivo Dinamico:**  Sistema di "**Velo Predittivo**": mentre digiti, le caselle si colorano di un velo tenue (verde o grigio) se stai inserendo lettere di cui conosci già l'esito dalle righe precedenti.
+    * Previene errori banali segnalando in tempo reale se una lettera è già stata dichiarata assente o se è nella posizione errata.
 * **📚 Dizionari Curati:** Le liste di parole sono state generate partendo dai corpora dell'Università di Lipsia, filtrando i termini per frequenza d'uso e ripulendo i dati da simboli e nomi propri.
     * **Soluzioni:** Prime 3.000 parole più comuni per categoria.
     * **Dizionario:** Migliaia di parole accettate per ogni lingua.
@@ -30,6 +34,7 @@ Il progetto offre una sfida dinamica adattabile a diversi livelli di competenza 
     * **🟩 Verde:** Lettera corretta nella posizione corretta.
     * **🟨 Giallo:** Lettera presente nella parola ma in una posizione diversa.
     * **⬜ Grigio:** Lettera non presente nella parola.
+4.  **Bonus:** Ogni 5 vittorie riceverai un aiuto 💡. Cliccala durante una partita difficile per scoprire una lettera!
 
 ---
 
