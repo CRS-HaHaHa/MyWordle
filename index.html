@@ -469,6 +469,31 @@
                 margin-top: 30px;
                 margin-bottom: 30px;
             }
+
+            @media (max-height: 760px) {
+                #home-screen {
+                    padding-top: 10px;
+                }
+                h1 {
+                    margin-top: 20px;
+                    margin-bottom: 20px;
+                }
+            }
+
+            @media (max-height: 710px) {
+                #home-screen {
+                    padding-top: 5px; /* Ancora meno padding se lo schermo è corto */
+                }
+                h1 {
+                    font-size: 2rem;   /* Rimpiccioliamo il font */
+                    margin-top: 15px;
+                    margin-bottom: 15px;
+                }
+                .language-selector {
+                    margin-bottom: 10px;
+                }
+            }
+
             /* 1. MODIFICA CONTENITORE: Permette ai bottoni di andare a capo */
             .btn-group:not(.length-group) {
                 flex-wrap: wrap;
@@ -523,6 +548,17 @@
                 line-height: 30px;
                 padding: 12px 40px;  /* Più basso e meno largo */
                 font-size: 1.3rem;   /* Testo leggermente più piccolo */
+            }
+
+            #back-btn {
+                top: 14px;
+            }
+
+            #hint-btn {
+                position: absolute;
+                left: 75px;
+                right: auto;
+                top: 16px; /* Sotto le statistiche */
             }
 
             /* Altri aggiustamenti griglia/tastiera (già presenti nel tuo codice) */
@@ -1206,4 +1242,3 @@
 
 </body>
 </html>
-
