@@ -288,6 +288,27 @@
             padding: 0;
         }
 
+        #hint-btn {
+            position: absolute;
+            right: 17px;
+            top: 70px; /* Sotto le statistiche */
+            background: white;
+            border: 2px solid #FFD93D;
+            border-radius: 999px;
+            padding: 6px 12px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 4px 10px rgba(0,0,0,.15);
+            cursor: pointer;
+            z-index: 10;
+        }
+        #hint-btn:active {
+            transform: translateY(2px);
+        }
+
         /* GRIGLIA */
         .grid {
             display: flex;
@@ -581,6 +602,8 @@
     <div id="game-screen">
         <button id="back-btn" onclick="goHome()">&#x1F3E0</button>
         
+        <button id="hint-btn" onclick="useHint()">💡 <span id="hint-count">0</span></button>
+        
         <div id="stats-display">🔥 0  🏆 0</div>
 
         <div class="grid" id="grid"></div>
@@ -683,6 +706,14 @@
             document.getElementById('stats-display').innerText = `🔥 ${currentStreak}  🏆 ${currentBest}`;
         }
 
+        function updateHintUI() {
+            let hints = parseInt(localStorage.getItem('mywordle_hints')) || 0;
+            const hintCountEl = document.getElementById('hint-count');
+            if (hintCountEl) {
+                hintCountEl.innerText = hints;
+            }
+        }
+
         function selectConfig(lang, len, btn) {
             currentLang = lang;
             currentLen = len;
@@ -714,6 +745,7 @@
             
             // Scegliamo la parola target
             targetWord = solutions[Math.floor(Math.random() * solutions.length)].toLowerCase();
+            // console.log("Parola target:", targetWord); // Per debug, rimuovi in produzione
             
             // Reset interfaccia e avvio
             document.getElementById('home-screen').style.display = 'none';
@@ -928,19 +960,31 @@
             // Aggiorna conoscenza
             statuses.forEach((s, i) => {
                 const char = guess[i];
+                const tile = document.getElementById(`tile-${currentRow}-${i}`);
+                
+                // Rimuoviamo sempre le classi preview a fine riga
+                tile.classList.remove('preview-green', 'preview-gray', 'preview-wrong-pos');
+
                 if (s === 'green') {
                     knownLetters[i] = char;
+                    // Se prima pensavamo fosse assente, ora sappiamo che c'è
+                    absentLetters.delete(char); 
                 } else if (s === 'yellow') {
-                    // Se è gialla, aggiungiamo l'indice corrente a quelli "vietati" per questa lettera
                     if (!wrongPositions[char]) wrongPositions[char] = [];
                     if (!wrongPositions[char].includes(i)) {
                         wrongPositions[char].push(i);
                     }
+                    // Se prima pensavamo fosse assente, ora sappiamo che c'è
+                    absentLetters.delete(char);
                 } else if (s === 'gray') {
-                    absentLetters.add(char);
+                    // AGGIUNGIAMO AL GRIGIO SOLO SE:
+                    // 1. Non l'abbiamo già trovata in una posizione verde
+                    // 2. Non l'abbiamo già trovata come gialla
+                    const isEverywhereAbsent = !knownLetters.includes(char) && !wrongPositions[char];
+                    if (isEverywhereAbsent) {
+                        absentLetters.add(char);
+                    }
                 }
-                const tile = document.getElementById(`tile-${currentRow}-${i}`);
-                tile.classList.remove('preview-green', 'preview-gray'); // Pulisce il velo
             });
 
             // Applica colori
@@ -955,8 +999,8 @@
             });
 
             if (guess === targetWord) {
-                updateStreak(true);
-                showEndPopup(true);
+                const gotHint = updateStreak(true); // Salviamo se ha ottenuto l'aiuto
+                showEndPopup(true, gotHint);        // Passiamo l'informazione al popup
             } else if (currentRow === currentLen) {
                 updateStreak(false);
                 showEndPopup(false);
@@ -966,30 +1010,94 @@
             }
         }
 
+        function useHint() {
+            document.getElementById('hint-btn').blur();
+
+            let hints = parseInt(localStorage.getItem('mywordle_hints')) || 0;
+            
+            if (hints <= 0) {
+                showPopup(TEXT[currentLang].noHints);
+                return;
+            }
+
+            let availableIndices = [];
+            for (let i = 0; i < currentLen; i++) {
+                if (!knownLetters[i]) {
+                    availableIndices.push(i);
+                }
+            }
+
+            if (availableIndices.length === 0) {
+                showPopup(TEXT[currentLang].allKnown);
+                return;
+            }
+
+            let randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+            let letter = targetWord[randomIndex];
+
+            // Aggiorniamo la memoria per il "velo"
+            knownLetters[randomIndex] = letter;
+            absentLetters.delete(letter); 
+
+            // Scaliamo l'aiuto
+            hints--;
+            localStorage.setItem('mywordle_hints', hints);
+            updateHintUI();
+
+            // Prepariamo la frase prendendola dal dizionario e sostituendo i valori
+            let msg = TEXT[currentLang].hintRevealed
+                        .replace('{N}', randomIndex + 1)
+                        .replace('{L}', letter.toUpperCase());
+            
+            showPopup(msg);
+            
+            // Coloriamo la tastiera per aiuto visivo
+            const key = document.getElementById(`key-${letter}`);
+            if (key && key.style.backgroundColor !== 'var(--green)') {
+                key.style.backgroundColor = 'var(--yellow)'; 
+            }
+        }
+
         const TEXT = {
             it: {
                 win: "🎉 HAI VINTO!",
                 lose: "😭 LA PAROLA ERA ",
                 notInList: "❌ Parola non in elenco",
-                dataError: "⚠️ Errore: Dati non trovati nel file words_data.js"
+                dataError: "⚠️ Errore: Dati non trovati nel file words_data.js",
+                hintEarned: "\n\n🎁 +1 Aiuto 💡", // Va a capo sotto HAI VINTO
+                noHints: "❌ Zero aiuti!\nVinci per ottenerli",
+                allKnown: "😎 Sai già tutto!",
+                hintRevealed: "💡 Lettera {N}: {L}" // Es: Lettera 3: R
             },
             en: {
                 win: "🎉 YOU WON!",
                 lose: "😭 THE WORD WAS ",
                 notInList: "❌ Word not in list",
-                dataError: "⚠️ Error: Data not found in words_data.js"
+                dataError: "⚠️ Error: Data not found in words_data.js",
+                hintEarned: "\n\n🎁 +1 Hint 💡",
+                noHints: "❌ No hints!\nWin to get them",
+                allKnown: "😎 You know everything!",
+                hintRevealed: "💡 Letter {N}: {L}"
             },
             fr: {
                 win: "🎉 VOUS AVEZ GAGNÉ!",
                 lose: "😭 LE MOT ÉTAIT ",
                 notInList: "❌ Ce mot n'est pas dans la liste",
-                dataError: "⚠️ Erreur : Données non trouvées nel file words_data.js"
+                dataError: "⚠️ Erreur : Données non trouvées",
+                hintEarned: "\n\n🎁 +1 Indice 💡",
+                noHints: "❌ Zéro indice!\nGagnez pour en obtenir",
+                allKnown: "😎 Tu sais déjà tout!",
+                hintRevealed: "💡 Lettre {N}: {L}"
             },
             es: {
                 win: "🎉 ¡HAS GANADO!",
                 lose: "😭 LA PALABRA ERA ",
-                notInList: "❌ Esta palabra no está en la lista",
-                dataError: "⚠️ Error: Datos no encontrados en words_data.js"
+                notInList: "❌ Palabra no en la lista",
+                dataError: "⚠️ Error: Datos no encontrados",
+                hintEarned: "\n\n🎁 +1 Pista 💡",
+                noHints: "❌ ¡Cero pistas!\nGana para obtenerlas",
+                allKnown: "😎 ¡Ya lo sabes todo!",
+                hintRevealed: "💡 Letra {N}: {L}"
             }
         };
 
@@ -1003,13 +1111,17 @@
             setTimeout(() => popup.style.display = 'none', 1800);
         }
 
-        function showEndPopup(win) {
-            const msg = win
+        function showEndPopup(win, gotHint = false) {
+            let msg = win
                 ? TEXT[currentLang].win
                 : TEXT[currentLang].lose + targetWord.toUpperCase();
 
-            showPopup(msg);
+            // Se ha vinto l'aiuto, aggiungiamo la frase sotto "HAI VINTO"
+            if (gotHint) {
+                msg += TEXT[currentLang].hintEarned;
+            }
 
+            showPopup(msg);
             setTimeout(startGame, 2200);
         }
 
@@ -1019,16 +1131,33 @@
 
             let streak = parseInt(localStorage.getItem(streakKey)) || 0;
             let best = parseInt(localStorage.getItem(bestKey)) || 0;
+            let earnedHint = false; // Variabile per tracciare se abbiamo vinto l'aiuto
 
             if (win) {
                 streak++;
                 if (streak > best) best = streak;
+
+                // CONTATORE GLOBALE DELLE VITTORIE (vale per sempre e per tutte le lingue)
+                let totalWins = parseInt(localStorage.getItem('mywordle_global_wins')) || 0;
+                totalWins++;
+                localStorage.setItem('mywordle_global_wins', totalWins);
+
+                // Ogni 5 vittorie regaliamo l'aiuto
+                if (totalWins % 5 === 0) {
+                    let hints = parseInt(localStorage.getItem('mywordle_hints')) || 0;
+                    hints++;
+                    localStorage.setItem('mywordle_hints', hints);
+                    updateHintUI();
+                    earnedHint = true; // Segnaliamo che abbiamo vinto!
+                }
             } else {
                 streak = 0;
             }
 
             localStorage.setItem(streakKey, streak);
             localStorage.setItem(bestKey, best);
+            
+            return earnedHint; // Restituiamo il risultato
         }
 
         function goHome() {
@@ -1052,6 +1181,7 @@
             // Inizializza i record basandosi sulla lingua e lunghezza predefinite
             setLanguage(currentLang);
             updateHomeStats();
+            updateHintUI();
         };
 
         if ('serviceWorker' in navigator) {
@@ -1072,4 +1202,3 @@
 
 </body>
 </html>
-
