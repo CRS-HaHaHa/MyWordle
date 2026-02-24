@@ -1,4 +1,4 @@
-const VERSION = 'v1.0.7';
+const VERSION = 'v1.0.8';
 const CACHE_NAME = `MyWordle-cache-${VERSION}`;
 
 const ASSETS = [
@@ -47,6 +47,7 @@ self.addEventListener('fetch', (e) => {
     caches.match(e.request).then(res => res || fetch(e.request))
   );
 });
+
 
 
 
