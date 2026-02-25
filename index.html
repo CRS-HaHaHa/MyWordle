@@ -10,12 +10,11 @@
     <link rel="apple-touch-icon" href="https://crs-hahaha.github.io/MyWordle/MyWordle.png">
     <meta property="og:title" content="MyWordle - Sfida Multilingua">
     <meta property="og:description" content="Gioca a Wordle in 4 lingue con parole da 5, 6 o 7 lettere. Gratuito e senza pubblicità!">
-    <meta property="og:image" content="https://crs-hahaha.github.io/MyWordle/MyWordle.png">
-    <meta property="og:image:type" content="image/png" />
-    <meta property="og:image:width" content="600">
-    <meta property="og:image:height" content="600">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://crs-hahaha.github.io/MyWordle/">
+    <meta property="og:image" content="https://crs-hahaha.github.io/MyWordle/MyWordle_thumbnail.jpg">
+    <meta property="og:image:type" content="image/jpg" />
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:url" content="https://crs-hahaha.github.io/MyWordle/?play">
     <script src="words_data.js"></script>
     <link rel="manifest" href="manifest.json">
     <title>MyWordle</title>
@@ -416,6 +415,8 @@
             font-size: 1.8rem;
             font-weight: 900;
             text-align: center;
+            white-space: pre-wrap; /* Rispetta gli "invio" \n presenti nelle stringhe TEXT */
+            line-height: 1.4;
         }
 
         /* --- BANDIERA SFONDO TASTIERA --- */
@@ -1060,7 +1061,19 @@
             let hints = parseInt(localStorage.getItem('mywordle_hints')) || 0;
             
             if (hints <= 0) {
-                showPopup(TEXT[currentLang].noHints);
+                // Recuperiamo le vittorie totali
+                let totalWins = parseInt(localStorage.getItem('mywordle_global_wins')) || 0;
+                
+                // Calcoliamo quante mancano al prossimo multiplo di 5
+                // Se totalWins è 1, mancano 4 (5 - 1)
+                // Se totalWins è 4, manca 1 (5 - 4)
+                // Se totalWins è 5, il modulo è 0, quindi mancano 5 per il prossimo
+                let missing = 5 - (totalWins % 5);
+                
+                // Prendiamo il testo e sostituiamo {N} con il numero calcolato
+                let msg = TEXT[currentLang].noHints.replace('{N}', missing);
+                
+                showPopup(msg);
                 return;
             }
 
@@ -1109,7 +1122,7 @@
                 notInList: "❌ Parola non in elenco",
                 dataError: "⚠️ Errore: Dati non trovati nel file words_data.js",
                 hintEarned: "\n\n🎁 +1 Aiuto 💡", // Va a capo sotto HAI VINTO
-                noHints: "❌ Zero aiuti!\nVinci per ottenerli",
+                noHints: "❌ Zero aiuti!\nVinci altre {N} partite per ottenerne uno",
                 allKnown: "😎 Sai già tutto!",
                 hintRevealed: "💡 Lettera {N}: {L}" // Es: Lettera 3: R
             },
@@ -1119,7 +1132,7 @@
                 notInList: "❌ Word not in list",
                 dataError: "⚠️ Error: Data not found in words_data.js",
                 hintEarned: "\n\n🎁 +1 Hint 💡",
-                noHints: "❌ No hints!\nWin to get them",
+                noHints: "❌ No hints!\nWin {N} more games to get one",
                 allKnown: "😎 You know everything!",
                 hintRevealed: "💡 Letter {N}: {L}"
             },
@@ -1129,7 +1142,7 @@
                 notInList: "❌ Ce mot n'est pas dans la liste",
                 dataError: "⚠️ Erreur : Données non trouvées",
                 hintEarned: "\n\n🎁 +1 Indice 💡",
-                noHints: "❌ Zéro indice!\nGagnez pour en obtenir",
+                noHints: "❌ Zéro indice!\nGagne encore {N} parties per ne obtenir un",
                 allKnown: "😎 Tu sais déjà tout!",
                 hintRevealed: "💡 Lettre {N}: {L}"
             },
@@ -1139,7 +1152,7 @@
                 notInList: "❌ Palabra no en la lista",
                 dataError: "⚠️ Error: Datos no encontrados",
                 hintEarned: "\n\n🎁 +1 Pista 💡",
-                noHints: "❌ ¡Cero pistas!\nGana para obtenerlas",
+                noHints: "❌ ¡Cero pistas!\nGana {N} partidas más para obtener una",
                 allKnown: "😎 ¡Ya lo sabes todo!",
                 hintRevealed: "💡 Letra {N}: {L}"
             }
@@ -1152,7 +1165,7 @@
             content.innerText = message;
             popup.style.display = 'flex';
 
-            setTimeout(() => popup.style.display = 'none', 1800);
+            setTimeout(() => popup.style.display = 'none', 2000);
         }
 
         function showEndPopup(win, gotHint = false) {
@@ -1246,5 +1259,3 @@
 
 </body>
 </html>
-
-
