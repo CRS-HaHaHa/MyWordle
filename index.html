@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#667eea">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="MyWordle">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="apple-touch-icon" href="https://crs-hahaha.github.io/MyWordle/MyWordle.png">
     <meta property="og:title" content="MyWordle - Sfida Multilingua">
     <meta property="og:description" content="Gioca a Wordle in 4 lingue con parole da 5, 6 o 7 lettere. Gratuito e senza pubblicità!">
@@ -65,6 +66,22 @@
             text-shadow: 0 6px 20px rgba(0,0,0,.25);
         }
 
+        #mute-btn {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            height: 10px;
+            width: 10px;
+            font-size: 1.8rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         /* Card contenitori */
         .lang-section {
             background: var(--card);
@@ -99,6 +116,12 @@
             font-weight: 700;
             /* Solo qui mettiamo la transizione di movimento */
             transition: transform .15s, box-shadow .15s, background .15s;
+            
+            /* 1. Toglie il rettangolo blu di selezione al tocco su Mobile */
+            -webkit-tap-highlight-color: transparent;
+
+            /* 2. Toglie il bordo azzurro di "focus" (quello che rimane dopo il click) */
+            outline: none;
         }
 
         /* Effetto movimento SOLO per i bottoni normali */
@@ -164,7 +187,8 @@
             justify-content: center;
             height: 80px; /* Più alti per contenere il testo */
             background: #f3f4f6;
-            border: 2px solid transparent;
+            border: 2px solid;
+            border-color: #bdc3c7;
         }
 
         .len-btn.active {
@@ -225,10 +249,22 @@
             width: auto;
             font-size: 1.6rem;
             background: linear-gradient(135deg, #FFD93D, #ff6b6b);
+            /* 1. Impedisce al gradiente di ripetersi se avanzano pixel ai bordi */
+            background-repeat: no-repeat;
+            /* 2. Assicura che il gradiente parta dal limite del bordo e non dal padding */
+            background-origin: border-box;
+            /* 3. Evita che il colore "sbordi" sotto il bordo trasparente in modo strano */
+            /* background-clip: padding-box, border-box; */
             color: white;
             border-radius: 50px;
             border: 4px solid rgba(255,255,255,0.3);
             box-shadow: 0 10px 25px rgba(255,107,107,0.4);
+        }
+
+        #play-btn:active {
+            transform: scale(0.96) translateY(2px);
+            box-shadow: 0 4px 10px rgba(255,107,107,0.2);
+            filter: brightness(0.9);
         }
 
         .github-link {
@@ -343,7 +379,14 @@
             font-weight: 800;
             box-shadow: 0 4px 10px rgba(0,0,0,.15);
             text-transform: uppercase;
-            border: 2px solid transparent;
+            border: 2px solid #d1d5db;
+            transition: border-color 0.2s, transform 0.1s;
+        }
+
+        /* Evidenzia il quadratino dove l'utente scriverà la prossima lettera */
+        .tile-active {
+            border-color: var(--bg2) !important;
+            box-shadow: 0 0 8px rgba(102, 126, 234, 0.3);
         }
 
         /* --- TASTIERA A "V" (PIRAMIDE) --- */
@@ -368,39 +411,99 @@
         .key {
             background: white;
             height: 56px;
-            border-radius: 8px;
+            border-radius: 12px; /* Leggermente più arrotondati */
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-weight: 700;
-            box-shadow: 0 4px 0 rgba(0,0,0,.15);
+            font-weight: 800;
             font-size: 1.2rem;
             user-select: none;
             
-            /* TRUCCO PER LARGHEZZA UGUALE */
-            width: 8.5%; /* Percentuale fissa per tutti i tasti */
-            max-width: 50px; /* Limite per non diventare enormi */
-            flex: none; /* Disabilita il riempimento automatico */
+            /* Effetto 3D "Keycap" */
+            box-shadow: 0 5px 0 #bdc3c7; 
+            border: 1px solid rgba(0,0,0,0.05);
+            
+            /* Transizione fluida per colori e trasformazioni */
+            transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: background-color 0.1s ease, transform 0.05s ease;
+            
+            width: 8.5%; 
+            max-width: 50px;
+            flex: none;
+            color: var(--text-dark);
+
+            /* 3. Impedisce la selezione del testo se si preme velocemente */
+            user-select: none;
         }
 
         .key:active {
-            transform: translateY(2px);
-            box-shadow: 0 1px 0 rgba(0,0,0,.15);
+            transform: translateY(4px); /* Si abbassa quasi del tutto */
+            box-shadow: 0 1px 0 #bdc3c7; /* La "profondità" sparisce */
+            background: #e2e8f0 !important; /* Diventa leggermente più scuro */
+            filter: brightness(0.9);
+        }
+        .key:focus, .key:active {
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         /* Tasti speciali (Enter/Back) un po' più larghi */
         .key-big {
             width: 13%; 
             max-width: 80px;
-            font-size: 1rem;
-            background: #f0f0f0;
+            font-size: 0.9rem;
+            background: #d1d5db; /* Colore diverso per distinguerli */
+            box-shadow: 0 5px 0 #a0aec0;
+        }
+
+        .key-big:active {
+            box-shadow: 0 1px 0 #a0aec0;
+        }
+
+        #toast-container {
+            position: fixed;
+            top: 50px; /* Distanza dall'alto */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: none; /* Non blocca i click sul gioco */
+        }
+
+        .toast {
+            background: rgba(33, 37, 41, 0.95);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px; /* Forma a pillola */
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            backdrop-filter: blur(5px);
+            
+            /* Animazione: entra scendendo, sparisce in dissolvenza */
+            animation: slideDownIn 0.3s ease-out forwards, 
+                    fadeOut 0.3s ease-in 2.2s forwards;
+        }
+
+        @keyframes slideDownIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-10px); }
         }
 
         #end-popup {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,.6);
+            background: rgba(0,0,0,0.2);
+            backdrop-filter: blur(15px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -409,7 +512,7 @@
         }
 
         #popup-content {
-            background: white;
+            background: rgba(255, 255, 255, 0.7) !important;
             padding: 30px 40px;
             border-radius: 25px;
             font-size: 1.8rem;
@@ -454,6 +557,116 @@
             color: var(--text-dark);
         }
 
+        /* --- ANIMAZIONI --- */
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 1. Pop quando inserisci una lettera */
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+        .tile-pop { animation: pop 0.1s ease-in-out; }
+
+        /* 2. Scuotimento per parola errata (non in elenco) */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        .row-shake { animation: shake 0.4s ease-in-out; }
+
+        /* 3. Onda di rotazione (Flip) per la verifica */
+        @keyframes flip {
+            0% { transform: rotateX(0); }
+            50% { transform: rotateX(90deg); }
+            100% { transform: rotateX(0); }
+        }
+        .tile-flip { animation: flip 0.5s ease-in-out forwards; }
+
+        /* 4. Salto della vittoria e effetto dorato */
+        @keyframes bounce-gold {
+            0%, 100% { transform: translateY(0); }
+            50% { 
+                transform: translateY(-20px);
+                background-color: #FFD700 !important; /* Oro */
+                border-color: #B8860B !important;
+                box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+            }
+        }
+        .tile-winner { 
+            animation: bounce-gold 0.6s ease-in-out;
+            background-color: #FFD700 !important;
+            color: #1a1a1a !important;
+            border-color: #B8860B !important;
+        }
+
+        @keyframes confetti-fall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        .confetti {
+            position: fixed; width: 10px; height: 10px;
+            top: -10px; z-index: 9999;
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        /* Animazione per l'overlay (lo sfondo scuro/sfocato) */
+        @keyframes fadeInOverlay {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Animazione per il contenuto (il rettangolo bianco) */
+        @keyframes popupEntrance {
+            from { 
+                opacity: 0;
+                transform: scale(0.8) translateY(20px); 
+            }
+            to { 
+                opacity: 1;
+                transform: scale(1) translateY(0); 
+            }
+        }
+
+        /* Applichiamo lo stile Glassmorphism migliorato */
+        .modal-overlay, #end-popup {
+            background: rgba(0, 0, 0, 0.4); /* Sfondo scurito */
+            backdrop-filter: blur(8px); /* Sfocatura */
+            display: none; 
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            animation: fadeInOverlay 0.3s ease-out forwards;
+        }
+
+        .modal-content, #popup-content {
+            background: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            
+            /* Applichiamo l'animazione di entrata */
+            animation: popupEntrance 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
         /* Regolazione per Computer (schermi larghi) */
         @media (min-width: 900px) {
             #keyboard-bg-flag {
@@ -461,6 +674,11 @@
                 height: 220px; /* Poco più alta della tastiera */
                 border-radius: 40px 40px 0 0; /* Arrotondata solo sopra */
                 bottom: 10px; /* Sollevata leggermente dal fondo */
+            }
+            .key:hover {
+                background: #f8f9fa;
+                transform: translateY(-2px);
+                box-shadow: 0 7px 0 #bdc3c7;
             }
         }
 
@@ -602,8 +820,12 @@
     </style>
 </head>
 <body>
+    <audio id="bg-music" loop>
+        <source src="background-music.mp3" type="audio/mpeg">
+    </audio>
 
     <div id="home-screen">
+        <!-- <button id="mute-btn" onclick="toggleMute()">🔇</button> -->
         <h1>MyWordle</h1>
 
         <!-- Toggle lingua -->
@@ -640,8 +862,8 @@
 
         <button id="play-btn" onclick="startGame()">GIOCA</button>
         <a href="https://github.com/crs-hahaha/MyWordle" target="_blank" class="github-link">
-        GitHub
-    </a>
+            GitHub
+        </a>
     </div>
 
     <div id="game-screen">
@@ -670,6 +892,37 @@
         let knownLetters = [];  // Memorizza le lettere corrette nelle posizioni esatte
         let wrongPositions = {}; // Memorizza le lettere presenti nella parola ma nella posizione sbagliata
         let absentLetters = new Set(); // Memorizza le lettere che NON esistono nella parola
+
+        // Gestione Volume e Fade-in
+        const bgMusic = document.getElementById('bg-music');
+        const muteIcon = document.getElementById('mute-btn');
+
+        function playWithFade() {
+            if (bgMusic.paused) {
+                bgMusic.volume = 0; // Parte da zero
+                bgMusic.play().then(() => {
+                    let targetVolume = 0.1; // Volume finale desiderato (30% per non essere invadente)
+                    let fadeInterval = setInterval(() => {
+                        if (bgMusic.volume < targetVolume) {
+                            // Incrementa il volume di 0.05 ogni 100ms
+                            bgMusic.volume = Math.min(targetVolume, bgMusic.volume + 0.001);
+                        } else {
+                            clearInterval(fadeInterval);
+                        }
+                    }, 200);
+                }).catch(e => console.log("Audio in attesa di interazione"));
+            }
+        }
+
+        function toggleMute() {
+            bgMusic.yes = !bgMusic.yes;
+            muteIcon.innerText = bgMusic.yes ? '🔊' : '🔇';
+            if (bgMusic.yes) {
+                playWithFade();
+            } else {
+                bgMusic.pause();
+            }
+        }
 
         function setLanguage(lang) {
             currentLang = lang;
@@ -768,39 +1021,138 @@
         }
 
         function startGame() {
-            // RESET DELLO STATO: Fondamentale per far ricominciare il puntatore da zero
-            currentRow = 0;
-            currentCol = 0;
-            knownLetters = Array(currentLen).fill(null); // Reset conoscenza posizioni
-            wrongPositions = {}; // Reset conoscenza posizioni
-            absentLetters = new Set(); // Reset lettere inesistenti
+            // Reset interfaccia e avvio
+            const gameScreen = document.getElementById('game-screen');
+            document.getElementById('home-screen').style.display = 'none';
+            gameScreen.style.display = 'flex';
+            gameScreen.classList.add('fade-in-up');
+
+            initGrid();
+            initKeyboard();
+
+            const sessionKey = `session_${currentLang}_${currentLen}`;
+            const saved = localStorage.getItem(sessionKey);
 
             // Recuperiamo le liste direttamente dall'oggetto in memoria
             const solKey = `${currentLang}_${currentLen}_sol`;
             const dictKey = `${currentLang}_${currentLen}_dict`;
-            
             // Controlliamo se i dati esistono
             if (!WORD_DATA[solKey] || !WORD_DATA[dictKey]) {
                 alert(TEXT[currentLang].dataError); // Usa la traduzione dinamica
                 return;
             }
-
-            const solutions = WORD_DATA[solKey];
             dictionary = WORD_DATA[dictKey];
-            
-            // Scegliamo la parola target
-            targetWord = solutions[Math.floor(Math.random() * solutions.length)].toLowerCase();
-            // console.log("Parola target:", targetWord); // Per debug, rimuovi in produzione
-            
-            // Reset interfaccia e avvio
-            document.getElementById('home-screen').style.display = 'none';
-            document.getElementById('game-screen').style.display = 'flex';
-            
-            initGrid();
-            initKeyboard();
+
+            if (saved) {
+                const state = JSON.parse(saved);
+                // Ripristiniamo la logica
+                targetWord = state.targetWord;
+                currentRow = state.currentRow;
+                currentCol = 0;
+                knownLetters = state.knownLetters;
+                wrongPositions = state.wrongPositions;
+                absentLetters = new Set(state.absentLetters);
+
+                // Ricostruiamo la griglia visiva e i colori
+                state.guesses.forEach((guess, rIndex) => {
+                    recolorRowFromSaved(guess, rIndex);
+                });
+                updateKeyboardColors(); // Funzione che colora i tasti in base ai risultati
+            } else {
+                // Nessun salvataggio: Nuova partita
+                currentRow = 0;
+                currentCol = 0;
+                
+                const solutions = WORD_DATA[solKey];
+                targetWord = solutions[Math.floor(Math.random() * solutions.length)].toLowerCase();
+                knownLetters = Array(currentLen).fill(null);
+                wrongPositions = {};
+                absentLetters = new Set();
+                saveGameState(); // Creiamo subito il salvataggio iniziale
+            }
+            console.log("Parola target:", targetWord); // Per debug, rimuovi in produzione           
             
             // Carica streak
             updateHomeStats();
+            updateActiveTile();
+        }
+
+        function recolorRowFromSaved(guess, rowIndex) {
+            const statuses = getLetterStatuses(guess, targetWord);
+            statuses.forEach((s, colIndex) => {
+                const tile = document.getElementById(`tile-${rowIndex}-${colIndex}`);
+                tile.innerText = guess[colIndex].toUpperCase();
+                tile.style.backgroundColor = `var(--${s})`;
+                tile.style.borderColor = `var(--${s})`;
+                
+                // Rimuoviamo eventuali classi di preview rimaste
+                tile.classList.remove('preview-green', 'preview-gray', 'preview-wrong-pos');
+            });
+        }
+
+        function updateKeyboardColors() {
+            // 1. Reset iniziale: riportiamo i tasti al colore base (opzionale se già puliti)
+            const keys = document.querySelectorAll('.key');
+            keys.forEach(k => k.style.backgroundColor = '');
+
+            // 2. Recuperiamo tutte le parole scritte finora nella griglia
+            const guesses = getGuessesSoFar();
+
+            guesses.forEach(guess => {
+                const statuses = getLetterStatuses(guess, targetWord);
+                
+                statuses.forEach((s, i) => {
+                    const char = guess[i];
+                    const key = document.getElementById(`key-${char}`);
+                    if (!key) return;
+
+                    const currentColor = key.style.backgroundColor;
+
+                    // Logica di precedenza: Verde > Giallo > Grigio
+                    if (s === 'green') {
+                        key.style.backgroundColor = 'var(--green)';
+                    } else if (s === 'yellow') {
+                        // Diventa giallo solo se non è già verde
+                        if (currentColor !== 'var(--green)') {
+                            key.style.backgroundColor = 'var(--yellow)';
+                        }
+                    } else if (s === 'gray') {
+                        // Diventa grigio solo se non ha già un colore (verde o giallo)
+                        if (!currentColor) {
+                            key.style.backgroundColor = 'gray';
+                        }
+                    }
+                });
+            });
+        }
+
+        function getLetterStatuses(guess, target) {
+            let n = target.length;
+            let statuses = Array(n).fill('gray');
+            let targetArr = target.split('');
+            let guessArr = guess.split('');
+
+            // 1. Primo passaggio: Trova i VERDI (corrispondenza esatta)
+            for (let i = 0; i < n; i++) {
+                if (guessArr[i] === targetArr[i]) {
+                    statuses[i] = 'green';
+                    targetArr[i] = null; // "Consumiamo" la lettera nella soluzione
+                    guessArr[i] = null;  // "Consumiamo" la lettera nel tentativo
+                }
+            }
+
+            // 2. Secondo passaggio: Trova i GIALLI (lettera presente ma posto sbagliato)
+            for (let i = 0; i < n; i++) {
+                if (guessArr[i] !== null) { // Salta quelle già segnate verdi
+                    let indexInTarget = targetArr.indexOf(guessArr[i]);
+                    if (indexInTarget !== -1) {
+                        statuses[i] = 'yellow';
+                        targetArr[indexInTarget] = null; // Consumiamo la lettera
+                    }
+                }
+            }
+
+            return statuses;
         }
 
         function initGrid() {
@@ -940,6 +1292,11 @@
                     const tile = document.getElementById(`tile-${currentRow}-${currentCol}`);
                     tile.innerText = key.toUpperCase();
 
+                    // Rimuove e riaggiunge la classe per resettare l'animazione
+                    tile.classList.remove('tile-pop');
+                    void tile.offsetWidth; // Trucco per resettare l'animazione CSS
+                    tile.classList.add('tile-pop');
+
                     tile.classList.remove('preview-green', 'preview-gray');
 
                     // LOGICA DI COLORAZIONE ANTEPRIMA
@@ -954,6 +1311,22 @@
                     currentCol++;
                 }
             }
+            updateActiveTile();
+        }
+
+        function updateActiveTile() {
+            // Rimuoviamo la classe 'tile-active' da TUTTE le celle della riga corrente
+            for (let i = 0; i < currentLen; i++) {
+                const tile = document.getElementById(`tile-${currentRow}-${i}`);
+                if (tile) tile.classList.remove('tile-active');
+            }
+
+            // Aggiungiamo la classe solo alla cella corrispondente a currentCol
+            // (ma solo se non abbiamo già riempito tutta la riga)
+            if (currentCol < currentLen) {
+                const activeTile = document.getElementById(`tile-${currentRow}-${currentCol}`);
+                if (activeTile) activeTile.classList.add('tile-active');
+            }
         }
 
         function submitWord() {
@@ -963,16 +1336,35 @@
             }
 
             if (guess.length !== currentLen) return;
+
             if (!dictionary.includes(guess)) {
-                showPopup(TEXT[currentLang].notInList);
-                for (let i = 0; i < currentLen; i++) {
-                    if (currentCol > 0) {
-                        currentCol--;
-                        const tile = document.getElementById(`tile-${currentRow}-${currentCol}`);
-                        tile.innerText = '';
-                        tile.classList.remove('preview-green', 'preview-gray');
-                    }
-                }
+                const currentRowEl = document.querySelectorAll('.row')[currentRow];
+                
+                // 1. Inizia lo scuotimento
+                currentRowEl.classList.add('row-shake');
+                showToast(TEXT[currentLang].notInList);
+                
+                // 2. Aspettiamo che finisca lo scuotimento (400ms) prima di cancellare
+                setTimeout(() => {
+                    currentRowEl.classList.remove('row-shake');
+                    
+                    // 3. Cancellazione progressiva (opzionale, o tutto insieme)
+                    let i = currentLen - 1;
+                    const interval = setInterval(() => {
+                        if (i >= 0) {
+                            const tile = document.getElementById(`tile-${currentRow}-${i}`);
+                            tile.innerText = '';
+                            tile.classList.remove('preview-green', 'preview-gray', 'tile-pop');
+                            i--;
+                        } else {
+                            currentCol = 0;
+                            clearInterval(interval);
+                        }
+                    }, 50); // Cancella una lettera ogni 50ms
+                    currentCol = 0; // Reset della posizione al primo quadratino
+                    
+                }, 400);
+
                 return;
             }
 
@@ -982,49 +1374,27 @@
         function checkWord(guess) {
             const rowTiles = [];
             for(let i=0; i<currentLen; i++) rowTiles.push(document.getElementById(`tile-${currentRow}-${i}`));
-            
-            let targetArr = targetWord.split('');
-            let statuses = Array(currentLen).fill('gray');
 
-            // Primo pass: Verdi
-            for(let i=0; i<currentLen; i++) {
-                if(guess[i] === targetArr[i]) {
-                    statuses[i] = 'green';
-                    targetArr[i] = null;
-                }
-            }
+            // USIAMO LA NUOVA FUNZIONE LOGICA
+            const statuses = getLetterStatuses(guess, targetWord);
 
-            // Secondo pass: Gialli
-            for(let i=0; i<currentLen; i++) {
-                if(statuses[i] !== 'green' && targetArr.includes(guess[i])) {
-                    statuses[i] = 'yellow';
-                    targetArr[targetArr.indexOf(guess[i])] = null;
-                }
-            }
-
-            // Aggiorna conoscenza
+            // 1. Aggiorna conoscenza (Memoria per il "velo" predittivo)
             statuses.forEach((s, i) => {
                 const char = guess[i];
-                const tile = document.getElementById(`tile-${currentRow}-${i}`);
+                const tile = rowTiles[i];
                 
-                // Rimuoviamo sempre le classi preview a fine riga
+                // Pulizia classi preview
                 tile.classList.remove('preview-green', 'preview-gray', 'preview-wrong-pos');
 
                 if (s === 'green') {
                     knownLetters[i] = char;
-                    // Se prima pensavamo fosse assente, ora sappiamo che c'è
                     absentLetters.delete(char); 
                 } else if (s === 'yellow') {
                     if (!wrongPositions[char]) wrongPositions[char] = [];
-                    if (!wrongPositions[char].includes(i)) {
-                        wrongPositions[char].push(i);
-                    }
-                    // Se prima pensavamo fosse assente, ora sappiamo che c'è
+                    if (!wrongPositions[char].includes(i)) wrongPositions[char].push(i);
                     absentLetters.delete(char);
                 } else if (s === 'gray') {
-                    // AGGIUNGIAMO AL GRIGIO SOLO SE:
-                    // 1. Non l'abbiamo già trovata in una posizione verde
-                    // 2. Non l'abbiamo già trovata come gialla
+                    // Logica "isEverywhereAbsent" originale
                     const isEverywhereAbsent = !knownLetters.includes(char) && !wrongPositions[char];
                     if (isEverywhereAbsent) {
                         absentLetters.add(char);
@@ -1032,28 +1402,73 @@
                 }
             });
 
-            // Applica colori
+            // 2. Applica colori alla UI (Griglia e Tastiera) - Applichiamo l'effetto onda (Flip)
             statuses.forEach((s, i) => {
-                rowTiles[i].style.backgroundColor = `var(--${s})`;
-                rowTiles[i].style.borderColor = `var(--${s})`;
-                // Update tastiera
-                const key = document.getElementById(`key-${guess[i]}`);
-                if (s === 'green') key.style.backgroundColor = 'var(--green)';
-                else if (s === 'yellow' && key.style.backgroundColor !== 'var(--green)') key.style.backgroundColor = 'var(--yellow)';
-                else if (s === 'gray' && !key.style.backgroundColor) key.style.backgroundColor = 'gray';
+                setTimeout(() => {
+                    rowTiles[i].classList.add('tile-flip');
+                    
+                    // Cambiamo il colore a metà della rotazione (0.25s)
+                    setTimeout(() => {
+                        const char = guess[i];
+                        const tile = rowTiles[i];
+                        tile.style.backgroundColor = `var(--${s})`;
+                        tile.style.borderColor = `var(--${s})`;
+                        tile.style.color = "black"; // Più leggibile sul colore
+
+                        // Aggiorna tastiera
+                        updateSingleKey(char, s);
+                    }, 250);
+                }, i * 100); // 100ms di ritardo tra ogni lettera
             });
 
-            if (guess === targetWord) {
-                const gotHint = updateStreak(true); // Salviamo se ha ottenuto l'aiuto
-                showEndPopup(true, gotHint);        // Passiamo l'informazione al popup
-            } else if (currentRow === currentLen) {
-                updateStreak(false);
-                showEndPopup(false);
-            } else {
-                currentRow++;
-                currentCol = 0;
+            // 3. Logica di fine riga o fine partita
+            setTimeout(() => {
+                if (guess === targetWord) {
+                    // Animazione vittoria
+                    launchConfetti();
+                    rowTiles.forEach((tile, i) => {
+                        setTimeout(() => tile.classList.add('tile-winner'), i * 100);
+                    });
+                    
+                    const gotHint = updateStreak(true);
+                    setTimeout(() => showEndPopup(true, gotHint), 1800);
+                    clearGameState(); // Ricordati di pulire la sessione quando si vince!
+                } else if (currentRow === currentLen) {
+                    updateStreak(false);
+                    showEndPopup(false);
+                    clearGameState(); // E quando si perde!
+                } else {
+                    currentRow++;
+                    currentCol = 0;
+                    saveGameState();
+                    updateActiveTile();
+                }
+            }, currentLen * 100 + 500);
+        }
+
+        function launchConfetti() {
+            for (let i = 0; i < 50; i++) {
+                const c = document.createElement('div');
+                c.className = 'confetti';
+                c.style.left = Math.random() * 100 + "vw";
+                c.style.backgroundColor = ["#667eea", "#764ba2", "#FFD700", "#48bb78"][Math.floor(Math.random()*4)];
+                c.style.animationDelay = Math.random() * 2 + "s";
+                document.body.appendChild(c);
+                setTimeout(() => c.remove(), 5000);
             }
         }
+
+        function updateSingleKey(char, status) {
+            const key = document.getElementById(`key-${char}`);
+            if (!key) return;
+            if (status === 'green') {
+                key.style.backgroundColor = 'var(--green)';
+            } else if (status === 'yellow' && key.style.backgroundColor !== 'var(--green)') {
+                key.style.backgroundColor = 'var(--yellow)';
+            } else if (status === 'gray' && !key.style.backgroundColor) {
+                key.style.backgroundColor = 'gray';
+            }
+        }                
 
         function useHint() {
             document.getElementById('hint-btn').blur();
@@ -1178,6 +1593,7 @@
                 msg += TEXT[currentLang].hintEarned;
             }
 
+            clearGameState(); // Rimuoviamo il salvataggio a fine partita
             showPopup(msg);
             setTimeout(startGame, 2200);
         }
@@ -1224,6 +1640,55 @@
             updateHomeStats();
         }
 
+        // Salva lo stato attuale
+        function saveGameState() {
+            const sessionKey = `session_${currentLang}_${currentLen}`;
+            const state = {
+                targetWord: targetWord,
+                currentRow: currentRow,
+                // Salviamo le parole inserite finora
+                guesses: getGuessesSoFar(), 
+                // Dati per il "velo" e la tastiera
+                knownLetters: knownLetters,
+                wrongPositions: wrongPositions,
+                absentLetters: Array.from(absentLetters) // I Set vanno convertiti in Array per JSON
+            };
+            localStorage.setItem(sessionKey, JSON.stringify(state));
+        }
+
+        // Recupera le parole scritte nella griglia
+        function getGuessesSoFar() {
+            let guesses = [];
+            for (let r = 0; r < currentRow; r++) {
+                let word = "";
+                for (let c = 0; c < currentLen; c++) {
+                    const tile = document.getElementById(`tile-${r}-${c}`);
+                    if(tile) word += tile.innerText.toLowerCase();
+                }
+                if(word.length === currentLen) guesses.push(word);
+            }
+            return guesses;
+        }
+
+        // Rimuove la sessione (da chiamare a fine partita)
+        function clearGameState() {
+            localStorage.removeItem(`session_${currentLang}_${currentLen}`);
+        }
+
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerText = message;
+            
+            container.appendChild(toast);
+            
+            // Rimuove l'elemento dal DOM dopo che l'animazione di uscita è finita
+            setTimeout(() => {
+                toast.remove();
+            }, 2500);
+        }
+
         // Ascolto tastiera fisica
         window.addEventListener('keydown', (e) => {
             if(document.getElementById('game-screen').style.display === 'flex') {
@@ -1256,6 +1721,7 @@
     <div id="end-popup" style="display:none">
         <div id="popup-content"></div>
     </div>
+    <div id="toast-container"></div>
 
 </body>
 </html>
