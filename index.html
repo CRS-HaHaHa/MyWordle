@@ -378,7 +378,7 @@
         .stat-len div {
             flex: 1; /* Rende i tre bottoni della lunghezza uguali */
             justify-content: center;
-            min-width: 80px;
+            min-width: 50px;
         }
 
         .stats-grid {
@@ -1229,6 +1229,10 @@
             /* Sistemazione badge per la versione verticale */
             .stat-badge {
                 right: 10px; /* Portiamo il badge un po' più dentro per non farlo uscire dallo schermo */
+            }
+
+            .stat-lang div, .stat-len div {
+                padding: 4px 0px;
             }
 
             /* 3. Riduzione pulsante GIOCA */
@@ -2330,7 +2334,7 @@
                 noHints: "❌ Zero aiuti!\nVinci altre {N} partite per ottenerne uno", allKnown: "😎 Sai già tutto!", hintRevealed: "💡 Lettera {N}: {L}",
                 // TRADUZIONI STATISTICHE
                 stTitle: "Statistiche", stSpec: "Specifiche", stGlob: "Globali",
-                stPlay: "Giocate", stWon: "Vinte", stWinP: "% Vittoria", stAvg: "Media",
+                stPlay: "Giocate", stWon: "Vinte", stWinP: "% Vittoria", stAvg: "Media Tentativi",
                 stDist: "Distribuzione Tentativi", stClose: "CHIUDI", stLet: "Lettere", stAll: "Tutte"
             },
             en: {
@@ -2339,7 +2343,7 @@
                 noHints: "❌ No hints!\nWin {N} more games to get one", allKnown: "😎 You know everything!", hintRevealed: "💡 Letter {N}: {L}",
                 // TRADUZIONI STATISTICHE
                 stTitle: "Statistics", stSpec: "Specific", stGlob: "Global",
-                stPlay: "Played", stWon: "Won", stWinP: "Win %", stAvg: "Average",
+                stPlay: "Played", stWon: "Won", stWinP: "Win %", stAvg: "Average Attempts",
                 stDist: "Guess Distribution", stClose: "CLOSE", stLet: "Letters", stAll: "All"
             },
             fr: {
@@ -2348,7 +2352,7 @@
                 noHints: "❌ Zéro indice!\nGagne encore {N} parties per ne obtenir un", allKnown: "😎 Tu sais déjà tout!", hintRevealed: "💡 Lettre {N}: {L}",
                 // TRADUZIONI STATISTICHE
                 stTitle: "Statistiques", stSpec: "Spécifique", stGlob: "Globales",
-                stPlay: "Jouées", stWon: "Gagnées", stWinP: "% Victoire", stAvg: "Moyenne",
+                stPlay: "Jouées", stWon: "Gagnées", stWinP: "% Victoire", stAvg: "Moyenne des Tentatives",
                 stDist: "Répartition des essais", stClose: "FERMER", stLet: "Lettres", stAll: "Toutes"
             },
             es: {
@@ -2357,7 +2361,7 @@
                 noHints: "❌ ¡Cero pistas!\nGana {N} partidas más para obtener una", allKnown: "😎 ¡Ya lo sabes todo!", hintRevealed: "💡 Letra {N}: {L}",
                 // TRADUZIONI STATISTICHE
                 stTitle: "Estadísticas", stSpec: "Específicas", stGlob: "Globales",
-                stPlay: "Jugadas", stWon: "Ganadas", stWinP: "% Victoria", stAvg: "Media",
+                stPlay: "Jugadas", stWon: "Ganadas", stWinP: "% Victoria", stAvg: "Media De Intentos",
                 stDist: "Distribución", stClose: "CERRAR", stLet: "Letras", stAll: "Todas"
             }
         };
