@@ -1,27 +1,47 @@
 # 🧩 MyWordle - Multilingua
 
-Benvenuto in **MyWordle**, un clone moderno, fluido e personalizzabile del famoso gioco di parole, sviluppato interamente in HTML5, CSS3 e JavaScript. 
-
-Il progetto offre una sfida dinamica adattabile a diversi livelli di competenza linguistica e difficoltà.
+**MyWordle** è l'evoluzione moderna, fluida e senza pubblicità del classico gioco di parole. Progettato per essere giocato ovunque, offre una sfida linguistica profonda in 4 lingue e la possibilità di personalizzare la difficoltà.
 
 ---
 
-## ✨ Caratteristiche Principali
+## 🌟 Perché giocare a MyWordle?
 
-* **🌍 Multilingua Avanzato:** Supporto completo per **Italiano, Inglese, Francese e Spagnolo**.
-    * Gestione nativa di caratteri speciali: **Ñ** per lo spagnolo e **Ç** per il francese.
-    * Normalizzazione automatica degli accenti (es: *perché* diventa *perche*) per garantire una giocabilità fluida.
-* **📏 Difficoltà Variabile:** Possibilità di sfidarsi con parole di **5, 6 o 7 lettere**.
-* **💡 Sistema di Aiuti:** Guadagna un aiuto 💡 ogni 5 vittorie totali (indipendentemente da lingua/lunghezza).
-    * Usa l'aiuto per rivelare una lettera mancante nella sua posizione corretta.
-* **✨ Feedback Visivo Dinamico:**  Sistema di "**Velo Predittivo**": mentre digiti, le caselle si colorano di un velo tenue (verde o grigio) se stai inserendo lettere di cui conosci già l'esito dalle righe precedenti.
-    * Previene errori banali segnalando in tempo reale se una lettera è già stata dichiarata assente o se è nella posizione errata.
-* **📚 Dizionari Curati:** Le liste di parole sono state generate partendo dai corpora dell'Università di Lipsia, filtrando i termini per frequenza d'uso e ripulendo i dati da simboli e nomi propri.
-    * **Soluzioni:** Prime 3.000 parole più comuni per categoria.
-    * **Dizionario:** Migliaia di parole accettate per ogni lingua.
-* **🔥 Sistema di Streak & Record:** Il gioco tiene traccia delle tue vittorie consecutive e del tuo miglior punteggio per ogni combinazione lingua/lunghezza (salvataggio locale tramite `localStorage`).
-* **📱 PWA Ready:** Include `manifest.json` e `sw.js` (Service Worker) per essere installato come un'app nativa su smartphone.
-* **🎨 Design Responsivo:** Interfaccia adattiva con tastiera virtuale dinamica e layout della griglia ottimizzato per PC e Mobile.
+* **🌍 4 Lingue, Zero Limiti:** Gioca in **Italiano, Inglese, Francese e Spagnolo**. Il gioco gestisce nativamente i caratteri speciali come la Ñ e la Ç per un'esperienza autentica.
+
+* **📏 Scegli la tua Sfida:** Preferisci una partita veloce o un rompicapo complesso? Scegli parole da **5, 6 o 7 lettere**.
+
+* **💡 Sistema di Aiuti Intelligente:** Non restare bloccato! Guadagni un aiuto 💡 ogni 5 vittorie. Usalo per rivelare una lettera difficile.
+
+* **✨ Velo Predittivo (Esclusivo):** Mentre digiti, le caselle si colorano con un velo tenue per ricordarti le lettere che hai già indovinato o sbagliato nei tentativi precedenti. Un assistente visivo che previene errori banali!
+
+* **☁️ Sincronizzazione Cloud & Offline:** Accedi con Google per salvare i tuoi record nel Cloud. Se perdi la connessione (in treno o in aereo), il gioco continua a funzionare: i tuoi progressi verranno sincronizzati automaticamente non appena tornerai online.
+
+---
+
+## 📲 Installa MyWordle come un'App
+
+Puoi aggiungere MyWordle alla tua schermata home e usarlo proprio come un'app nativa, con caricamenti istantanei e supporto offline.
+
+**Su Android (Chrome)**
+1.  Apri il sito e clicca sui **tre puntini** in alto a destra.
+2.  Seleziona **"Installa applicazione"**.
+
+**Su iOS (Safari)**
+1.  Clicca sull'icona **Condividi** (il quadrato con la freccia verso l'alto).
+2.  Scorri e seleziona **"Aggiungi alla schermata Home"**.
+
+**Su PC (Chrome/Edge)**
+1.  Clicca sull'icona del monitor con la freccia nella barra degli indirizzi e seleziona **"Installa"**.
+
+---
+
+## 📚 La Scienza dietro le Parole
+
+Le liste di parole non sono casuali. Sono state generate attraverso un rigoroso processo di analisi linguistica:
+
+1.  **Dizionari Reali:** Analisi di milioni di frasi (Corpora dell'Università di Lipsia) per estrarre solo i termini usati nel linguaggio comune.
+2.  **Pulizia Totale:** Abbiamo rimosso nomi propri, simboli e termini arcaici per garantirti solo sfide stimolanti ma possibili.
+3.  **Normalizzazione:** Il gioco pulisce automaticamente accenti e legature (es: œ → oe) per farti concentrare solo sulla strategia di gioco.
 
 ---
 
@@ -31,40 +51,16 @@ Il progetto offre una sfida dinamica adattabile a diversi livelli di competenza 
 2.  **Configurazione:** Scegli la lingua cliccando sulla bandiera e seleziona la lunghezza della parola.
 3.  **Regole:**
     * Hai un numero di tentativi pari alla **lunghezza della parola + 1**.
-    * **🟩 Verde:** Lettera corretta nella posizione corretta.
-    * **🟨 Giallo:** Lettera presente nella parola ma in una posizione diversa.
+    * **🟩 Verde:** Lettera giusta al posto giusto.
+    * **🟨 Giallo:** Lettera presente ma in una posizione diversa.
     * **⬜ Grigio:** Lettera non presente nella parola.
-4.  **Bonus:** Ogni 5 vittorie riceverai un aiuto 💡. Cliccala durante una partita difficile per scoprire una lettera!
+4.  **Vinci:** Accumula vittorie consecutive (Streak) e scala la tua classifica personale!
+5.  **Bonus:** Ogni 5 vittorie riceverai un aiuto 💡. Cliccala durante una partita difficile per scoprire una lettera!
 
 ---
 
-## 🛠️ Dettagli Tecnici e Pulizia Dati
+## ❤️ Un Progetto Speciale
 
-I dizionari inclusi in `words_data.js` sono il risultato di un processo di elaborazione dati (Python/JS) che ha:
-1.  Unito più corpora di frequenza da 1M di frasi.
-2.  Sostituito legature speciali (es: `œ` → `oe`).
-3.  Preservato caratteri distintivi (`ñ`, `ç`) rimuovendo gli accenti fonetici.
-4.  Suddiviso i file per lunghezza (5, 6, 7) e ordinato per popolarità.
+MyWordle non è solo codice. È nato come un regalo personalizzato per una giocatrice speciale, appassionata di puzzle linguistici. L'obiettivo era creare un ambiente di gioco pulito, veloce e che permettesse di sfidarsi in più lingue senza le interruzioni delle pubblicità moderne.
 
----
-
-## 📁 Struttura del Repository
-
-* `index.html`: Cuore dell'applicazione (Logica, UI, Stili).
-* `words_data.js`: Database dei dizionari e delle soluzioni.
-* `Flags/`: Directory contenente le icone delle bandiere nazionali.
-* `MyWordle.png`: Immagine di copertina e icona dell'app.
-* `manifest.json` & `sw.js`: File necessari per il supporto Progressive Web App (PWA).
-
----
-
-## 👨‍💻 Sviluppo e Dedica
-
-Questo progetto è nato da un'idea semplice ma speciale: creare un'esperienza di gioco personalizzata per la mia ragazza, appassionata di puzzle linguistici e giochi di parole. 
-
-L'obiettivo era superare i limiti dei classici cloni di Wordle, offrendole la possibilità di giocare nella sua lingua preferita, scegliere la lunghezza delle parole e avere un sistema di record persistente. 
-
-Dal punto di vista tecnico, MyWordle dimostra come una logica di gioco complessa e multilingua possa essere gestita interamente lato client (Vanilla JS), garantendo un'esperienza fluida, veloce e senza interruzioni pubblicitarie.
-
----
-*Creato con ❤️ per una giocatrice speciale e per tutti gli amanti dei puzzle linguistici.*
+*Gioca ora, sfida la tua mente e porta le tue statistiche sempre con te.*
