@@ -7,11 +7,11 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="MyWordle">
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="apple-touch-icon" href="https://crs-hahaha.github.io/MyWordle/MyWordle.png">
+    <link rel="icon" type="image/x-icon" href="Imgs/favicon.ico">
+    <link rel="apple-touch-icon" href="https://crs-hahaha.github.io/MyWordle/Imgs/MyWordle.png">
     <meta property="og:title" content="MyWordle - Sfida Multilingua">
     <meta property="og:description" content="Gioca a Wordle in 4 lingue con parole da 5, 6 o 7 lettere. Gratuito e senza pubblicità!">
-    <meta property="og:image" content="https://crs-hahaha.github.io/MyWordle/MyWordle_thumbnail.jpg">
+    <meta property="og:image" content="https://crs-hahaha.github.io/MyWordle/Imgs/MyWordle_thumbnail.jpg">
     <meta property="og:image:type" content="image/jpg" />
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -3277,9 +3277,19 @@
 
                 // Attiviamo lo Snapshotting: Firebase ci chiamerà in automatico ogni volta che i dati cambiano!
                 unsubscribeSnapshot = onSnapshot(doc(window.firebaseDB, 'users', user.uid), (docSnap) => {
+                    let localDB = LocalDB.get();
+
+                    // 1. SE IL DOCUMENTO ESISTE (Dati trovati)
                     if (docSnap.exists()) {
+                        
+                        // 🔥 FIX CRITICO: Se il modal di setup si era aperto per errore (falso allarme cache), chiudilo!
+                        const setupModal = document.getElementById('profile-setup-modal');
+                        if (setupModal) setupModal.classList.add('hidden');
+                        
+                        const authModal = document.getElementById('auth-modal');
+                        if (authModal) authModal.classList.add('hidden');
+
                         const cloudData = docSnap.data();
-                        let localDB = LocalDB.get();
 
                         // 1. Sincronizza Profilo
                         if (cloudData.account) {
@@ -3301,6 +3311,15 @@
 
                         // 3. Salva tutto nel LocalStorage (Senza sovrascrivere con Firebase!)
                         LocalDB.save(localDB);
+                    
+                    } else { // 2. SE IL DOCUMENTO NON ESISTE (Utente realmente nuovo)
+                        
+                        // 🔥 FIX CRITICO: Mostra il setup SOLO se il server conferma che l'utente non esiste.
+                        // Se `fromCache` è true, ignoriamo l'evento perché stiamo aspettando la risposta del server.
+                        if (!docSnap.metadata.fromCache) {
+                            document.getElementById('auth-modal').classList.add('hidden');
+                            document.getElementById('profile-setup-modal').classList.remove('hidden');
+                        }
                     }
                 });
 
