@@ -8,12 +8,12 @@
   "theme_color": "#667eea",
   "icons": [
     {
-      "src": "https://crs-hahaha.github.io/MyWordle/MyWordle.png",
+      "src": "https://crs-hahaha.github.io/MyWordle/Imgs/MyWordle.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://crs-hahaha.github.io/MyWordle/MyWordle.png",
+      "src": "https://crs-hahaha.github.io/MyWordle/Imgs/MyWordle.png",
       "sizes": "512x512",
       "type": "image/png"
     }
