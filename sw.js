@@ -1,4 +1,4 @@
-const VERSION = 'v1.0.10';
+const VERSION = 'v1.1.0';
 const CACHE_NAME = `MyWordle-cache-${VERSION}`;
 
 const ASSETS = [
@@ -6,13 +6,52 @@ const ASSETS = [
   './index.html',
   './words_data.js',
   './manifest.json',
-  './MyWordle.png',
-  './MyWordle_thumbnail.jpg',
-  './favicon.ico',
+  './Imgs/MyWordle.png',
+  './Imgs/MyWordle_thumbnail.jpg',
+  './Imgs/favicon.ico',
+  './Imgs/Google-icon.png',
   './Flags/it.png',
-  './Flags/en.png',
+  './Flags/gb.png',
   './Flags/fr.png',
-  './Flags/es.png'
+  './Flags/es.png',
+  './Music/background-music.mp3',
+  './Avatar/1.png',
+  './Avatar/2.png',
+  './Avatar/3.png',
+  './Avatar/4.png',
+  './Avatar/5.png',
+  './Avatar/6.png',
+  './Avatar/7.png',
+  './Avatar/8.png',
+  './Avatar/9.png',
+  './Avatar/10.png',
+  './Avatar/11.png',
+  './Avatar/12.png',
+  './Avatar/13.png',
+  './Avatar/14.png',
+  './Avatar/15.png',
+  './Avatar/16.png',
+  './Avatar/17.png',
+  './Avatar/18.png',
+  './Avatar/19.png',
+  './Avatar/20.png',
+  './Avatar/21.png',
+  './Avatar/22.png',
+  './Avatar/23.png',
+  './Avatar/24.png',
+  './Avatar/25.png',
+  './Avatar/26.png',
+  './Avatar/27.png',
+  './Avatar/28.png',
+  './Avatar/29.png',
+  './Avatar/30.png',
+  './Avatar/31.png',
+  './Avatar/32.png',
+  './Avatar/33.png',
+  './Avatar/34.png',
+  './Avatar/35.png',
+  './Avatar/36.png',
+  './Avatar/40.png',
 ];
 
 self.addEventListener('install', (e) => {
@@ -37,6 +76,9 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   // HTML → network first (evita versioni vecchie)
+  if (e.request.url.includes('generate_204')) {
+        return; 
+    }
   if (e.request.mode === 'navigate') {
     e.respondWith(
       fetch(e.request).catch(() => caches.match('./index.html'))
