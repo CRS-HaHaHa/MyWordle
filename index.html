@@ -89,6 +89,8 @@
             padding: 25px;
             box-shadow: 0 20px 40px rgba(0,0,0,.25);
             margin-top: 25px;
+            margin-right: 0px;
+            margin-left: 0px;
         }
 
         #length-title {
@@ -267,6 +269,125 @@
             filter: brightness(0.9);
         }
 
+        /* Tasto Statistiche sulla Home */
+        #stats-btn {
+            position: absolute;
+            top: 30px;
+            left: 30px; /* Opposto al tasto mute */
+            height: 40px;
+            width: 40px;
+            font-size: 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            box-shadow: none;
+        }
+        #stats-btn:hover { transform: scale(1.1); box-shadow: none; }
+
+        /* --- POPUP STATISTICHE --- */
+        #stats-popup {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeInOverlay 0.3s ease-out forwards;
+        }
+
+        .stats-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px 10px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 380px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            animation: popupEntrance 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        #stats-filters-area {
+            margin-bottom: 20px;
+            display: flex !important; 
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .stat-lang, .stat-len {
+            display: flex;
+            justify-content: center;
+            gap: 4px; /* Ridotto il gap tra i tasti */
+            flex-wrap: nowrap; /* Impedisce di andare a capo */
+            width: 100%;
+            padding-bottom: 5px;
+        }
+
+        .stat-lang div, .stat-len div {
+            padding: 4px 3px; /* Padding ridotto per far spazio */
+            background: rgba(0, 0, 0, 0.05);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.85rem; /* Testo leggermente rimpicciolito */
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: all 0.2s ease;
+            color: #444;
+            flex: 0 1 75px; /* Non crescono oltre i 75px, ma possono restringersi */
+            min-width: 0;
+            height: 24px; /* Altezza fissa per uniformità */
+        }
+
+        .stat-lang div img {
+            width: 18px;
+            height: auto;
+            border-radius: 2px;
+        }
+
+        /* Stato Attivo */
+        .stat-lang div.active, .stat-len div.active {
+            background: white;
+            border-color: var(--bg2);
+            color: var(--bg2);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transform: translateY(-1px);
+        }
+
+        .stat-len div {
+            flex: 1; /* Rende i tre bottoni della lunghezza uguali */
+            justify-content: center;
+            min-width: 80px;
+        }
+
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px;
+        }
+        .stat-box { display: flex; flex-direction: column; }
+        .stat-val { font-size: 1.4rem; font-weight: 900; color: var(--bg2); }
+        .stat-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: #666; }
+
+        /* Grafico a barre */
+        .dist-chart { display: flex; flex-direction: column; gap: 5px; margin-top: 10px; }
+        .dist-row { display: flex; align-items: center; font-size: 0.85rem; font-weight: 700; }
+        .dist-num { width: 15px; text-align: right; margin-right: 8px; }
+        .dist-bar-bg { flex-grow: 1; background: #e5e7eb; border-radius: 4px; height: 22px; display: flex; }
+        .dist-bar {
+            background: var(--gray); height: 100%; border-radius: 4px; display: flex;
+            align-items: center; justify-content: flex-end; padding-right: 8px; color: white;
+            min-width: 8%; transition: width 0.5s ease-out; font-size: 0.8rem;
+        }
+        .dist-bar.highlight { background: var(--green); }
+
         .github-link {
             position: absolute;
             bottom: 15px;
@@ -288,6 +409,272 @@
         #game-screen ~ .github-link {
             display: none;
         }
+
+        /* --- MENU UTENTE ALTO A DESTRA --- */
+        #user-menu-container {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            z-index: 2000;
+        }
+
+        #user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
+            background: #e5e7eb;
+            transition: transform 0.2s;
+            object-fit: cover;
+        }
+
+        #user-avatar:active { transform: scale(0.9); }
+
+        #user-dropdown {
+            position: absolute;
+            top: 65px;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 10px;
+            width: 190px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            border: 1px solid rgba(0,0,0,0.05);
+            /* Animazione di entrata */
+            transform-origin: top right;
+            animation: dropIn 0.2s ease-out forwards;
+        }
+
+        @keyframes dropIn {
+            from { opacity: 0; transform: scale(0.9) translateY(-10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        #user-dropdown.hidden { display: none; }
+
+        #user-dropdown button {
+            width: 100%;
+            padding: 10px 15px;
+            background: transparent;
+            border: none;
+            text-align: left;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            border-radius: 8px;
+            box-shadow: none;
+        }
+
+        /* Stile per i pulsanti disabilitati offline */
+        .disabled-offline {
+            cursor: not-allowed !important;
+            position: relative !important;
+            pointer-events: auto !important;
+            transition: none !important;
+            transform: none !important;
+        }
+
+        /* filtro SOLO sul contenuto */
+        .disabled-offline .content {
+            filter: grayscale(100%) brightness(0.8) opacity(0.5);
+        }
+
+        /* emoji NON filtrata */
+        .disabled-offline::after {
+            content: '🚫';
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            font-size: 18px;
+        }
+
+        #user-dropdown button:hover { background: rgba(0,0,0,0.05); transform: none; box-shadow: none;}
+        #menu-nickname { font-size: 1.0rem; font-weight: 600; color: #666; text-align: center; margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px solid #eee; }
+
+        /* --- INPUT E MODAL LOGIN/PROFILO --- */
+        .custom-input {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            box-sizing: border-box;
+            font-weight: 600;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .custom-input:focus { border-color: var(--bg1); }
+
+        .action-btn { width: 100%; height: 50px; font-size: 1rem; margin-bottom: 5px; }
+
+        /* --- STILI SPECIFICI PER POPUP LOGIN COLORATO E CENTRATO --- */
+        /* Container specifico per il login per aumentare specificità */
+        .stats-container.login-modal {
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.9); /* Sfondo leggermente più opaco per leggibilità input */
+        }
+
+        /* Testo Titolo con Gradiente (come H1) */
+        .gradient-text {
+            background: linear-gradient(135deg, var(--bg1), var(--bg2));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 25px;
+            font-size: 2rem;
+            font-weight: 900;
+        }
+
+        /* Contenitore per allineare i pulsanti */
+        .modal-buttons-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Centra orizzontalmente i figli */
+            width: 100%;
+            margin-top: 20px;
+            gap: 10px; /* Spazio uniforme tra i pulsanti (eccetto dove c'è il divider) */
+        }
+
+        /* Reset e base per pulsanti action nel modal */
+        .modal-buttons-group .action-btn {
+            width: 100%; /* Occupano tutta la larghezza del container parent (.stats-container) */
+            max-width: 300px; /* Larghezza massima per non farli troppo larghi su PC */
+            height: 50px;
+            margin: 0; /* Resettiamo margini vecchi */
+            border-radius: 25px; /* Bordi arrotondati stile pillola */
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* 1. Pulsante Principale con Gradiente (come Play) */
+        .main-gradient-btn {
+            background: linear-gradient(135deg, #FFD93D, #ff6b6b);
+            background-repeat: no-repeat;
+            background-origin: border-box;
+            color: white !important;
+            border: 2px solid rgba(255,255,255,0.3);
+            font-weight: 800;
+        }
+        .main-gradient-btn:active {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+        }
+
+        /* Divider stilizzato */
+        .modal-buttons-group .divider {
+            width: 100%;
+            max-width: 300px;
+            margin: 5px 0; /* Margine ridotto per il gruppo */
+        }
+
+        /* 2. Pulsante Google elegante */
+        .google-btn {
+            background: white !important;
+            color: #333 !important;
+            border: 1px solid #ddd !important;
+            gap: 10px;
+        }
+        .google-btn:hover { background: #f8f9fa !important; }
+        
+        .google-btn img { width: 20px; }
+
+        /* 3. Pulsante Annulla Outline Colorato */
+        .cancel-outline-btn {
+            background: transparent !important;
+            color: #ff6b6b !important; /* Colore accent */
+            border: 2px solid #ff6b6b !important;
+            box-shadow: none !important; /* Rimuoviamo ombra per stile outline */
+            font-weight: 700;
+            margin-top: 10px !important; /* Spazio extra prima dell'annulla */
+        }
+        .cancel-outline-btn:hover {
+            background: rgba(255, 107, 107, 0.1) !important; /* Leggero sfondo al passaggio */
+        }
+
+        /* Correzione per Input fields nel modal login */
+        .login-modal .custom-input {
+            text-align: center; /* Centra il testo digitato */
+        }
+
+        .divider {
+            display: flex; align-items: center; text-align: center; margin: 10px 0; color: #999; font-size: 0.8rem; font-weight: bold;
+        }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #ddd; }
+        .divider span { padding: 0 10px; }
+        .divider-avatar {
+            display: flex; align-items: center; text-align: center; margin: 10px 0; color: var(--text-dark); opacity: 0.8; font-size: 1rem; font-weight: bold;
+        }
+        .divider-avatar::before, .divider-avatar::after { content: ''; flex: 1; border-bottom: 1px solid var(--text-dark); opacity: 0.8; }
+        .divider-avatar span { padding: 0 10px; }
+
+        /* --- CAROSELLO AVATAR FLUIDO DEFINITIVO --- */
+        .avatar-selector {
+            display: flex; align-items: center; justify-content: center;
+            gap: 15px; margin: 20px 0; width: 100%;
+        }
+
+        .nav-btn {
+            background: rgba(0,0,0,0.1); border-radius: 50%;
+            width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; border: none; cursor: pointer; color: var(--text-dark);
+            transition: background 0.2s, transform 0.1s; flex: none; z-index: 10;
+        }
+        .nav-btn:hover { background: rgba(0,0,0,0.2); }
+        .nav-btn:active { transform: scale(0.9); }
+
+        .avatar-viewport {
+            width: 250px; height: 120px;
+            position: relative; /* Contenitore per le posizioni assolute */
+        }
+
+        /* "Cancelliamo" strutturalmente il binario e gli slot per muovere libere le immagini */
+        .avatar-track, .avatar-slot { display: contents; }
+
+        .avatar-item {
+            position: absolute;
+            left: 50%; top: 50%;
+            width: 100px; height: 100px;
+            margin-top: -50px; margin-left: -50px; /* Centra l'immagine 100x100 */
+            border-radius: 50%; object-fit: cover; background: white;
+            border: 4px solid transparent; box-sizing: border-box;
+        }
+
+        /* CLASSE CHIAVE: L'animazione si attiva solo quando ha questa classe */
+        .avatar-item.animated {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                        opacity 0.4s ease, filter 0.4s ease,
+                        border-color 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        /* --- Le 5 posizioni del carosello infinito --- */
+        .pos-hidden-left { transform: translateX(-140px) scale(0.5); opacity: 0; z-index: 1; }
+        
+        .pos-prev { 
+            transform: translateX(-80px) scale(0.7); opacity: 0.5; 
+            filter: grayscale(0.8); z-index: 2; border-color: rgba(255,255,255,0.3); 
+        }
+        
+        .pos-curr { 
+            transform: translateX(0) scale(1); opacity: 1; filter: none; 
+            z-index: 3; border-color: #FFD93D; box-shadow: 0 8px 20px rgba(0,0,0,0.3); 
+        }
+        
+        .pos-next { 
+            transform: translateX(80px) scale(0.7); opacity: 0.5; 
+            filter: grayscale(0.8); z-index: 2; border-color: rgba(255,255,255,0.3); 
+        }
+        
+        .pos-hidden-right { transform: translateX(140px) scale(0.5); opacity: 0; z-index: 1; }
 
         /* --- SCHERMATA GIOCO --- */
         #game-screen {
@@ -461,6 +848,31 @@
             box-shadow: 0 1px 0 #a0aec0;
         }
 
+        /* --- STATI COLORATI DELLA TASTIERA --- */
+        .key.key-green {
+            background-color: var(--green) !important;
+            color: white !important;
+            box-shadow: 0 5px 0 #388e3c !important; /* Verde scuro */
+            border-color: #388e3c !important;
+        }
+        .key.key-green:active { box-shadow: 0 1px 0 #388e3c !important; }
+
+        .key.key-yellow {
+            background-color: var(--yellow) !important;
+            color: white !important;
+            box-shadow: 0 5px 0 #d49800 !important; /* Giallo/Arancio scuro */
+            border-color: #d49800 !important;
+        }
+        .key.key-yellow:active { box-shadow: 0 1px 0 #d49800 !important; }
+
+        .key.key-gray {
+            background-color: var(--gray) !important;
+            color: white !important;
+            box-shadow: 0 5px 0 #787c7e !important; /* Grigio scuro (Wordle style) */
+            border-color: #787c7e !important;
+        }
+        .key.key-gray:active { box-shadow: 0 1px 0 #787c7e !important; }
+
         #toast-container {
             position: fixed;
             top: 50px; /* Distanza dall'alto */
@@ -476,13 +888,17 @@
         .toast {
             background: rgba(33, 37, 41, 0.95);
             color: white;
-            padding: 12px 24px;
+            padding: 12px 28px;
             border-radius: 50px; /* Forma a pillola */
             font-weight: 600;
             font-size: 0.9rem;
             margin-bottom: 10px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
             backdrop-filter: blur(5px);
+            white-space: nowrap;      /* Forza il testo su una riga sola */
+            min-width: 150px;         /* Larghezza minima per non farlo sembrare troppo piccolo */
+            max-width: 90vw;          /* Non supera il 90% della larghezza dello schermo */
+            text-align: center;
             
             /* Animazione: entra scendendo, sparisce in dissolvenza */
             animation: slideDownIn 0.3s ease-out forwards, 
@@ -717,6 +1133,17 @@
                 }
             }
 
+            #user-menu-container {
+            position: absolute;
+            top: 20px;
+            right: 17px;
+            }
+
+            #user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+
             /* 1. MODIFICA CONTENITORE: Permette ai bottoni di andare a capo */
             .btn-group:not(.length-group) {
                 flex-wrap: wrap;
@@ -732,6 +1159,8 @@
             /* 1. Riduzione spazio sopra "Scegli la lunghezza" */
             .lang-section {
                 margin-top: 15px; /* Ridotto da 20px */
+                margin-right: 20px;
+                margin-left: 20px;
                 padding: 10px;    /* Leggermente più compatto */
             }
 
@@ -821,11 +1250,10 @@
 </head>
 <body>
     <audio id="bg-music" loop>
-        <source src="background-music.mp3" type="audio/mpeg">
+        <source src="Music/background-music.mp3" type="audio/mpeg">
     </audio>
 
-    <div id="home-screen">
-        <!-- <button id="mute-btn" onclick="toggleMute()">🔇</button> -->
+    <div id="home-screen">        
         <h1>MyWordle</h1>
 
         <!-- Toggle lingua -->
@@ -866,6 +1294,95 @@
         </a>
     </div>
 
+    <div id="user-menu-container">
+        <img src="Avatar/40.png" id="user-avatar" onclick="toggleUserMenu()" alt="Menu Utente">
+        
+        <div id="user-dropdown" class="hidden">
+            <div id="menu-logged-out">
+                <button onclick="openLoginModal()" class="online-only">👤 Accedi / Registrati</button>
+                <button onclick="openStats()">📊 Statistiche</button>
+                <button onclick="toggleMute()" class="menu-mute-btn">🔇 Musica: OFF</button>
+            </div>
+            
+            <div id="menu-logged-in" style="display:none;">
+                <div id="menu-nickname">Ciao, Giocatore!</div>
+                <button onclick="openProfileModal()" class="online-only">⚙️ Modifica Profilo</button>
+                <button onclick="openStats()">📊 Statistiche</button>
+                <button onclick="toggleMute()" class="menu-mute-btn">🔇 Musica: OFF</button>
+                <button onclick="logoutAction()" style="color: #ff6b6b;" class="online-only">🚪 Esci</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="login-popup" class="modal-overlay">
+        <div class="stats-container login-modal">
+            
+            <h2 class="gradient-text">Accedi</h2>
+            
+            <form id="login-form" onsubmit="loginWithEmail(); return false;">
+                <div class="form-group">
+                    <input type="email" id="login-email" 
+                        placeholder="Email" class="custom-input" 
+                        autocomplete="username" required>
+                    
+                    <input type="password" id="login-password" 
+                        placeholder="Password" class="custom-input" 
+                        autocomplete="current-password" required>
+                </div>
+                
+                <div class="modal-buttons-group">
+                    <button type="submit" class="action-btn main-gradient-btn">Accedi / Registrati</button>
+                    
+                    <div class="divider"><span>oppure</span></div>
+                    
+                    <button type="button" class="action-btn google-btn" onclick="loginWithGoogle()">
+                        <img src="Imgs/Google-icon.png" alt="G"> 
+                        Accedi con Google
+                    </button>
+                    
+                    <button type="button" class="action-btn cancel-outline-btn" onclick="closeModals()">ANNULLA</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="profile-popup" class="modal-overlay">
+        <div class="stats-container login-modal">
+            <h2 class="gradient-text">Il Tuo Profilo</h2>
+
+            <div class="form-group" style="width: 100%;">
+                <input type="text" id="profile-nickname" 
+                       placeholder="Scegli un Nickname" 
+                       class="custom-input" maxlength="12" 
+                       autocomplete="off">
+            </div>
+            
+            <div class="divider-avatar"><span>Scegli il tuo Avatar</span></div>
+            <div class="avatar-selector">
+                <button class="nav-btn" onclick="rotateAvatar(-1)">&#10094;</button>
+                <div class="avatar-viewport" id="avatar-viewport">
+                    <div class="avatar-track" id="avatar-track">
+                        <div class="avatar-slot">
+                            <img id="av-prev" class="avatar-item side" src="">
+                        </div>
+                        <div class="avatar-slot">
+                            <img id="av-curr" class="avatar-item main" src="">
+                        </div>
+                        <div class="avatar-slot">
+                            <img id="av-next" class="avatar-item side" src="">
+                        </div>
+                    </div>
+                </div>
+                <button class="nav-btn" onclick="rotateAvatar(1)">&#10095;</button>
+            </div>
+            
+            <div class="modal-buttons-group">
+                <button class="action-btn main-gradient-btn" onclick="saveProfile()">SALVA MODIFICHE</button>                
+                <button class="action-btn cancel-outline-btn" onclick="closeModals()">CHIUDI</button>
+            </div>
+        </div>
+    </div>
+
     <div id="game-screen">
         <button id="back-btn" onclick="goHome()">&#x1F3E0</button>
         
@@ -880,7 +1397,114 @@
         <div id="keyboard"></div>
     </div>
 
+    <div id="stats-popup">
+        <div class="stats-container">
+            <h2 id="st-title">Statistiche</h2>
+
+            <div id="stats-filters-area">
+                <div class="stat-lang">  
+                    <div id="sl-all" onclick="selectStatLang('all')">🌐<span class="st-all-txt">Tutte</span></div>
+                    <div id="sl-it" onclick="selectStatLang('it')"><img src="Flags/it.png"> ITA</div>
+                    <div id="sl-en" onclick="selectStatLang('en')"><img src="Flags/gb.png"> ENG</div>
+                    <div id="sl-fr" onclick="selectStatLang('fr')"><img src="Flags/fr.png"> FRA</div>
+                    <div id="sl-es" onclick="selectStatLang('es')"><img src="Flags/es.png"> ESP</div>
+                </div>
+                
+                <div class="stat-len">  
+                    <div id="sn-all" onclick="selectStatLen('all')">🌐<span class="st-all-txt">Tutte</span></div>
+                    <div id="sn-5" onclick="selectStatLen(5)">5 <span class="st-let-txt">Lettere</span></div>
+                    <div id="sn-6" onclick="selectStatLen(6)">6 <span class="st-let-txt">Lettere</span></div>
+                    <div id="sn-7" onclick="selectStatLen(7)">7 <span class="st-let-txt">Lettere</span></div>
+                </div>
+            </div>
+
+            <div class="stats-grid" id="stats-numbers"></div>
+
+            <h3 id="st-dist-title">Distribuzione Tentativi</h3>
+            <div class="dist-chart" id="dist-chart"></div>
+
+            <button class="key-big" id="st-close" style="width: 100%; margin-top: 20px;" onclick="closeStats()">CHIUDI</button>
+        </div>
+    </div>
+
     <script>
+        const ConnectionMonitor = {
+            isStable: false,
+            checkInterval: 30000, // millisecondi - Controlla ogni 30 secondi
+
+            async check() {
+                // Se il browser dice già che siamo offline, non proviamo nemmeno il fetch
+                if (!navigator.onLine) {
+                    this.isStable = false;
+                    this.updateUI();
+                    return false;
+                }
+
+                try {
+                    // Usiamo un endpoint che non restituisce quasi nulla (204 No Content)
+                    // 'no-cors' evita problemi di permessi, 'cache: no-store' evita falsi positivi
+                    await fetch("https://clients3.google.com/generate_204", {
+                        mode: "no-cors",
+                        cache: "no-store",
+                        signal: AbortSignal.timeout(5000) // Se dopo 5 secondi non risponde, è troppo lento
+                    });
+                    this.isStable = true;
+                } catch (e) {
+                    this.isStable = false;
+                }
+
+                this.updateUI();
+                return this.isStable;
+            },
+
+            updateUI() {
+                const onlineElements = document.querySelectorAll('.online-only');
+
+                onlineElements.forEach(el => {
+
+                    // 🔹 Se non ha ancora il wrapper, lo creiamo
+                    if (!el.querySelector('.content')) {
+                        const wrapper = document.createElement('span');
+                        wrapper.classList.add('content');
+
+                        // sposta tutto dentro
+                        wrapper.innerHTML = el.innerHTML;
+                        el.innerHTML = '';
+                        el.appendChild(wrapper);
+                    }
+
+                    // 🔹 Stato online/offline
+                    if (this.isStable) {
+                        el.classList.remove('disabled-offline');
+                    } else {
+                        el.classList.add('disabled-offline');
+                    }
+                });
+            },
+
+            start() {
+                this.check();
+                setInterval(() => this.check(), this.checkInterval);
+                
+                // Ascolta anche gli eventi di sistema per reagire istantaneamente
+                window.addEventListener('online', () => this.check());
+                window.addEventListener('offline', () => this.check());
+            }
+        };
+
+        ConnectionMonitor.start();
+
+        document.addEventListener("DOMContentLoaded", () => {
+            let db = LocalDB.get();
+            
+            // Controlliamo che gli elementi esistano prima di toccarli
+            const nickEl = document.getElementById('menu-nickname');
+            const avatarEl = document.getElementById('user-avatar');
+
+            if (nickEl) nickEl.innerText = db.profile.nickname;
+            if (avatarEl) avatarEl.src = `Avatar/${db.profile.avatar}.png`;
+        });
+
         // Configurazione Globale
         let currentLang = 'it';
         let currentLen = 5;
@@ -892,6 +1516,142 @@
         let knownLetters = [];  // Memorizza le lettere corrette nelle posizioni esatte
         let wrongPositions = {}; // Memorizza le lettere presenti nella parola ma nella posizione sbagliata
         let absentLetters = new Set(); // Memorizza le lettere che NON esistono nella parola
+        window.firebaseDB = null; 
+        window.firebaseAuth = null;
+
+        // --- MOTORE LOCALE E SINCRONIZZAZIONE ---
+        const LocalDB = {
+            key: 'mywordle_data',
+            
+            // Recupera o crea la struttura base
+            get: function() {
+                let data = JSON.parse(localStorage.getItem(this.key));
+                if (!data) {
+                    data = {
+                        profile: { nickname: "Player", avatar: 40 },
+                        account: { hints: 0, globalWins: 0 },
+                        history: {}, // Es: { "it_5": ["1710...#3"] }
+                        sessions: {}, // Qui salviamo le partite in corso (es: "it_5": {targetWord: ...})
+                        syncQueue: [] // Qui finiscono le partite da inviare al cloud
+                    };
+                }
+                // Assicurati che l'oggetto sessions esista anche per i vecchi salvataggi
+                if (!data.sessions) data.sessions = {};
+                return data;
+            },
+
+            // Salva nel localStorage
+            save: function(data) {
+                // Se l'oggetto è nullo, non è un oggetto, o ha troppe chiavi (Firebase ne ha centinaia)
+                if (!data || typeof data !== 'object' || Object.keys(data).length > 20) {
+                    console.error("❌ Bloccato salvataggio sospetto (possibile oggetto Firebase o dati non validi)");
+                    return;
+                }
+
+                // Verifichiamo che esistano le chiavi "Cuore" del gioco
+                const requiredKeys = ['account', 'history', 'profile', 'sessions', 'syncQueue'];
+                const hasRequired = requiredKeys.every(key => key in data);
+
+                if (!hasRequired) {
+                    console.error("❌ Bloccato: L'oggetto non contiene la struttura dati del gioco.");
+                    return;
+                }
+                localStorage.setItem(this.key, JSON.stringify(data));
+            },
+
+            // Aggiunge una partita e la mette in coda
+            addGame: function(mode, dataString) {
+                let db = this.get();
+                if (!db.history[mode]) db.history[mode] = [];
+                db.history[mode].push(dataString);
+                
+                // Mettiamo in coda per l'invio al server
+                db.syncQueue.push({ mode: mode, event: dataString });
+                this.save(db);
+                
+                // Tentiamo subito la sincronizzazione se c'è internet
+                if (window.syncDataToCloud) window.syncDataToCloud();
+            },
+
+            // Salva la sessione di gioco in corso
+            saveSession: function(modeKey, state) {
+                let db = this.get();
+                db.sessions[modeKey] = state;
+                this.save(db);
+            },
+
+            // Recupera la sessione di gioco in corso
+            getSession: function(modeKey) {
+                let db = this.get();
+                return db.sessions[modeKey] || null;
+            },
+
+            // Elimina la sessione di gioco in corso (a fine partita)
+            clearSession: function(modeKey) {
+                let db = this.get();
+                delete db.sessions[modeKey];
+                this.save(db);
+            },
+
+            // Migrazione vecchi dati (Pulisce il disordine precedente)
+            migrateOldData: function() {
+                let db = this.get();
+                
+                // Recupera vecchie informazioni account se presenti (e non ancora migrate)
+                if (localStorage.getItem('mywordle_nickname')) db.profile.nickname = localStorage.getItem('mywordle_nickname');
+                if (localStorage.getItem('mywordle_avatar')) db.profile.avatar = parseInt(localStorage.getItem('mywordle_avatar'));
+                if (localStorage.getItem('mywordle_hints')) db.account.hints = parseInt(localStorage.getItem('mywordle_hints'));
+                if (localStorage.getItem('mywordle_global_wins')) db.account.globalWins = parseInt(localStorage.getItem('mywordle_global_wins'));
+
+                // Array per raccogliere le chiavi da cancellare (per evitare problemi modificando l'oggetto su cui si itera)
+                let keysToRemove = [];
+
+                // Scansione di tutto il localStorage
+                for (let i = 0; i < localStorage.length; i++) {
+                    let k = localStorage.key(i);
+                    if (!k) continue;
+
+                    if (k.startsWith('history_')) {
+                        let mode = k.replace('history_', '');
+                        try { 
+                            let oldHistory = JSON.parse(localStorage.getItem(k));
+                            if (!db.history[mode]) db.history[mode] = oldHistory;
+                        } catch(e){}
+                        keysToRemove.push(k);
+                    } 
+                    else if (k.startsWith('session_')) {
+                        let mode = k.replace('session_', '');
+                        try {
+                            db.sessions[mode] = JSON.parse(localStorage.getItem(k));
+                        } catch(e){}
+                        keysToRemove.push(k);
+                    }
+                    else if (
+                        k.startsWith('streak_') || 
+                        k.startsWith('maxStreak_') || 
+                        k.startsWith('stats_array_') ||
+                        k.startsWith('MyWordle_records_') || // Se hai vecchi record con questo nome
+                        k === 'mywordle_nickname' ||
+                        k === 'mywordle_avatar' ||
+                        k === 'mywordle_hints' ||
+                        k === 'mywordle_global_wins'
+                    ) {
+                        keysToRemove.push(k);
+                    }
+                }
+
+                // Salviamo le modifiche al LocalDB
+                this.save(db);
+
+                // Pulizia finale (Esecuzione della "condanna a morte" per le vecchie chiavi)
+                keysToRemove.forEach(k => localStorage.removeItem(k));
+                
+                console.log("Migrazione e pulizia dati locali completata! Eliminate " + keysToRemove.length + " chiavi obsolete.");
+            }
+        };
+
+        // Eseguiamo la migrazione all'avvio
+        LocalDB.migrateOldData();
 
         // Gestione Volume e Fade-in
         const bgMusic = document.getElementById('bg-music');
@@ -982,34 +1742,30 @@
         }
 
         function updateHomeStats() {
-            // Aggiorniamo i badge di TUTTI i pulsanti (5, 6, 7)
+            // Aggiorniamo i badge di TUTTI i pulsanti lunghezza per la lingua corrente (5, 6, 7)
             [5, 6, 7].forEach(len => {
-                const streakKey = `streak_${currentLang}_${len}`;
-                const bestKey = `best_${currentLang}_${len}`;
-                
-                const streak = localStorage.getItem(streakKey) || 0;
-                const best = localStorage.getItem(bestKey) || 0;
+                const stats = getFullStats(currentLang, len);
                 
                 // Inseriamo i dati nel badge specifico
                 const badge = document.getElementById(`badge-${len}`);
                 if(badge) {
                     // \n crea l'a capo visivo grazie a white-space: pre nel CSS
-                    badge.innerText = `🔥 ${streak}\n🏆 ${best}`;
+                    badge.innerText = `🔥 ${stats.streak}\n🏆 ${stats.best}`;
                 }
             });
 
             // Aggiorniamo anche il display in alto nella schermata di gioco (quello attuale)
-            const currentStreak = localStorage.getItem(`streak_${currentLang}_${currentLen}`) || 0;
-            const currentBest = localStorage.getItem(`best_${currentLang}_${currentLen}`) || 0;
-            document.getElementById('stats-display').innerText = `🔥 ${currentStreak}  🏆 ${currentBest}`;
+            const currentStats = getFullStats(currentLang, currentLen);
+            const display = document.getElementById('stats-display');
+            if (display) {
+                display.innerText = `🔥 ${currentStats.streak}  🏆 ${currentStats.best}`;
+            }
         }
 
         function updateHintUI() {
-            let hints = parseInt(localStorage.getItem('mywordle_hints')) || 0;
+            let db = LocalDB.get();
             const hintCountEl = document.getElementById('hint-count');
-            if (hintCountEl) {
-                hintCountEl.innerText = hints;
-            }
+            if (hintCountEl) hintCountEl.innerText = db.account.hints;
         }
 
         function selectConfig(lang, len, btn) {
@@ -1026,12 +1782,11 @@
             document.getElementById('home-screen').style.display = 'none';
             gameScreen.style.display = 'flex';
             gameScreen.classList.add('fade-in-up');
+            const profileBtn = document.getElementById('user-profile-btn');
+            if (profileBtn) profileBtn.style.display = 'none';
 
             initGrid();
             initKeyboard();
-
-            const sessionKey = `session_${currentLang}_${currentLen}`;
-            const saved = localStorage.getItem(sessionKey);
 
             // Recuperiamo le liste direttamente dall'oggetto in memoria
             const solKey = `${currentLang}_${currentLen}_sol`;
@@ -1043,21 +1798,23 @@
             }
             dictionary = WORD_DATA[dictKey];
 
-            if (saved) {
-                const state = JSON.parse(saved);
+            const modeKey = `${currentLang}_${currentLen}`;
+            const savedState = LocalDB.getSession(modeKey); // USA LOCALDB!
+
+            if (savedState) {
                 // Ripristiniamo la logica
-                targetWord = state.targetWord;
-                currentRow = state.currentRow;
+                targetWord = savedState.targetWord;
+                currentRow = savedState.currentRow;
                 currentCol = 0;
-                knownLetters = state.knownLetters;
-                wrongPositions = state.wrongPositions;
-                absentLetters = new Set(state.absentLetters);
+                knownLetters = savedState.knownLetters;
+                wrongPositions = savedState.wrongPositions;
+                absentLetters = new Set(savedState.absentLetters);
 
                 // Ricostruiamo la griglia visiva e i colori
-                state.guesses.forEach((guess, rIndex) => {
+                savedState.guesses.forEach((guess, rIndex) => {
                     recolorRowFromSaved(guess, rIndex);
                 });
-                updateKeyboardColors(); // Funzione che colora i tasti in base ai risultati
+                updateKeyboardColors(); 
             } else {
                 // Nessun salvataggio: Nuova partita
                 currentRow = 0;
@@ -1070,7 +1827,7 @@
                 absentLetters = new Set();
                 saveGameState(); // Creiamo subito il salvataggio iniziale
             }
-            console.log("Parola target:", targetWord); // Per debug, rimuovi in produzione           
+            console.log("Parola target:", targetWord); // Per debug, rimuovi in produzione
             
             // Carica streak
             updateHomeStats();
@@ -1091,38 +1848,28 @@
         }
 
         function updateKeyboardColors() {
-            // 1. Reset iniziale: riportiamo i tasti al colore base (opzionale se già puliti)
+            // 1. Reset completo: rimuove tutte le classi colore da tutti i tasti
             const keys = document.querySelectorAll('.key');
-            keys.forEach(k => k.style.backgroundColor = '');
+            keys.forEach(k => {
+                k.style.backgroundColor = '';
+                k.classList.remove('key-green', 'key-yellow', 'key-gray');
+            });
 
-            // 2. Recuperiamo tutte le parole scritte finora nella griglia
+            // 2. Ricalcola leggendo tutta la griglia (i tuoi tentativi)
             const guesses = getGuessesSoFar();
-
             guesses.forEach(guess => {
                 const statuses = getLetterStatuses(guess, targetWord);
-                
                 statuses.forEach((s, i) => {
-                    const char = guess[i];
-                    const key = document.getElementById(`key-${char}`);
-                    if (!key) return;
-
-                    const currentColor = key.style.backgroundColor;
-
-                    // Logica di precedenza: Verde > Giallo > Grigio
-                    if (s === 'green') {
-                        key.style.backgroundColor = 'var(--green)';
-                    } else if (s === 'yellow') {
-                        // Diventa giallo solo se non è già verde
-                        if (currentColor !== 'var(--green)') {
-                            key.style.backgroundColor = 'var(--yellow)';
-                        }
-                    } else if (s === 'gray') {
-                        // Diventa grigio solo se non ha già un colore (verde o giallo)
-                        if (!currentColor) {
-                            key.style.backgroundColor = 'gray';
-                        }
-                    }
+                    updateSingleKey(guess[i], s);
                 });
+            });
+
+            // 3. Ricalcola dalle lettere suggerite (hints)
+            // Se una lettera è in knownLetters, deve apparire sulla tastiera
+            knownLetters.forEach(letter => {
+                if (letter) {
+                    updateSingleKey(letter, 'green');
+                }
             });
         }
 
@@ -1375,7 +2122,6 @@
             const rowTiles = [];
             for(let i=0; i<currentLen; i++) rowTiles.push(document.getElementById(`tile-${currentRow}-${i}`));
 
-            // USIAMO LA NUOVA FUNZIONE LOGICA
             const statuses = getLetterStatuses(guess, targetWord);
 
             // 1. Aggiorna conoscenza (Memoria per il "velo" predittivo)
@@ -1394,9 +2140,20 @@
                     if (!wrongPositions[char].includes(i)) wrongPositions[char].push(i);
                     absentLetters.delete(char);
                 } else if (s === 'gray') {
-                    // Logica "isEverywhereAbsent" originale
-                    const isEverywhereAbsent = !knownLetters.includes(char) && !wrongPositions[char];
-                    if (isEverywhereAbsent) {
+                    // --- NUOVA LOGICA VELO GRIGIO INTELLIGENTE ---
+                    
+                    // 1. Memorizziamo che in QUESTA casella specifica la lettera è sbagliata
+                    if (!wrongPositions[char]) wrongPositions[char] = [];
+                    if (!wrongPositions[char].includes(i)) wrongPositions[char].push(i);
+
+                    // 2. Controllo Esaurimento: abbiamo già trovato TUTTE le occorrenze di questa lettera?
+                    const totalInTarget = targetWord.split('').filter(c => c === char).length;
+                    const greensFound = knownLetters.filter(c => c === char).length;
+                    
+                    // Se le lettere verdi trovate sono pari al totale esistente (es. c'era 1 sola 'A' ed è verde),
+                    // oppure se la lettera non esiste proprio (0 == 0), allora la lettera è "esaurita".
+                    // La mettiamo in absentLetters per attivare il velo grigio ovunque!
+                    if (greensFound === totalInTarget) {
                         absentLetters.add(char);
                     }
                 }
@@ -1424,7 +2181,6 @@
             // 3. Logica di fine riga o fine partita
             setTimeout(() => {
                 if (guess === targetWord) {
-                    // Animazione vittoria
                     launchConfetti();
                     rowTiles.forEach((tile, i) => {
                         setTimeout(() => tile.classList.add('tile-winner'), i * 100);
@@ -1432,11 +2188,11 @@
                     
                     const gotHint = updateStreak(true);
                     setTimeout(() => showEndPopup(true, gotHint), 1800);
-                    clearGameState(); // Ricordati di pulire la sessione quando si vince!
+                    clearGameState(); 
                 } else if (currentRow === currentLen) {
                     updateStreak(false);
                     showEndPopup(false);
-                    clearGameState(); // E quando si perde!
+                    clearGameState(); 
                 } else {
                     currentRow++;
                     currentCol = 0;
@@ -1457,46 +2213,39 @@
                 setTimeout(() => c.remove(), 5000);
             }
         }
-
+        
         function updateSingleKey(char, status) {
             const key = document.getElementById(`key-${char}`);
             if (!key) return;
+            
+            // Rimuoviamo vecchi stili manuali nel caso siano rimasti da un vecchio salvataggio
+            key.style.backgroundColor = ''; 
+
+            // Logica di precedenza delle classi
             if (status === 'green') {
-                key.style.backgroundColor = 'var(--green)';
-            } else if (status === 'yellow' && key.style.backgroundColor !== 'var(--green)') {
-                key.style.backgroundColor = 'var(--yellow)';
-            } else if (status === 'gray' && !key.style.backgroundColor) {
-                key.style.backgroundColor = 'gray';
+                key.classList.remove('key-yellow', 'key-gray');
+                key.classList.add('key-green');
+            } else if (status === 'yellow' && !key.classList.contains('key-green')) {
+                key.classList.remove('key-gray');
+                key.classList.add('key-yellow');
+            } else if (status === 'gray' && !key.classList.contains('key-green') && !key.classList.contains('key-yellow')) {
+                key.classList.add('key-gray');
             }
-        }                
+        }
 
         function useHint() {
             document.getElementById('hint-btn').blur();
-
-            let hints = parseInt(localStorage.getItem('mywordle_hints')) || 0;
+            let db = LocalDB.get();
             
-            if (hints <= 0) {
-                // Recuperiamo le vittorie totali
-                let totalWins = parseInt(localStorage.getItem('mywordle_global_wins')) || 0;
-                
-                // Calcoliamo quante mancano al prossimo multiplo di 5
-                // Se totalWins è 1, mancano 4 (5 - 1)
-                // Se totalWins è 4, manca 1 (5 - 4)
-                // Se totalWins è 5, il modulo è 0, quindi mancano 5 per il prossimo
-                let missing = 5 - (totalWins % 5);
-                
-                // Prendiamo il testo e sostituiamo {N} con il numero calcolato
-                let msg = TEXT[currentLang].noHints.replace('{N}', missing);
-                
-                showPopup(msg);
+            if (db.account.hints <= 0) {
+                let missing = 5 - (db.account.globalWins % 5);
+                showPopup(TEXT[currentLang].noHints.replace('{N}', missing));
                 return;
             }
 
             let availableIndices = [];
             for (let i = 0; i < currentLen; i++) {
-                if (!knownLetters[i]) {
-                    availableIndices.push(i);
-                }
+                if (!knownLetters[i]) availableIndices.push(i);
             }
 
             if (availableIndices.length === 0) {
@@ -1506,72 +2255,218 @@
 
             let randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
             let letter = targetWord[randomIndex];
-
-            // Aggiorniamo la memoria per il "velo"
             knownLetters[randomIndex] = letter;
             absentLetters.delete(letter); 
 
-            // Scaliamo l'aiuto
-            hints--;
-            localStorage.setItem('mywordle_hints', hints);
+            // Aggiorniamo il LocalDB
+            db.account.hints--;
+            LocalDB.save(db);
             updateHintUI();
+            
+            // Manda al cloud
+            if (window.saveHintsToCloud) window.saveHintsToCloud(db.account.hints);
 
-            // Prepariamo la frase prendendola dal dizionario e sostituendo i valori
-            let msg = TEXT[currentLang].hintRevealed
-                        .replace('{N}', randomIndex + 1)
-                        .replace('{L}', letter.toUpperCase());
-            
-            showPopup(msg);
-            
-            // Coloriamo la tastiera per aiuto visivo
-            const key = document.getElementById(`key-${letter}`);
-            if (key && key.style.backgroundColor !== 'var(--green)') {
-                key.style.backgroundColor = 'var(--yellow)'; 
-            }
+            showPopup(TEXT[currentLang].hintRevealed.replace('{N}', randomIndex + 1).replace('{L}', letter.toUpperCase()));
+            updateSingleKey(letter, 'green');
+            saveGameState();
         }
 
         const TEXT = {
             it: {
-                win: "🎉 HAI VINTO!",
-                lose: "😭 LA PAROLA ERA ",
-                notInList: "❌ Parola non in elenco",
-                dataError: "⚠️ Errore: Dati non trovati nel file words_data.js",
-                hintEarned: "\n\n🎁 +1 Aiuto 💡", // Va a capo sotto HAI VINTO
-                noHints: "❌ Zero aiuti!\nVinci altre {N} partite per ottenerne uno",
-                allKnown: "😎 Sai già tutto!",
-                hintRevealed: "💡 Lettera {N}: {L}" // Es: Lettera 3: R
+                win: "🎉 HAI VINTO!", lose: "😭 LA PAROLA ERA ", notInList: "❌ Parola non in elenco",
+                dataError: "⚠️ Errore: Dati non trovati nel file words_data.js", hintEarned: "\n\n🎁 +1 Aiuto 💡",
+                noHints: "❌ Zero aiuti!\nVinci altre {N} partite per ottenerne uno", allKnown: "😎 Sai già tutto!", hintRevealed: "💡 Lettera {N}: {L}",
+                // TRADUZIONI STATISTICHE
+                stTitle: "Statistiche", stSpec: "Specifiche", stGlob: "Globali",
+                stPlay: "Giocate", stWon: "Vinte", stWinP: "% Vittoria", stAvg: "Media",
+                stDist: "Distribuzione Tentativi", stClose: "CHIUDI", stLet: "Lettere", stAll: "Tutte"
             },
             en: {
-                win: "🎉 YOU WON!",
-                lose: "😭 THE WORD WAS ",
-                notInList: "❌ Word not in list",
-                dataError: "⚠️ Error: Data not found in words_data.js",
-                hintEarned: "\n\n🎁 +1 Hint 💡",
-                noHints: "❌ No hints!\nWin {N} more games to get one",
-                allKnown: "😎 You know everything!",
-                hintRevealed: "💡 Letter {N}: {L}"
+                win: "🎉 YOU WON!", lose: "😭 THE WORD WAS ", notInList: "❌ Word not in list",
+                dataError: "⚠️ Error: Data not found in words_data.js", hintEarned: "\n\n🎁 +1 Hint 💡",
+                noHints: "❌ No hints!\nWin {N} more games to get one", allKnown: "😎 You know everything!", hintRevealed: "💡 Letter {N}: {L}",
+                // TRADUZIONI STATISTICHE
+                stTitle: "Statistics", stSpec: "Specific", stGlob: "Global",
+                stPlay: "Played", stWon: "Won", stWinP: "Win %", stAvg: "Average",
+                stDist: "Guess Distribution", stClose: "CLOSE", stLet: "Letters", stAll: "All"
             },
             fr: {
-                win: "🎉 VOUS AVEZ GAGNÉ!",
-                lose: "😭 LE MOT ÉTAIT ",
-                notInList: "❌ Ce mot n'est pas dans la liste",
-                dataError: "⚠️ Erreur : Données non trouvées",
-                hintEarned: "\n\n🎁 +1 Indice 💡",
-                noHints: "❌ Zéro indice!\nGagne encore {N} parties per ne obtenir un",
-                allKnown: "😎 Tu sais déjà tout!",
-                hintRevealed: "💡 Lettre {N}: {L}"
+                win: "🎉 VOUS AVEZ GAGNÉ!", lose: "😭 LE MOT ÉTAIT ", notInList: "❌ Ce mot n'est pas dans la liste",
+                dataError: "⚠️ Erreur : Données non trouvées", hintEarned: "\n\n🎁 +1 Indice 💡",
+                noHints: "❌ Zéro indice!\nGagne encore {N} parties per ne obtenir un", allKnown: "😎 Tu sais déjà tout!", hintRevealed: "💡 Lettre {N}: {L}",
+                // TRADUZIONI STATISTICHE
+                stTitle: "Statistiques", stSpec: "Spécifique", stGlob: "Globales",
+                stPlay: "Jouées", stWon: "Gagnées", stWinP: "% Victoire", stAvg: "Moyenne",
+                stDist: "Répartition des essais", stClose: "FERMER", stLet: "Lettres", stAll: "Toutes"
             },
             es: {
-                win: "🎉 ¡HAS GANADO!",
-                lose: "😭 LA PALABRA ERA ",
-                notInList: "❌ Palabra no en la lista",
-                dataError: "⚠️ Error: Datos no encontrados",
-                hintEarned: "\n\n🎁 +1 Pista 💡",
-                noHints: "❌ ¡Cero pistas!\nGana {N} partidas más para obtener una",
-                allKnown: "😎 ¡Ya lo sabes todo!",
-                hintRevealed: "💡 Letra {N}: {L}"
+                win: "🎉 ¡HAS GANADO!", lose: "😭 LA PALABRA ERA ", notInList: "❌ Palabra no en la lista",
+                dataError: "⚠️ Error: Datos no encontrados", hintEarned: "\n\n🎁 +1 Pista 💡",
+                noHints: "❌ ¡Cero pistas!\nGana {N} partidas más para obtener una", allKnown: "😎 ¡Ya lo sabes todo!", hintRevealed: "💡 Letra {N}: {L}",
+                // TRADUZIONI STATISTICHE
+                stTitle: "Estadísticas", stSpec: "Específicas", stGlob: "Globales",
+                stPlay: "Jugadas", stWon: "Ganadas", stWinP: "% Victoria", stAvg: "Media",
+                stDist: "Distribución", stClose: "CERRAR", stLet: "Letras", stAll: "Todas"
             }
         };
+
+        // Variabili di stato per il popup (inizializzate con la partita corrente)
+        let stLang = currentLang;
+        let stLen = currentLen;
+
+        function openStats() {
+            // Sincronizza con il gioco attuale all'apertura
+            stLang = currentLang;
+            stLen = currentLen;
+            
+            document.getElementById('stats-popup').style.display = 'flex';
+            updateStatsTranslations();
+            renderStatsUI();
+        }
+
+        function updateStatsTranslations() {
+            const t = TEXT[currentLang];
+            document.getElementById('st-title').innerText = t.stTitle || "Statistiche";
+            document.getElementById('st-dist-title').innerText = t.stDist || "Distribuzione";
+            document.getElementById('st-close').innerText = t.stClose || "CHIUDI";
+            
+            // Traduce i testi interni ai selettori
+            document.querySelectorAll('.st-let-txt').forEach(el => el.innerText = t.stLet || "Lettere");
+            document.querySelectorAll('.st-all-txt').forEach(el => el.innerText = t.stAll || "Tutte");
+        }
+
+        function selectStatLang(lang) {
+            stLang = lang;
+            renderStatsUI();
+        }
+
+        // Nota: ora len può essere un numero (5,6,7) oppure la stringa 'all'
+        function selectStatLen(len) {
+            stLen = len; 
+            renderStatsUI();
+        }
+
+        function updateStatsTranslations() {
+            // Usiamo currentLang per i testi dell'interfaccia (Chiudi, Titoli)
+            // Ma potresti voler usare stLang se vuoi che i titoli seguano il filtro selezionato
+            const t = TEXT[stLang] || TEXT['it']; 
+
+            document.getElementById('st-title').innerText = t.stTitle;
+            document.getElementById('st-dist-title').innerText = t.stDist;
+            document.getElementById('st-close').innerText = t.stClose;
+            
+            // Aggiorna anche i testi piccoli dentro i bottoni dei filtri
+            document.querySelectorAll('.st-let-txt').forEach(el => el.innerText = t.stLet);
+            document.querySelectorAll('.st-all-txt').forEach(el => el.innerText = t.stAll);
+        }
+
+        function renderStatsUI() {
+            updateStatsTranslations();
+            const statsContainer = document.getElementById('stats-numbers');
+            const chartContainer = document.getElementById('dist-chart');
+            if (!statsContainer || !chartContainer) return;
+
+            let s = { played: 0, won: 0, dist: [0,0,0,0,0,0,0,0] };
+            const t = TEXT[stLang] || TEXT['it']; // Fallback alla lingua italiana se qualcosa va storto
+
+            // 1. Gestione classi Active sui filtri
+            document.querySelectorAll('.stat-lang div').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.stat-len div').forEach(el => el.classList.remove('active'));
+            
+            const langEl = document.getElementById(`sl-${stLang}`);
+            const lenEl = document.getElementById(`sn-${stLen}`);
+            if(langEl) langEl.classList.add('active');
+            if(lenEl) lenEl.classList.add('active');
+
+            // 2. LOGICA DI AGGREGAZIONE INTELLIGENTE
+            // Determiniamo su quali lingue iterare
+            const langsToIterate = stLang === 'all' ? ['it', 'en', 'fr', 'es'] : [stLang];
+            // Determiniamo su quali lunghezze iterare
+            const lensToIterate = stLen === 'all' ? [5, 6, 7] : [stLen];
+
+            langsToIterate.forEach(l => {
+                lensToIterate.forEach(n => {
+                    let data = getFullStats(l, n);
+                    s.played += data.played;
+                    s.won += data.won;
+                    // Somma i tentativi array per array
+                    data.dist.forEach((v, i) => { if(s.dist[i] !== undefined) s.dist[i] += v; });
+                });
+            });
+
+            // 3. Calcoli Metriche
+            const winPerc = s.played > 0 ? Math.round((s.won / s.played) * 100) : 0;
+            let totalGuesses = 0;
+            let totalWins = 0;
+            s.dist.forEach((count, i) => {
+                totalGuesses += (count * (i + 1));
+                totalWins += count;
+            });
+            const avg = totalWins > 0 ? (totalGuesses / totalWins).toFixed(1) : "-";
+
+            // 4. Scrittura Dati (Numeri in alto)
+            statsContainer.innerHTML = `
+                <div class="stat-box"><span class="stat-val">${s.played}</span><span class="stat-label">${t.stPlay}</span></div>
+                <div class="stat-box"><span class="stat-val">${s.won}</span><span class="stat-label">${t.stWon}</span></div>
+                <div class="stat-box"><span class="stat-val">${winPerc}%</span><span class="stat-label">${t.stWinP}</span></div>
+                <div class="stat-box"><span class="stat-val">${avg}</span><span class="stat-label">${t.stAvg}</span></div>
+            `;
+
+            // 5. Disegno Grafico
+            const maxVal = Math.max(...s.dist, 1);
+            
+            // Quante righe mostrare? Se è selezionata una lunghezza fissa, mostra N+1 righe. Se 'all', mostra tutte le 8 possibili.
+            const triesLimit = stLen === 'all' ? 8 : parseInt(stLen) + 1;
+            
+            let chartHTML = "";
+            for (let i = 1; i <= triesLimit; i++) {
+                const val = s.dist[i-1] || 0;
+                const width = Math.max(7, Math.round((val / maxVal) * 100));
+                const isHighlight = val > 0 ? 'highlight' : '';
+                
+                chartHTML += `
+                    <div class="dist-row">
+                        <div class="dist-num">${i}</div>
+                        <div class="dist-bar-bg">
+                            <div class="dist-bar ${isHighlight}" style="width:${width}%">${val}</div>
+                        </div>
+                    </div>`;
+            }
+            chartContainer.innerHTML = chartHTML;
+        }
+
+        function closeStats() {
+            document.getElementById('stats-popup').style.display = 'none';
+        }
+
+        // Funzione fondamentale per recuperare i dati salvati (ora legge l'array)
+        function getFullStats(lang, len) {
+            const modeKey = `${lang}_${len}`;
+            
+            if (window.cloudStats && window.cloudStats[modeKey]) {
+                return window.cloudStats[modeKey];
+            }
+
+            // Legge dal nuovo LocalDB
+            let db = LocalDB.get();
+            const localHistory = db.history[modeKey] || [];
+            
+            let s = { played: 0, won: 0, streak: 0, best: 0, dist: [0,0,0,0,0,0,0,0] };
+            let sortedHistory = [...localHistory].sort((a,b) => parseInt(a.split('#')[0]) - parseInt(b.split('#')[0]));
+
+            sortedHistory.forEach(match => {
+                const tries = parseInt(match.split('#')[1]);
+                s.played++;
+                if (tries > 0) {
+                    s.won++; s.streak++;
+                    if (s.streak > s.best) s.best = s.streak;
+                    s.dist[tries - 1]++;
+                } else {
+                    s.streak = 0;
+                }
+            });
+            return s;
+        }
 
         function showPopup(message) {
             const popup = document.getElementById('end-popup');
@@ -1599,61 +2494,53 @@
         }
 
         function updateStreak(win) {
-            const streakKey = `streak_${currentLang}_${currentLen}`;
-            const bestKey = `best_${currentLang}_${currentLen}`;
+            let earnedHint = false;
+            const attemptValue = win ? currentRow + 1 : 0;
+            const dataString = `${Date.now()}#${attemptValue}`;
+            const modeKey = `${currentLang}_${currentLen}`;
 
-            let streak = parseInt(localStorage.getItem(streakKey)) || 0;
-            let best = parseInt(localStorage.getItem(bestKey)) || 0;
-            let earnedHint = false; // Variabile per tracciare se abbiamo vinto l'aiuto
+            // 1. Salva nel DB Locale e metti in coda!
+            LocalDB.addGame(modeKey, dataString);
 
+            // 2. Logica Globale Vittorie
+            let db = LocalDB.get();
             if (win) {
-                streak++;
-                if (streak > best) best = streak;
-
-                // CONTATORE GLOBALE DELLE VITTORIE (vale per sempre e per tutte le lingue)
-                let totalWins = parseInt(localStorage.getItem('mywordle_global_wins')) || 0;
-                totalWins++;
-                localStorage.setItem('mywordle_global_wins', totalWins);
-
-                // Ogni 5 vittorie regaliamo l'aiuto
-                if (totalWins % 5 === 0) {
-                    let hints = parseInt(localStorage.getItem('mywordle_hints')) || 0;
-                    hints++;
-                    localStorage.setItem('mywordle_hints', hints);
+                db.account.globalWins++;
+                if (db.account.globalWins % 5 === 0) {
+                    db.account.hints++;
                     updateHintUI();
-                    earnedHint = true; // Segnaliamo che abbiamo vinto!
+                    earnedHint = true;
+                    if (window.saveHintsToCloud) window.saveHintsToCloud(db.account.hints);
                 }
-            } else {
-                streak = 0;
+                LocalDB.save(db); // Salviamo le vittorie e gli aiuti
             }
 
-            localStorage.setItem(streakKey, streak);
-            localStorage.setItem(bestKey, best);
-            
-            return earnedHint; // Restituiamo il risultato
+            updateHomeStats();
+            return earnedHint; 
         }
 
         function goHome() {
+            saveGameState();
             document.getElementById('game-screen').style.display = 'none';
             document.getElementById('home-screen').style.display = 'flex';
+            const profileBtn = document.getElementById('user-profile-btn');
+            if (profileBtn) profileBtn.style.display = 'flex';
             currentRow = 0; currentCol = 0;
             updateHomeStats();
         }
 
         // Salva lo stato attuale
         function saveGameState() {
-            const sessionKey = `session_${currentLang}_${currentLen}`;
+            const modeKey = `${currentLang}_${currentLen}`;
             const state = {
                 targetWord: targetWord,
                 currentRow: currentRow,
-                // Salviamo le parole inserite finora
                 guesses: getGuessesSoFar(), 
-                // Dati per il "velo" e la tastiera
                 knownLetters: knownLetters,
                 wrongPositions: wrongPositions,
-                absentLetters: Array.from(absentLetters) // I Set vanno convertiti in Array per JSON
+                absentLetters: Array.from(absentLetters) 
             };
-            localStorage.setItem(sessionKey, JSON.stringify(state));
+            LocalDB.saveSession(modeKey, state); // USA LOCALDB!
         }
 
         // Recupera le parole scritte nella griglia
@@ -1672,7 +2559,8 @@
 
         // Rimuove la sessione (da chiamare a fine partita)
         function clearGameState() {
-            localStorage.removeItem(`session_${currentLang}_${currentLen}`);
+            const modeKey = `${currentLang}_${currentLen}`;
+            LocalDB.clearSession(modeKey); // USA LOCALDB!
         }
 
         function showToast(message) {
@@ -1687,6 +2575,239 @@
             setTimeout(() => {
                 toast.remove();
             }, 2500);
+        }
+
+        function calculateAllStats(gameHistory) {
+            let statsMap = {};
+
+            // Cicliamo su ogni "cartella" (it_5, en_6, ecc.)
+            for (const [mode, matches] of Object.entries(gameHistory)) {
+                if (!Array.isArray(matches)) continue;
+
+                // Inizializziamo le statistiche per questa modalità
+                statsMap[mode] = { played: 0, won: 0, streak: 0, best: 0, dist: [0, 0, 0, 0, 0, 0, 0, 0] };
+                let s = statsMap[mode];
+
+                // Ordiniamo le partite per timestamp (la parte prima del #)
+                const sortedMatches = matches.sort((a, b) => {
+                    return parseInt(a.split('#')[0]) - parseInt(b.split('#')[0]);
+                });
+
+                sortedMatches.forEach(match => {
+                    const [ts, triesStr] = match.split('#');
+                    const tries = parseInt(triesStr);
+                    
+                    s.played++;
+
+                    if (tries > 0) { // È una vittoria
+                        s.won++;
+                        s.streak++;
+                        if (s.streak > s.best) s.best = s.streak;
+                        s.dist[tries - 1]++;
+                    } else { // È una sconfitta
+                        s.streak = 0;
+                    }
+                });
+            }
+
+            return statsMap;
+        }
+
+        // --- GESTIONE MENU UTENTE ---
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('user-dropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        // Chiude il menu se clicchi fuori
+        window.addEventListener('click', function(e) {
+            if (!document.getElementById('user-menu-container').contains(e.target)) {
+                document.getElementById('user-dropdown').classList.add('hidden');
+            }
+        });
+
+        function openLoginModal() {
+            document.getElementById('user-dropdown').classList.add('hidden');
+            document.getElementById('login-popup').style.display = 'flex';
+        }
+
+        // Funzione da chiamare quando si clicca per aprire il profilo
+        function openProfileModal() {
+            let db = LocalDB.get();
+            document.getElementById('user-dropdown').classList.add('hidden');
+            document.getElementById('profile-popup').style.display = 'flex';
+            const nickInput = document.getElementById('profile-nickname');
+            
+            // 1. Inserisce il nickname attuale se esiste
+            if (nickInput) {
+                nickInput.value = db.profile.nickname || "";
+            }
+
+            // 2. Imposta l'avatar nel carosello basandosi sul DB
+            window.currentAvatarId = db.profile.avatar || 1;
+            updateAvatarDisplay(); // Questa funzione aggiorna le immagini prev/curr/next
+        }
+
+        function closeModals() {
+            document.getElementById('login-popup').style.display = 'none';
+            document.getElementById('profile-popup').style.display = 'none';
+        }
+
+        // Aggiorna il tasto mute nel nuovo menu
+        function toggleMute() {
+            bgMusic.yes = !bgMusic.yes;
+            const txt = bgMusic.yes ? '🔊 Musica: ON' : '🔇 Musica: OFF';
+            document.querySelectorAll('.menu-mute-btn').forEach(btn => btn.innerText = txt);
+            
+            if (bgMusic.yes) playWithFade();
+            else bgMusic.pause();
+            
+            document.getElementById('user-dropdown').classList.add('hidden');
+        }
+
+        // --- NUOVO MOTORE CAROSELLO INFINITO ---
+        window.currentAvatarId = 1;
+        const totalAvatars = 36;
+        let isAnimating = false;
+
+        // Memorizziamo gli elementi HTML (non importa in che ordine sono nel DOM)
+        let domSlots = [
+            document.getElementById('av-prev'),
+            document.getElementById('av-curr'),
+            document.getElementById('av-next')
+        ];
+
+        // Inizializza/Reset
+        function updateAvatarDisplay() {
+            let prevId = (window.currentAvatarId - 1 - 1 + totalAvatars) % totalAvatars + 1;
+            let nextId = (window.currentAvatarId - 1 + 1 + totalAvatars) % totalAvatars + 1;
+
+            // Rimuoviamo le transizioni per evitare salti visivi durante il caricamento
+            domSlots.forEach(img => img.classList.remove('animated'));
+
+            // Impostiamo le immagini
+            domSlots[0].src = `Avatar/${prevId}.png`;
+            domSlots[1].src = `Avatar/${window.currentAvatarId}.png`;
+            domSlots[2].src = `Avatar/${nextId}.png`;
+
+            // Impostiamo le posizioni base
+            domSlots[0].className = "avatar-item pos-prev";
+            domSlots[1].className = "avatar-item pos-curr";
+            domSlots[2].className = "avatar-item pos-next";
+
+            // Forza il browser ad applicare i cambi istantanei
+            void domSlots[0].offsetWidth; 
+
+            // Riattiviamo la fluidità
+            domSlots.forEach(img => img.classList.add('animated'));
+        }
+
+        // Rotazione Animata
+        function rotateAvatar(direction) {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            let nextAvatarId = (window.currentAvatarId - 1 + direction + totalAvatars) % totalAvatars + 1;
+            let newOffscreenId;
+
+            let oldPrev = domSlots[0];
+            let oldCurr = domSlots[1];
+            let oldNext = domSlots[2];
+
+            if (direction === 1) { // Avanti
+                newOffscreenId = (nextAvatarId - 1 + 1 + totalAvatars) % totalAvatars + 1;
+                
+                // Teletrasportiamo l'avatar vecchio a destra (invisibile) e cambiamo faccia
+                oldPrev.classList.remove('animated');
+                oldPrev.className = "avatar-item pos-hidden-right";
+                oldPrev.src = `Avatar/${newOffscreenId}.png`;
+                void oldPrev.offsetWidth; // Applica il salto
+                oldPrev.classList.add('animated');
+
+                // Muoviamo tutti verso sinistra fluidamente
+                oldCurr.className = "avatar-item animated pos-prev";
+                oldNext.className = "avatar-item animated pos-curr";
+                oldPrev.className = "avatar-item animated pos-next";
+
+                domSlots = [oldCurr, oldNext, oldPrev]; // Aggiorna riferimenti
+
+            } else { // Indietro
+                newOffscreenId = (nextAvatarId - 1 - 1 + totalAvatars) % totalAvatars + 1;
+
+                // Teletrasportiamo l'avatar futuro a sinistra (invisibile) e cambiamo faccia
+                oldNext.classList.remove('animated');
+                oldNext.className = "avatar-item pos-hidden-left";
+                oldNext.src = `Avatar/${newOffscreenId}.png`;
+                void oldNext.offsetWidth; // Applica il salto
+                oldNext.classList.add('animated');
+
+                // Muoviamo tutti verso destra fluidamente
+                oldPrev.className = "avatar-item animated pos-curr";
+                oldCurr.className = "avatar-item animated pos-next";
+                oldNext.className = "avatar-item animated pos-prev";
+
+                domSlots = [oldNext, oldPrev, oldCurr]; // Aggiorna riferimenti
+            }
+
+            window.currentAvatarId = nextAvatarId;
+
+            // Sblocco l'animazione dopo il termine della transizione (400ms match css)
+            setTimeout(() => { isAnimating = false; }, 400); 
+        }
+
+        // Supporto Swipe su Touchscreen (Più stabile del drag per 3 elementi)
+        const viewport = document.getElementById('avatar-viewport');
+        let touchStartX = 0;
+
+        viewport.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, {passive: true});
+
+        viewport.addEventListener('touchend', e => {
+            let touchEndX = e.changedTouches[0].screenX;
+            if (touchStartX - touchEndX > 30) rotateAvatar(1); // Swipe sinistra
+            if (touchEndX - touchStartX > 30) rotateAvatar(-1); // Swipe destra
+        }, {passive: true});
+
+        // Aiuta l'interpolazione visiva durante il drag
+        function willChangeClasses(state) {
+            const els = [imgPrev, imgCurr, imgNext];
+            els.forEach(el => {
+                if(state === 'start') el.style.transition = "none"; // Blocca CSS transition
+                else el.style.transition = ""; // Riabilita CSS transition
+            });
+        }
+
+        // Calcola manualmente dimensione/opacità durante il drag per massima fluidità
+        function interpolateClasses(ratio) {
+            // ratio va da -1 (full left swipe) a 1 (full right swipe)
+            const absRatio = Math.abs(ratio);
+            const sideSize = 70; const mainSize = 100;
+            const sizeDiff = mainSize - sideSize;
+
+            // Calcolo dimensioni
+            const newCenterSize = mainSize - (sizeDiff * absRatio);
+            const newSideSize = sideSize + (sizeDiff * absRatio);
+
+            // Calcolo opacità
+            const newCenterOp = 1 - (0.5 * absRatio);
+            const newSideOp = 0.5 + (0.5 * absRatio);
+
+            // Applichiamo stili in linea (inline) temporanei
+            imgCurr.style.width = `${newCenterSize}px`; imgCurr.style.height = `${newCenterSize}px`;
+            imgCurr.style.opacity = newCenterOp;
+
+            if (ratio < 0) { // Trasciniamo a sx (verso Next)
+                imgNext.style.width = `${newSideSize}px`; imgNext.style.height = `${newSideSize}px`;
+                imgNext.style.opacity = newSideOp;
+                // Resettiamo prev
+                imgPrev.style.width = ``; imgPrev.style.height = ``; imgPrev.style.opacity = ``;
+            } else { // Trasciniamo a dx (verso Prev)
+                imgPrev.style.width = `${newSideSize}px`; imgPrev.style.height = `${newSideSize}px`;
+                imgPrev.style.opacity = newSideOp;
+                // Resettiamo next
+                imgNext.style.width = ``; imgNext.style.height = ``; imgNext.style.opacity = ``;
+            }
         }
 
         // Ascolto tastiera fisica
@@ -1706,6 +2827,28 @@
             updateHintUI();
         };
 
+        // Gestore globale per i click sugli elementi offline
+        document.addEventListener('click', function(event) {
+            // Cerchiamo se l'elemento cliccato (o i suoi genitori, come un pulsante con icona dentro) 
+            // ha la classe .disabled-offline
+            const disabledElement = event.target.closest('.disabled-offline');
+
+            if (disabledElement) {
+                // Blocca l'azione del pulsante (es. non apre il modale, non invia il form)
+                event.preventDefault();
+                event.stopPropagation();
+
+                // Mostra il feedback all'utente
+                if (typeof showToast === "function") {
+                    showToast("⚠️ Funzione disabilitata: connessione a internet assente.");
+                } else {
+                    alert("Accesso disabilitato per mancanza di internet");
+                }
+                
+                console.warn("Click bloccato: il dispositivo è offline.");
+            }
+        }, true); // Usiamo 'true' per intercettare l'evento nella fase di cattura
+
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./sw.js').then(reg => {
 
@@ -1722,6 +2865,303 @@
         <div id="popup-content"></div>
     </div>
     <div id="toast-container"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+        import { 
+            getAuth, GoogleAuthProvider, signInWithPopup, signOut, 
+            createUserWithEmailAndPassword, signInWithEmailAndPassword, 
+            onAuthStateChanged, getAdditionalUserInfo 
+        } from 'https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js';
+        import { 
+            initializeFirestore, persistentLocalCache, persistentMultipleTabManager, doc, setDoc, getDoc, onSnapshot, arrayUnion, updateDoc
+        } from 'https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js';
+
+        // 1. Configurazione
+        const firebaseConfig = {
+            apiKey: "AIzaSyDmJhK0G1CZ5uu28o5LIxmWgqF3_p0GtBk",
+            authDomain: "mywordle-c2379.firebaseapp.com",
+            projectId: "mywordle-c2379",
+            storageBucket: "mywordle-c2379.firebasestorage.app",
+            messagingSenderId: "936548361432",
+            appId: "1:936548361432:web:b11f57f2190ef17e1f63ad",
+            measurementId: "G-QPFZ856C4V"
+        };
+
+        // 2. Inizializzazione
+        const app = initializeApp(firebaseConfig);
+        window.firebaseAuth = getAuth(app);
+        window.firebaseDB = initializeFirestore(app, {
+            localCache: persistentLocalCache(),
+            multipleTabManager: persistentMultipleTabManager()
+        });
+
+        let currentUserDoc = null; // Variabile per tenere in memoria i dati del profilo
+
+        // 3. Funzione di Aggiornamento UI
+        // Aggiorna anche il salvataggio Profilo per riflettere il nuovo DB Locale
+        window.updateUIForLoggedInUser = (nickname, avatarId) => {
+            const loggedOutMenu = document.getElementById('menu-logged-out');
+            const loggedInMenu = document.getElementById('menu-logged-in');
+            const nickDisplay = document.getElementById('menu-nickname');
+            const avatarImg = document.getElementById('user-avatar');
+
+            let db = LocalDB.get();
+            db.profile.nickname = nickname;
+            db.profile.avatar = avatarId;
+            LocalDB.save(db);
+
+            if (loggedOutMenu) loggedOutMenu.style.display = 'none';
+            if (loggedInMenu) loggedInMenu.style.display = 'block';
+            if (nickDisplay) nickDisplay.innerText = `Ciao, ${nickname}!`;
+            if (avatarImg) avatarImg.src = `Avatar/${avatarId || 40}.png`;
+        };
+
+        function updateUIForLoggedOutUser() {
+            document.getElementById('menu-logged-out').style.display = 'block';
+            document.getElementById('menu-logged-in').style.display = 'none';
+            document.getElementById('user-avatar').src = `Avatar/40.png`;
+        }
+
+        // 4. Gestione Successo Accesso
+        async function handleLoginSuccess(user, isNewUser) {
+            if (isNewUser) {
+                closeModals();
+                openProfileModal();
+            } else {
+                try {
+                    // Proviamo a leggere il documento
+                    const docSnap = await getDoc(doc(window.firebaseDB, 'users', user.uid));
+                    
+                    if (docSnap.exists() && docSnap.data().account.nickname) {
+                        currentUserDoc = docSnap.data();
+                        updateUIForLoggedInUser(currentUserDoc.account.nickname, currentUserDoc.account.avatarId);
+                        closeModals();
+                        showToast("Bentornato " + currentUserDoc.account.nickname + "!");
+                    } else {
+                        // Loggato ma senza profilo compilato
+                        closeModals();
+                        openProfileModal();
+                    }
+                } catch (error) {
+                    console.error("Errore nel recupero del profilo:", error);
+                    showToast("Errore di connessione al profilo.");
+                    closeModals(); // Chiudiamo comunque il modal per non bloccare l'utente
+                }
+            }
+        }
+
+        // --- FUNZIONI GLOBALI (esposte a window per gli onclick dell'HTML) ---
+
+        // Accesso Google
+        window.loginWithGoogle = async () => {
+            const provider = new GoogleAuthProvider();
+            try {
+                const cred = await signInWithPopup(window.firebaseAuth, provider);
+                const details = getAdditionalUserInfo(cred);
+                handleLoginSuccess(cred.user, details.isNewUser);
+            } catch (error) {
+                console.error(error);
+                showToast("Errore Google: " + error.message);
+            }
+        };
+
+        // Accesso/Registrazione automatica Email
+        window.loginWithEmail = async () => {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (!email || !password) {
+                return showToast("Inserisci Email e Password!");
+            }
+
+            try {
+                // Tentativo 1: Facciamo il Login
+                const cred = await signInWithEmailAndPassword(window.firebaseAuth, email, password);
+                handleLoginSuccess(cred.user, false);
+                
+            } catch (error) {
+                // Se fallisce, controlliamo se è perché i dati sono invalidi o non esiste
+                if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found') {
+                    try {
+                        // Tentativo 2: Non esiste? Lo registriamo in automatico!
+                        const cred = await createUserWithEmailAndPassword(window.firebaseAuth, email, password);
+                        handleLoginSuccess(cred.user, true); // true = è un nuovo utente
+                    } catch (regError) {
+                        if (regError.code === 'auth/email-already-in-use') {
+                            showToast("❌ Password errata!"); // Se l'email esisteva già, allora ha solo sbagliato la password
+                        } else if (regError.code === 'auth/weak-password') {
+                            showToast("❌ La password deve essere di almeno 6 caratteri");
+                        } else {
+                            showToast("❌ Errore registrazione: " + regError.message);
+                        }
+                    }
+                } else {
+                    showToast("❌ Errore: " + error.message);
+                }
+            }
+        };
+
+        // Logout
+        window.logoutAction = async () => {
+            await signOut(window.firebaseAuth);
+            document.getElementById('user-dropdown').classList.add('hidden');
+            showToast("Sei uscito dall'account.");
+        };
+
+        // Salvataggio Profilo
+        window.saveProfile = async () => {
+            const nick = document.getElementById('profile-nickname').value.trim();
+            const validNickRegex = /^[a-zA-Z0-9 _-àèìòùÀÈÌÒÙáéíóúÁÉÍÓÚ]+$/;
+
+            if (!nick) {
+                return showToast("⚠️ Il nickname non può essere vuoto!");
+            }
+            if(nick.length < 3) {
+                return showToast("⚠️ Il nickname deve avere almeno 3 caratteri!");
+            }
+            if(!validNickRegex.test(nick)) {
+                return showToast("⚠️ Il nickname contiene caratteri non validi!");
+            }
+            
+            const user = window.firebaseAuth.currentUser;
+            if (!user) return;
+
+            try {
+                // Salviamo su Firestore (merge: true evita di cancellare i punteggi se già esistono)
+                await setDoc(doc(window.firebaseDB, 'users', user.uid), {
+                    account: {
+                        nickname: nick,
+                        avatarId: window.currentAvatarId,
+                        email: user.email,
+                        provider: user.providerData[0].providerId,
+                        lastSync: new Date().toISOString()
+                    }
+                }, { merge: true });
+
+                updateUIForLoggedInUser(nick, window.currentAvatarId);
+                let dbLocal = LocalDB.get();
+                dbLocal.profile.nickname = nick;
+                dbLocal.profile.avatar = window.currentAvatarId;
+                LocalDB.save(dbLocal);
+                closeModals();
+                showToast("✅ Profilo salvato!");
+            } catch (error) {
+                console.error(error);
+                showToast("❌ Errore di connessione.");
+            }
+        };
+
+        // --- SALVATAGGIO STATISTICHE A FINE PARTITA ---
+        window.syncDataToCloud = async () => {
+            // 1. LIVELLO: Siamo davvero online?
+            if (!ConnectionMonitor.isStable) return;
+
+            // 2. LIVELLO: Firebase è pronto? 
+            // Usiamo window.db per assicurarci di leggere la variabile globale
+            const firestore = window.firebaseDB; 
+            const user = window.firebaseAuth.currentUser;
+
+            if (!user || !firestore) return;
+
+            const localData = LocalDB.get();
+            const queue = localData.syncQueue || [];
+            if (queue.length === 0) return;
+
+            const historyToSend = localData.history || {};
+
+            try {
+                const userDocRef = doc(firestore, 'users', user.uid);
+
+                // Proviamo il salvataggio
+                // Firebase offline non darà errore qui, ma se abbiamo passato il ConnectionMonitor
+                // siamo ragionevolmente sicuri di essere davvero online.
+                await setDoc(userDocRef, {
+                    gameHistory: historyToSend,
+                    account: {
+                        lastSync: new Date().toISOString()
+                    }
+                }, { merge: true });
+
+                // 3. LIVELLO: Solo se setDoc non ha lanciato eccezioni, svuotiamo la coda
+                console.log("✅ Sincronizzazione Cloud riuscita!");
+                localData.syncQueue = []; 
+                LocalDB.save(localData);
+
+            } catch (error) {
+                console.error("❌ Errore critico durante la sincronizzazione:", error);
+                // Se c'è un errore di permessi o di rete non previsto, la coda RESTA lì.
+            }
+        };
+
+        window.saveHintsToCloud = async (hintsCount) => {
+            const user = window.firebaseAuth.currentUser;
+            if (!user) return;
+            try {
+                await updateDoc(doc(window.firebaseDB, 'users', user.uid), {
+                    "account.hints": hintsCount,
+                    "account.lastSync": new Date().toISOString()
+                });
+            } catch (e) {
+                console.error("Errore salvataggio aiuti:", e);
+            }
+        };
+
+        // 5. Listener di Stato (Riconosce l'utente quando ricarichi la pagina)
+        // --- VARIABILI GLOBALI UTILI ---
+        let unsubscribeSnapshot = null; // Serve per "spegnere" l'ascolto se l'utente fa logout
+        window.cloudStats = {}; // Qui salveremo i dati scaricati dal cloud
+
+        // --- LISTENER DI STATO E SNAPSHOT ---
+        onAuthStateChanged(window.firebaseAuth, (user) => {
+            if (user) {
+                // Se c'era un vecchio ascolto attivo, lo spegniamo per sicurezza
+                if (unsubscribeSnapshot) unsubscribeSnapshot();
+
+                // SVUOTA LA CODA APPENA FAI IL LOGIN!
+                window.syncDataToCloud();
+
+                // Attiviamo lo Snapshotting: Firebase ci chiamerà in automatico ogni volta che i dati cambiano!
+                unsubscribeSnapshot = onSnapshot(doc(window.firebaseDB, 'users', user.uid), (docSnap) => {
+                    if (docSnap.exists()) {
+                        const cloudData = docSnap.data();
+                        let localDB = LocalDB.get();
+
+                        // 1. Sincronizza Profilo
+                        if (cloudData.account) {
+                            localDB.profile.nickname = cloudData.account.nickname || "Player";
+                            localDB.profile.avatar = cloudData.account.avatarId || 1;
+                            localDB.account.hints = cloudData.account.hints ?? 0;
+                            
+                            updateUIForLoggedInUser(localDB.profile.nickname, localDB.profile.avatar);
+                            if (typeof updateHintUI === "function") updateHintUI();
+                        }
+
+                        // 2. Sincronizza HISTORY (Il punto critico)
+                        if (cloudData.gameHistory && typeof cloudData.gameHistory === 'object') {
+                            localDB.history = cloudData.gameHistory;
+                            window.cloudStats = calculateAllStats(cloudData.gameHistory);
+                            
+                            if (typeof updateHomeStats === "function") updateHomeStats();
+                        }
+
+                        // 3. Salva tutto nel LocalStorage (Senza sovrascrivere con Firebase!)
+                        LocalDB.save(localDB);
+                    }
+                });
+
+            } else {
+                // L'utente si è scollegato
+                if (unsubscribeSnapshot) {
+                    unsubscribeSnapshot();
+                    unsubscribeSnapshot = null;
+                }
+                window.cloudStats = {};
+                updateUIForLoggedOutUser();
+            }
+        });
+
+    </script>
 
 </body>
 </html>
