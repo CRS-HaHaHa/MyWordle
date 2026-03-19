@@ -1148,6 +1148,7 @@
             h1 {
                 margin-top: 30px;
                 margin-bottom: 30px;
+                margin-right: 13%;
             }
 
             @media (max-height: 760px) {
@@ -1176,13 +1177,13 @@
 
             #user-menu-container {
             position: absolute;
-            top: 20px;
+            top: 38px;
             right: 17px;
             }
 
             #user-avatar {
-                width: 32px;
-                height: 32px;
+                width: 40px;
+                height: 40px;
             }
 
             /* 1. MODIFICA CONTENITORE: Permette ai bottoni di andare a capo */
@@ -1254,7 +1255,7 @@
 
             /* Altri aggiustamenti griglia/tastiera (già presenti nel tuo codice) */
             .tile { width: 44px; height: 44px; font-size: 1.6rem; }
-            #keyboard { width: 98%; padding: 2px; margin-bottom: 10px;}
+            #keyboard { width: 95%; padding: 2px; margin-bottom: 10px;}
             .kb-row { gap: 3px; margin-bottom: 15px; }
             .key { 
                 height: 52px; 
@@ -1833,8 +1834,8 @@
             document.getElementById('home-screen').style.display = 'none';
             gameScreen.style.display = 'flex';
             gameScreen.classList.add('fade-in-up');
-            const profileBtn = document.getElementById('user-profile-btn');
-            if (profileBtn) profileBtn.style.display = 'none';
+            const userProfile = document.getElementById('user-avatar');
+            if (userProfile) userProfile.style.display = 'none';
 
             initGrid();
             initKeyboard();
@@ -2574,8 +2575,10 @@
             saveGameState();
             document.getElementById('game-screen').style.display = 'none';
             document.getElementById('home-screen').style.display = 'flex';
-            const profileBtn = document.getElementById('user-profile-btn');
-            if (profileBtn) profileBtn.style.display = 'flex';
+            const userProfile = document.getElementById('user-avatar');
+            if (userProfile && !userProfile.classList.contains('hidden')) {
+                userProfile.style.display = 'flex'; // o 'block', a seconda di come è impostato nel tuo CSS/Tailwind
+            }
             currentRow = 0; currentCol = 0;
             updateHomeStats();
         }
