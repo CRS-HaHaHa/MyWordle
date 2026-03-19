@@ -905,6 +905,8 @@
                     fadeOut 0.3s ease-in 2.2s forwards;
         }
 
+        .hidden { display: none !important; }
+
         @keyframes slideDownIn {
             from { transform: translateY(-20px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
@@ -1424,6 +1426,18 @@
             <div class="dist-chart" id="dist-chart"></div>
 
             <button class="key-big" id="st-close" style="width: 100%; margin-top: 20px;" onclick="closeStats()">CHIUDI</button>
+        </div>
+    </div>
+
+    <div id="custom-confirm" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+        <div style="background: white; padding: 2rem; border-radius: 1.5rem; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🚪</div>
+            <h3 id="confirm-title" style="margin-bottom: 1rem; color: #1a202c; font-size: 1.25rem; font-weight: bold;">Sei sicuro?</h3>
+            <p id="confirm-message" style="color: #4a5568; margin-bottom: 2rem; line-height: 1.5;">Le tue statistiche sono al sicuro nel Cloud, ma i dati locali verranno rimossi.</p>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button id="confirm-cancel" style="padding: 0.75rem 1.5rem; border-radius: 0.75rem; border: 1px solid #e2e8f0; background: white; cursor: pointer; font-weight: 600;">Annulla</button>
+                <button id="confirm-ok" style="padding: 0.75rem 1.5rem; border-radius: 0.75rem; border: none; background: #f56565; color: white; cursor: pointer; font-weight: 600;">Sì, Esci</button>
+            </div>
         </div>
     </div>
 
@@ -2644,7 +2658,8 @@
             }
 
             // 2. Imposta l'avatar nel carosello basandosi sul DB
-            window.currentAvatarId = db.profile.avatar || 1;
+            if (!db.profile.avatar || db.profile.avatar < 1 || db.profile.avatar > totalAvatars) db.profile.avatar = 1; // Sanity check
+            window.currentAvatarId = db.profile.avatar;
             updateAvatarDisplay(); // Questa funzione aggiorna le immagini prev/curr/next
         }
 
@@ -3002,11 +3017,88 @@
             }
         };
 
+        window.askConfirm = (title, message, okText = "Conferma") => {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('custom-confirm');
+                const titleEl = document.getElementById('confirm-title');
+                const msgEl = document.getElementById('confirm-message');
+                const okBtn = document.getElementById('confirm-ok');
+                const cancelBtn = document.getElementById('confirm-cancel');
+
+                titleEl.innerText = title;
+                msgEl.innerText = message;
+                okBtn.innerText = okText;
+                modal.classList.remove('hidden');
+
+                const cleanup = (result) => {
+                    modal.classList.add('hidden');
+                    okBtn.onclick = null;
+                    cancelBtn.onclick = null;
+                    resolve(result);
+                };
+
+                okBtn.onclick = () => cleanup(true);
+                cancelBtn.onclick = () => cleanup(false);
+                // Chiudi anche cliccando fuori dal box
+                modal.onclick = (e) => { if(e.target === modal) cleanup(false); };
+            });
+        };
+
         // Logout
         window.logoutAction = async () => {
-            await signOut(window.firebaseAuth);
-            document.getElementById('user-dropdown').classList.add('hidden');
-            showToast("Sei uscito dall'account.");
+            // 1. Controllo Connessione (Sicurezza extra oltre alla classe CSS)
+            if (!ConnectionMonitor.isStable) {
+                showToast("⚠️ Connessione instabile. Torna online per uscire in sicurezza.");
+                return;
+            }
+
+            const localData = LocalDB.get();
+            const queue = localData.syncQueue || [];
+
+            // 2. Gestione dei dati pendenti (SyncQueue)
+            if (queue.length > 0) {
+                showToast("🔄 Sincronizzazione ultimi dati in corso...");
+                await window.syncDataToCloud();
+                
+                // Verifichiamo se dopo il tentativo la coda è ancora piena
+                const checkAgain = LocalDB.get();
+                if (checkAgain.syncQueue && checkAgain.syncQueue.length > 0) {
+                    const force = await askConfirm(
+                        "⚠️ Attenzione", 
+                        "Alcuni dati non sono stati salvati sul Cloud. Se esci ora, questi progressi andranno persi per sempre. Vuoi uscire comunque?",
+                        "Sì, Esci"
+                    );
+                    if (!force) return; // L'utente ha deciso di annullare per non perdere i dati
+                }
+            } else {
+                // 3. Conferma standard se tutto è già sincronizzato
+                const confermato = await askConfirm(
+                    "Vuoi uscire?", 
+                    "Le tue statistiche sono al sicuro nel Cloud, ma i dati locali verranno rimossi da questo dispositivo.",
+                    "Sì, Esci"
+                );
+                if (!confermato) return;
+            }
+
+            // 4. Esecuzione del Logout e Pulizia
+            try {
+                // Chiude la sessione Firebase
+                await signOut(window.firebaseAuth);
+                
+                // Rimuove i dati locali (così il prossimo utente non vede i tuoi record)
+                localStorage.removeItem('mywordle_data');
+                
+                showToast("✅ Logout completato. Alla prossima!");
+
+                // Ricarica la pagina per resettare lo stato dell'app
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+
+            } catch (error) {
+                console.error("Errore durante il logout:", error);
+                showToast("❌ Errore durante l'uscita. Riprova.");
+            }
         };
 
         // Salvataggio Profilo
