@@ -2865,13 +2865,38 @@
         }, true); // Usiamo 'true' per intercettare l'evento nella fase di cattura
 
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js').then(reg => {
+            let refreshing = false;
 
-                // se c'è già un SW in attesa → ricarica quando prende controllo
-                navigator.serviceWorker.addEventListener('controllerchange', () => {
-                window.location.reload();
-                });
+            // 1. Intercettiamo il cambio di versione immediatamente
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (refreshing) return;
+                refreshing = true;
 
+                // BLOCCO IMMEDIATO: Impediamo all'utente di interagire con il gioco
+                document.body.style.pointerEvents = 'none'; 
+                document.body.style.transition = 'opacity 0.5s ease';
+                document.body.style.opacity = '0.7';
+
+                // Messaggio Toast prioritario
+                if (typeof showToast === "function") {
+                    showToast("🔄 Aggiornamento in corso: caricamento nuova versione...", 10000);
+                }
+
+                // Ricarichiamo dopo 1 secondo (abbastanza per vedere il messaggio, troppo poco per iniziare a giocare)
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            });
+
+            // 2. Registrazione e controllo aggiornamenti in attesa
+            navigator.serviceWorker.register('sw.js').then(reg => {
+                // Se c'è già un aggiornamento pronto che aspetta, forziamolo
+                if (reg.waiting) {
+                    reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+                }
+                
+                // Controlla aggiornamenti ogni volta che si apre la pagina
+                reg.update();
             });
         }
 
