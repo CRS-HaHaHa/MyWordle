@@ -1709,6 +1709,46 @@
         // Eseguiamo la migrazione all'avvio
         LocalDB.migrateOldData();
 
+        // Funzione per richiedere il blocco dello schermo
+        let wakeLock = null;
+        const requestWakeLock = async () => {
+            try {
+                // Controllo se l'API esiste nel browser
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    // console.log('Schermo sempre attivo.');
+
+                    wakeLock.addEventListener('release', () => {
+                        // console.log('Wake Lock rilasciato.');
+                        wakeLock = null;
+                    });
+                }
+            } catch (err) {
+                // L'errore può accadere se la batteria è troppo bassa o l'utente cambia scheda subito
+                console.warn(`Wake Lock non attivo: ${err}`);
+            }
+        };
+
+        // Per rilasciare il blocco manualmente
+        const releaseWakeLock = () => {
+            if (wakeLock !== null) {
+                wakeLock.release();
+                wakeLock = null;
+            }
+        };
+
+        // Gestione del ritorno sulla pagina dopo essere stati in background
+        document.addEventListener('visibilitychange', async () => {
+            // Verifichiamo se la schermata di gioco è effettivamente visibile
+            const gameScreen = document.getElementById('game-screen');
+            const isGameActive = gameScreen && gameScreen.style.display === 'flex';
+
+            // REQUISITI: La pagina deve essere visibile E dobbiamo essere in partita
+            if (document.visibilityState === 'visible' && isGameActive) {
+                await requestWakeLock();
+            }
+        });
+
         // Gestione Volume e Fade-in
         const bgMusic = document.getElementById('bg-music');
         const muteIcon = document.getElementById('mute-btn');
@@ -1840,7 +1880,8 @@
             gameScreen.classList.add('fade-in-up');
             const userProfile = document.getElementById('user-avatar');
             if (userProfile) userProfile.style.display = 'none';
-
+            
+            requestWakeLock();
             initGrid();
             initKeyboard();
 
@@ -2585,6 +2626,7 @@
             }
             currentRow = 0; currentCol = 0;
             updateHomeStats();
+            releaseWakeLock();
         }
 
         // Salva lo stato attuale
