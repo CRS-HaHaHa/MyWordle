@@ -1,4 +1,4 @@
-const VERSION = 'v1.1.1';
+const VERSION = 'v1.1.2';
 const CACHE_NAME = `MyWordle-cache-${VERSION}`;
 
 const ASSETS = [
@@ -72,6 +72,17 @@ self.addEventListener('activate', (e) => {
   );
 
   self.clients.claim();
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
+// Forza il controllo immediato dei client
+self.addEventListener('activate', (event) => {
+  event.waitUntil(clients.claim());
 });
 
 self.addEventListener('fetch', (e) => {
