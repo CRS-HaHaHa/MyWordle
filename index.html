@@ -56,7 +56,7 @@
         h1 {
             text-align: center;
             font-size: clamp(3.0rem, 9vw, 6.5rem);
-            font-family: Iowan Old Style, Apple Garamond, Baskerville, Times New Roman, Droid Serif, Times, Source Serif Pro, serif;
+            font-family: Iowan Old Style, Apple Garamond, Baskerville, Times New Roman, Droid Serif, Times, Source Serif Pro, serif;;
             font-weight: 900;
             font-variant-caps: small-caps;
             margin-top: 30px;
@@ -118,12 +118,10 @@
             font-weight: 700;
             /* Solo qui mettiamo la transizione di movimento */
             transition: transform .15s, box-shadow .15s, background .15s;
-            
-            /* 1. Toglie il rettangolo blu di selezione al tocco su Mobile */
-            -webkit-tap-highlight-color: transparent;
-
-            /* 2. Toglie il bordo azzurro di "focus" (quello che rimane dopo il click) */
+        }
+        .button:focus, .button:active {
             outline: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         /* Effetto movimento SOLO per i bottoni normali */
@@ -159,6 +157,8 @@
             box-shadow: 0 0 20px rgba(255,255,255,0.6) !important;
             filter: brightness(1.1);
             border-color: white;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         #lang-it.active, #lang-en.active, #lang-fr.active, #lang-es.active {
@@ -166,6 +166,12 @@
             box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.5) !important;
             filter: brightness(1.0);
         }
+        #lang-it.active:hover, #lang-en.active:hover, #lang-fr.active:hover, #lang-es.active:hover,
+        #lang-it.active:active, #lang-en.active:active, #lang-fr.active:active, #lang-es.active:active {
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
 
         #lang-it { background-image: url("Flags/it.png"); }
         #lang-en { background-image: url("Flags/gb.png"); }
@@ -198,6 +204,10 @@
             border-color: var(--accent);
             color: var(--accent);
             box-shadow: 0 10px 20px rgba(255, 107, 107, 0.2);
+        }
+        .len-btn:active, .len-btn:hover, .len-btn.active:hover, .len-btn.active:active {
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .num-large {
@@ -361,6 +371,8 @@
             color: var(--bg2);
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             transform: translateY(-1px);
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .stat-len div {
@@ -404,6 +416,10 @@
             opacity: 1;
             text-decoration: underline;
         }
+        .github-link:active, .github-link:hover {
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
 
         /* Nascondilo quando il gioco è attivo per non distrarre */
         #game-screen ~ .github-link {
@@ -430,7 +446,11 @@
             object-fit: cover;
         }
 
-        #user-avatar:active { transform: scale(0.9); }
+        #user-avatar:active { 
+            transform: scale(0.9); 
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
 
         #user-dropdown {
             position: absolute;
@@ -469,6 +489,11 @@
             color: var(--text-dark);
             border-radius: 8px;
             box-shadow: none;
+        }
+
+        #user-dropdown button :active, #user-dropdown button:hover {
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         /* Stile per i pulsanti disabilitati offline */
@@ -514,6 +539,10 @@
         .custom-input:focus { border-color: var(--bg1); }
 
         .action-btn { width: 100%; height: 50px; font-size: 1rem; margin-bottom: 5px; }
+        .action-btn:hover, .action-btn:active {
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
 
         /* --- STILI SPECIFICI PER POPUP LOGIN COLORATO E CENTRATO --- */
         /* Container specifico per il login per aumentare specificità */
@@ -569,6 +598,10 @@
         .main-gradient-btn:active {
             box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
         }
+        .main-gradient-btn:active, .main-gradient-btn:hover {
+            transform: translateY(2px) !important;
+            filter: brightness(0.9);
+         }
 
         /* Divider stilizzato */
         .modal-buttons-group .divider {
@@ -585,6 +618,10 @@
             gap: 10px;
         }
         .google-btn:hover { background: #f8f9fa !important; }
+        .google-btn:hover, .google-btn:active {
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
         
         .google-btn img { width: 20px; }
 
@@ -737,6 +774,8 @@
         }
         #hint-btn:active {
             transform: translateY(2px);
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         /* GRIGLIA */
