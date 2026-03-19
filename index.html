@@ -55,8 +55,10 @@
 
         h1 {
             text-align: center;
-            font-size: clamp(3rem, 6vw, 4.5rem);
+            font-size: clamp(3.3rem, 6vw, 4.5rem);
+            font-family: none;
             font-weight: 900;
+            font-variant-caps: small-caps;
             margin-top: 30px;
             margin-bottom: 20px;
             background: linear-gradient(135deg, #ff6b6b, #ffd11b, #ffe065);
@@ -89,8 +91,6 @@
             padding: 25px;
             box-shadow: 0 20px 40px rgba(0,0,0,.25);
             margin-top: 25px;
-            margin-right: 0px;
-            margin-left: 0px;
         }
 
         #length-title {
@@ -307,7 +307,7 @@
             padding: 25px 10px;
             border-radius: 24px;
             width: 90%;
-            max-width: 380px;
+            max-width: 500px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.3);
             text-align: center;
             animation: popupEntrance 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
@@ -1161,8 +1161,6 @@
             /* 1. Riduzione spazio sopra "Scegli la lunghezza" */
             .lang-section {
                 margin-top: 15px; /* Ridotto da 20px */
-                margin-right: 20px;
-                margin-left: 20px;
                 padding: 10px;    /* Leggermente più compatto */
             }
 
@@ -1196,8 +1194,8 @@
             /* 3. Riduzione pulsante GIOCA */
             #play-btn {
                 flex: none;
-                margin-top: auto;    /* Ridotto da 40px */
-                margin-bottom: 15px;
+                margin-top: 15px;    /* Ridotto da 40px */
+                margin-bottom: auto;
                 height: 60px;
                 line-height: 30px;
                 padding: 12px 40px;  /* Più basso e meno largo */
