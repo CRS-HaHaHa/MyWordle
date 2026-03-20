@@ -2596,23 +2596,31 @@
             const dataString = `${Date.now()}#${attemptValue}`;
             const modeKey = `${currentLang}_${currentLen}`;
 
-            // 1. Salva nel DB Locale e metti in coda!
+            // 1. Salva la partita nella history e lancia la sincronizzazione
             LocalDB.addGame(modeKey, dataString);
 
-            // 2. Logica Globale Vittorie
+            // 2. Ricalcolo Vittorie e calcolo Aiuti in memoria
             let db = LocalDB.get();
+            db.account.globalWins = window.recountGlobalWins(db.history);
+
             if (win) {
-                db.account.globalWins++;
-                if (db.account.globalWins % 5 === 0) {
+                // Se abbiamo vinto, controlliamo se il nuovo totale è un multiplo di 5 esatto
+                if (db.account.globalWins > 0 && db.account.globalWins % 5 === 0) {
                     db.account.hints++;
-                    updateHintUI();
                     earnedHint = true;
                     if (window.saveHintsToCloud) window.saveHintsToCloud(db.account.hints);
                 }
-                LocalDB.save(db); // Salviamo le vittorie e gli aiuti
             }
+            
+            // 3. SALVATAGGIO (Fondamentale farlo prima di aggiornare la UI!)
+            LocalDB.save(db); 
 
+            // 4. Aggiornamento Interfaccia Grafica (ora leggerà i dati freschi appena salvati)
+            if (earnedHint) {
+                updateHintUI();
+            }
             updateHomeStats();
+            
             return earnedHint; 
         }
 
@@ -2712,6 +2720,19 @@
 
             return statsMap;
         }
+
+        // Funzione per ricalcolare le vittorie esatte leggendo la cronologia
+        window.recountGlobalWins = function(historyObj) {
+            let wins = 0;
+            if (!historyObj) return 0;
+            for (const mode in historyObj) {
+                historyObj[mode].forEach(match => {
+                    const tries = parseInt(match.split('#')[1]);
+                    if (tries > 0) wins++;
+                });
+            }
+            return wins;
+        };
 
         // --- GESTIONE MENU UTENTE ---
         function toggleUserMenu() {
@@ -3257,17 +3278,12 @@
 
         // --- SALVATAGGIO STATISTICHE A FINE PARTITA ---
         window.syncDataToCloud = async () => {
-            // 1. LIVELLO: Siamo davvero online?
             if (!ConnectionMonitor.isStable) return;
-
-            // 2. LIVELLO: Firebase è pronto? 
-            // Usiamo window.db per assicurarci di leggere la variabile globale
             const firestore = window.firebaseDB; 
             const user = window.firebaseAuth.currentUser;
-
             if (!user || !firestore) return;
 
-            const localData = LocalDB.get();
+            let localData = LocalDB.get();
             const queue = localData.syncQueue || [];
             if (queue.length === 0) return;
 
@@ -3276,24 +3292,26 @@
             try {
                 const userDocRef = doc(firestore, 'users', user.uid);
 
-                // Proviamo il salvataggio
-                // Firebase offline non darà errore qui, ma se abbiamo passato il ConnectionMonitor
-                // siamo ragionevolmente sicuri di essere davvero online.
                 await setDoc(userDocRef, {
                     gameHistory: historyToSend,
-                    account: {
-                        lastSync: new Date().toISOString()
-                    }
+                    account: { lastSync: new Date().toISOString() }
                 }, { merge: true });
 
-                // 3. LIVELLO: Solo se setDoc non ha lanciato eccezioni, svuotiamo la coda
                 console.log("✅ Sincronizzazione Cloud riuscita!");
-                localData.syncQueue = []; 
-                LocalDB.save(localData);
+                
+                // 🔥 FIX CRITICO: Recuperiamo lo stato FRESCO del database locale
+                // perché nel frattempo il gioco ha cancellato la sessione in background!
+                let freshDB = LocalDB.get();
+                
+                // Rimuoviamo dalla coda solo gli elementi che abbiamo appena inviato
+                freshDB.syncQueue = freshDB.syncQueue.filter(item => 
+                    !queue.some(sentItem => sentItem.event === item.event)
+                );
+                
+                LocalDB.save(freshDB);
 
             } catch (error) {
                 console.error("❌ Errore critico durante la sincronizzazione:", error);
-                // Se c'è un errore di permessi o di rete non previsto, la coda RESTA lì.
             }
         };
 
@@ -3354,6 +3372,8 @@
                         if (cloudData.gameHistory && typeof cloudData.gameHistory === 'object') {
                             localDB.history = cloudData.gameHistory;
                             window.cloudStats = calculateAllStats(cloudData.gameHistory);
+
+                            localDB.account.globalWins = window.recountGlobalWins(cloudData.gameHistory);
                             
                             if (typeof updateHomeStats === "function") updateHomeStats();
                         }
