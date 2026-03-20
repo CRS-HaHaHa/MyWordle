@@ -1,4 +1,4 @@
-const VERSION = 'v1.1.09';
+const VERSION = 'v1.1.10';
 const CACHE_NAME = `MyWordle-cache-${VERSION}`;
 
 const ASSETS = [
@@ -64,6 +64,27 @@ self.addEventListener('install', (e) => {
   );
 });
 
+  // altri file → cache first
+self.addEventListener('fetch', e => {
+  const url = new URL(e.request.url);
+
+  // 1. ESCLUDI FIREBASE E GOOGLE AUTH
+  // Se l'URL contiene googleapis o firebase, non usare la cache e vai diretto in rete
+  if (url.hostname.includes('googleapis.com') || url.hostname.includes('firebase')) {
+      return; // Esce e lascia che il browser gestisca la richiesta normalmente
+  }
+
+  // 2. LOGICA STANDARD PER IL RESTO (Cache-first)
+  e.respondWith(
+      caches.match(e.request).then(res => {
+          return res || fetch(e.request).catch(() => {
+              // Opzionale: qui potresti ritornare una pagina offline se la rete fallisce
+              console.warn("Rete non disponibile per:", e.request.url);
+          });
+      })
+  );
+});
+
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then(keys =>
@@ -96,9 +117,4 @@ self.addEventListener('fetch', (e) => {
     );
     return;
   }
-
-  // altri file → cache first
-  e.respondWith(
-    caches.match(e.request).then(res => res || fetch(e.request))
-  );
 });
