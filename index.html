@@ -777,6 +777,10 @@
             outline: none;
             -webkit-tap-highlight-color: transparent;
         }
+        #hint-btn:hover {
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
 
         /* GRIGLIA */
         .grid {
@@ -959,6 +963,8 @@
         #end-popup {
             position: fixed;
             inset: 0;
+            margin-left: 10px;
+            margin-right: 10px;
             background: rgba(0,0,0,0.2);
             backdrop-filter: blur(15px);
             display: flex;
@@ -1484,6 +1490,16 @@
     </div>
 
     <script>
+        const isLocalhost =
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1";
+
+        if (!isLocalhost) {
+        console.log = function () {};
+        console.warn = function () {};
+        console.error = function () {};
+        }
+
         const ConnectionMonitor = {
             isStable: false,
             checkInterval: 30000, // millisecondi - Controlla ogni 30 secondi
@@ -1924,10 +1940,11 @@
                 absentLetters = new Set();
                 saveGameState(); // Creiamo subito il salvataggio iniziale
             }
-            console.log("Parola target:", targetWord); // Per debug, rimuovi in produzione
+            console.log("Parola target:", targetWord.toUpperCase()); // Per debug, rimuovi in produzione
             
             // Carica streak
             updateHomeStats();
+            updateHintUI();
             updateActiveTile();
         }
 
@@ -2608,7 +2625,9 @@
                 if (db.account.globalWins > 0 && db.account.globalWins % 5 === 0) {
                     db.account.hints++;
                     earnedHint = true;
-                    if (window.saveHintsToCloud) window.saveHintsToCloud(db.account.hints);
+                    if (window.saveHintsToCloud) {
+                        window.saveHintsToCloud(db.account.hints);
+                    }
                 }
             }
             
@@ -2616,10 +2635,10 @@
             LocalDB.save(db); 
 
             // 4. Aggiornamento Interfaccia Grafica (ora leggerà i dati freschi appena salvati)
-            if (earnedHint) {
-                updateHintUI();
-            }
             updateHomeStats();
+            if (typeof updateHintUI === "function") {
+                updateHintUI(); // Forza il numeretto sulla lampadina ad aggiornarsi ORA
+            }
             
             return earnedHint; 
         }
