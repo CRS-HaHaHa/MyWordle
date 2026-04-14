@@ -35,6 +35,7 @@
             font-family: 'Segoe UI', system-ui, sans-serif;
             background: linear-gradient(135deg, var(--bg1), var(--bg2));
             margin: 0;
+            height: 100vh;
             height: 100dvh;
             display: flex;
             justify-content: center;
@@ -1889,6 +1890,10 @@
         }
 
         function startGame() {
+            if (!history.state || history.state.page !== 'game') {
+                window.history.pushState({ page: 'game' }, '');
+            }
+
             // Reset interfaccia e avvio
             const gameScreen = document.getElementById('game-screen');
             document.getElementById('home-screen').style.display = 'none';
@@ -2644,16 +2649,7 @@
         }
 
         function goHome() {
-            saveGameState();
-            document.getElementById('game-screen').style.display = 'none';
-            document.getElementById('home-screen').style.display = 'flex';
-            const userProfile = document.getElementById('user-avatar');
-            if (userProfile && !userProfile.classList.contains('hidden')) {
-                userProfile.style.display = 'flex'; // o 'block', a seconda di come è impostato nel tuo CSS/Tailwind
-            }
-            currentRow = 0; currentCol = 0;
-            updateHomeStats();
-            releaseWakeLock();
+            window.history.back();
         }
 
         // Salva lo stato attuale
@@ -2990,6 +2986,70 @@
             }
         }, true); // Usiamo 'true' per intercettare l'evento nella fase di cattura
 
+        // --- GESTIONE TASTO INDIETRO (PWA / ANDROID) ---
+
+        // Quando l'app si avvia, creiamo uno stato "home" di base
+        window.addEventListener('load', () => {
+            window.history.pushState({ page: 'home' }, '');
+        });
+
+        let backPressedOnce = false;
+
+        window.addEventListener('popstate', (e) => {
+            // 1. PRIORITÀ MASSIMA: Chiudi eventuali modali aperti (Statistiche, Login, Profilo)
+            const statsPopup = document.getElementById('stats-popup');
+            const loginPopup = document.getElementById('login-popup');
+            const profilePopup = document.getElementById('profile-popup');
+            
+            if ((statsPopup && statsPopup.style.display === 'flex') || 
+                (loginPopup && loginPopup.style.display === 'flex') || 
+                (profilePopup && profilePopup.style.display === 'flex')) {
+                
+                closeStats();
+                closeModals();
+                // Siccome abbiamo "consumato" un back per chiudere il popup, rimettiamo lo stato home
+                window.history.pushState({ page: 'home' }, ''); 
+                return;
+            }
+
+            // 2. Controllo schermata di Gioco
+            const gameScreen = document.getElementById('game-screen');
+            const isGameActive = gameScreen && gameScreen.style.display === 'flex';
+
+            if (isGameActive) {
+                // L'utente ha premuto indietro mentre giocava: Torniamo alla Home!
+                saveGameState();
+                document.getElementById('game-screen').style.display = 'none';
+                document.getElementById('home-screen').style.display = 'flex';
+                
+                const userProfile = document.getElementById('user-avatar');
+                if (userProfile && !userProfile.classList.contains('hidden')) {
+                    userProfile.style.display = 'flex';
+                }
+                
+                currentRow = 0; currentCol = 0;
+                updateHomeStats();
+                releaseWakeLock();
+                
+            } else {
+                // 3. L'utente ha premuto indietro mentre era GIA' sulla Home
+                if (backPressedOnce) {
+                    // L'ha premuto due volte di fila: lasciamo che il browser lo butti fuori (chiuda l'app)
+                } else {
+                    // Primo tocco: Blocchiamo l'uscita, rimettiamo lo stato e mostriamo il Toast
+                    window.history.pushState({ page: 'home' }, '');
+                    backPressedOnce = true;
+                    
+                    showToast("Premi di nuovo indietro per uscire");
+                    
+                    // Se passano 2.5 secondi, resettiamo il contatore
+                    setTimeout(() => {
+                        backPressedOnce = false;
+                    }, 2500);
+                }
+            }
+        });
+
         if ('serviceWorker' in navigator) {
             let refreshing = false;
 
@@ -2998,19 +3058,27 @@
                 if (refreshing) return;
                 refreshing = true;
 
-                // BLOCCO IMMEDIATO: Impediamo all'utente di interagire con il gioco
+                // 1. Togliamo il focus da qualsiasi tasto o input per chiudere la tastiera
+                if (document.activeElement) {
+                    document.activeElement.blur();
+                }
+
+                // 2. Resettiamo lo scroll in cima per evitare traslazioni post-reload
+                window.scrollTo(0, 0);
+
+                // BLOCCO VISIVO
                 document.body.style.pointerEvents = 'none'; 
                 document.body.style.transition = 'opacity 0.5s ease';
                 document.body.style.opacity = '0.7';
 
-                // Messaggio Toast prioritario
                 if (typeof showToast === "function") {
-                    showToast("🔄 Aggiornamento in corso: caricamento nuova versione...", 10000);
+                    showToast("🔄 Aggiornamento: installazione nuova versione...", 10000);
                 }
 
-                // Ricarichiamo dopo 1 secondo (abbastanza per vedere il messaggio, troppo poco per iniziare a giocare)
+                // 3. Ricarichiamo pulendo la cache del browser specifico per questa pagina
                 setTimeout(() => {
-                    window.location.reload();
+                    // Il parametro true (se supportato) o aggiungere un timestamp forza un reload pulito
+                    window.location.href = window.location.pathname + '?v=' + Date.now();
                 }, 1000);
             });
 
