@@ -1591,6 +1591,11 @@
         let absentLetters = new Set(); // Memorizza le lettere che NON esistono nella parola
         window.firebaseDB = null; 
         window.firebaseAuth = null;
+        // Disabilita il tentativo del browser di ricordare dove avevi scrollato 
+        // prima di ricaricare la pagina (previene layout rotti dopo un update)
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
 
         // --- MOTORE LOCALE E SINCRONIZZAZIONE ---
         const LocalDB = {
@@ -1901,6 +1906,9 @@
             gameScreen.classList.add('fade-in-up');
             const userProfile = document.getElementById('user-avatar');
             if (userProfile) userProfile.style.display = 'none';
+
+            window.scrollTo(0, 0);
+            document.body.scrollTop = 0; // Fix specifico per i dispositivi Apple
             
             requestWakeLock();
             initGrid();
@@ -2958,6 +2966,10 @@
 
         // Questo codice viene eseguito automaticamente all'apertura della pagina
         window.onload = () => {
+            // Se c'è un parametro di aggiornamento, puliamo l'URL per resettare le metriche del browser
+            if (window.location.search.includes('v=')) {
+                window.history.replaceState({ page: 'home' }, '', window.location.pathname);
+            }
             // Inizializza i record basandosi sulla lingua e lunghezza predefinite
             setLanguage(currentLang);
             updateHomeStats();
