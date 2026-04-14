@@ -29,6 +29,7 @@
             --card: rgba(255,255,255,0.92);
             --text-dark: #1f2937;
             --accent: #ff6b6b;
+            --vh: 1vh;
         }
 
         body {
@@ -719,7 +720,7 @@
             display: none;
             flex-direction: column;
             width: 100%;
-            min-height: 100dvh; /* Forza lo schermo a occupare tutta l'altezza */
+            height: calc(var(--vh, 1vh) * 100);
             max-width: 800px;
             padding-top: 80px;
             box-sizing: border-box;
@@ -1899,6 +1900,9 @@
                 window.history.pushState({ page: 'game' }, '');
             }
 
+            updateViewportHeight();
+            setTimeout(updateViewportHeight, 100);
+
             // Reset interfaccia e avvio
             const gameScreen = document.getElementById('game-screen');
             document.getElementById('home-screen').style.display = 'none';
@@ -1909,18 +1913,6 @@
 
             window.scrollTo(0, 0);
             document.body.scrollTop = 0; // Fix specifico per i dispositivi Apple
-
-            setTimeout(() => {
-                // Questa riga "sporca" forza il browser a ricalcolare le posizioni
-                void gameScreen.offsetHeight;
-                
-                // Se necessario, riposiziona la tastiera (ma con flex non dovrebbe servire)
-                const kb = document.getElementById('keyboard');
-                if (kb) kb.style.marginBottom = '10px';
-                
-                // Aggiorna la cella attiva
-                updateActiveTile();
-            }, 50);
             
             requestWakeLock();
             initGrid();
@@ -2983,10 +2975,20 @@
                 window.history.replaceState({ page: 'home' }, '', window.location.pathname);
             }
             // Inizializza i record basandosi sulla lingua e lunghezza predefinite
+            updateViewportHeight();
             setLanguage(currentLang);
             updateHomeStats();
             updateHintUI();
         };
+
+        function updateViewportHeight() {
+            // Calcoliamo l'1% dell'altezza interna effettiva
+            let vh = window.innerHeight * 0.01;
+            // Esportiamo il valore come variabile CSS --vh
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+
+        window.addEventListener('resize', updateViewportHeight);
 
         // Gestore globale per i click sugli elementi offline
         document.addEventListener('click', function(event) {
