@@ -1909,6 +1909,18 @@
 
             window.scrollTo(0, 0);
             document.body.scrollTop = 0; // Fix specifico per i dispositivi Apple
+
+            setTimeout(() => {
+                // Questa riga "sporca" forza il browser a ricalcolare le posizioni
+                void gameScreen.offsetHeight;
+                
+                // Se necessario, riposiziona la tastiera (ma con flex non dovrebbe servire)
+                const kb = document.getElementById('keyboard');
+                if (kb) kb.style.marginBottom = '10px';
+                
+                // Aggiorna la cella attiva
+                updateActiveTile();
+            }, 50);
             
             requestWakeLock();
             initGrid();
