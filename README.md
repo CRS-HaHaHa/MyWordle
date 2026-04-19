@@ -3,6 +3,17 @@
 **MyWordle** è l'evoluzione moderna, fluida e senza pubblicità del classico gioco di parole. Progettato per essere giocato ovunque, offre una sfida linguistica profonda in 4 lingue e la possibilità di personalizzare la difficoltà.
 
 ---
+## 🌟 Novità Assolute: L'Era Multiplayer
+
+Oltre alla classica modalità in solitaria, MyWordle ora ti permette di sfidare amici e avversari da tutto il mondo:
+
+* **⚔️ Lobbies in Tempo Reale:** Crea una stanza privata, ricevi un codice univoco e invita chi vuoi. Segui l'avanzamento dei tuoi avversari in diretta: vedrai chi è ancora "In Partita" e chi ha già finito il round!
+
+* **🔗 Deep Linking (Invito Rapido):** Condividi un semplice link (es. https://crs-hahaha.github.io/MyWordle/?lobby=WORDLE) e i tuoi amici entreranno nella tua lobby istantaneamente, senza dover digitare codici.
+
+* **🎖️ Sistema di Punteggio Competitivo:** Non conta solo indovinare, ma farlo velocemente e con pochi errori. Guadagna punti in base alla tua posizione nel round e scala la **Classifica Globale della Lobby**.
+
+---
 
 ## 🌟 Perché giocare a MyWordle?
 
