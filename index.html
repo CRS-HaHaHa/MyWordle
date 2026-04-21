@@ -1904,7 +1904,7 @@
             </div>
         </div>
     </div>
-    <div id="end-popup" class="'hidden">
+    <div id="end-popup" class="hidden">
         <div id="popup-content"></div>
     </div>
     <div id="toast-container"></div>
@@ -3282,7 +3282,8 @@
             LocalDB.clearSession(modeKey); // USA LOCALDB!
         }
 
-        function showToast(message) {
+        function showToast(message, time) {
+            let timer = time || 2500;
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = 'toast';
@@ -3293,7 +3294,7 @@
             // Rimuove l'elemento dal DOM dopo che l'animazione di uscita è finita
             setTimeout(() => {
                 toast.remove();
-            }, 2500);
+            }, timer);
         }
 
         function calculateAllStats(gameHistory) {
@@ -3795,25 +3796,65 @@
                 document.body.style.transition = 'opacity 0.5s ease';
                 document.body.style.opacity = '0.7';
 
-                if (typeof showToast === "function") {
-                    showToast("🔄 Aggiornamento: installazione nuova versione...", 2000);
-                }
-
                 // 3. Ricarichiamo pulendo la cache del browser specifico per questa pagina
                 setTimeout(() => {
-                    // Il parametro true (se supportato) o aggiungere un timestamp forza un reload pulito
                     window.location.reload();
-                }, 1000);
+                }, 1000);                
             });
 
             // 2. Registrazione e controllo aggiornamenti in attesa
             navigator.serviceWorker.register('sw.js').then(reg => {
-                // Se c'è già un aggiornamento pronto che aspetta, forziamolo
+                
+                // CASO A: C'era già un aggiornamento fermo in attesa da una sessione precedente
                 if (reg.waiting) {
+                    showToast("🔄 Aggiornamento pronto. Riavvio in corso...", 2000);
                     reg.waiting.postMessage({ type: 'SKIP_WAITING' });
                 }
-                
-                // Controlla aggiornamenti ogni volta che si apre la pagina
+
+                // CASO B: Il browser ha appena trovato un aggiornamento e sta per scaricarlo
+                reg.addEventListener('updatefound', () => {
+                    const newWorker = reg.installing;
+                    
+                    // Se c'è un worker in installazione
+                    if (newWorker) {
+                        
+                        // ---> IL TUO AVVISO IMMEDIATO <---
+                        // Questo scatta MENTRE i file si stanno scaricando
+                        if (typeof showToast === "function") {
+                            showToast("⬇️ Download aggiornamento in corso. Attendi...", 2000);
+                        }
+
+                        if (document.activeElement) {
+                            document.activeElement.blur();
+                        }
+
+                        // 2. Resettiamo lo scroll in cima per evitare traslazioni post-reload
+                        window.scrollTo(0, 0);
+
+                        // BLOCCO VISIVO
+                        document.body.style.pointerEvents = 'none'; 
+                        document.body.style.transition = 'opacity 0.5s ease';
+                        document.body.style.opacity = '0.7';
+
+                        // Monitoriamo lo stato di questo nuovo download
+                        newWorker.addEventListener('statechange', () => {
+                            // Quando ha finito di scaricare ed è pronto ad attivarsi
+                            if (newWorker.state === 'installed') {
+                                
+                                // Verifichiamo che ci sia un vecchio worker da sostituire
+                                if (navigator.serviceWorker.controller) {
+                                    if (typeof showToast === "function") {
+                                        showToast("🔄 Installazione completata. Riavvio...", 2000);
+                                    }
+                                    // Diciamo al nuovo worker di prendere il controllo
+                                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                                }
+                            }
+                        });
+                    }
+                });
+
+                // Controlla aggiornamenti all'avvio
                 reg.update();
             });
         }
