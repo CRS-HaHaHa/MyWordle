@@ -113,6 +113,9 @@
         }
 
         /* --- STILE GENERALE BOTTONI (Numeri, Gioca, Back) --- */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
         button {
             flex: 1;
             padding: 14px;
@@ -126,9 +129,12 @@
             /* Solo qui mettiamo la transizione di movimento */
             transition: transform .15s, box-shadow .15s, background .15s;
         }
-        button:focus, button:active {
+        button:focus {
             outline: none;
-            -webkit-tap-highlight-color: transparent;
+        }
+
+        button:focus-visible {
+            outline: 2px solid #000; /* o come vuoi tu */
         }
 
         /* Effetto movimento SOLO per i bottoni normali */
@@ -164,8 +170,6 @@
             box-shadow: 0 0 20px rgba(255,255,255,0.6) !important;
             filter: brightness(1.1);
             border-color: white;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
         }
 
         #lang-it.active, #lang-en.active, #lang-fr.active, #lang-es.active {
@@ -173,12 +177,6 @@
             box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.5) !important;
             filter: brightness(1.0);
         }
-        #lang-it.active:hover, #lang-en.active:hover, #lang-fr.active:hover, #lang-es.active:hover,
-        #lang-it.active:active, #lang-en.active:active, #lang-fr.active:active, #lang-es.active:active {
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
 
         #lang-it { background-image: url("Flags/it.png"); }
         #lang-en { background-image: url("Flags/gb.png"); }
@@ -211,10 +209,6 @@
             border-color: var(--accent);
             color: var(--accent);
             box-shadow: 0 10px 20px rgba(255, 107, 107, 0.2);
-        }
-        .len-btn:active, .len-btn:hover, .len-btn.active:hover, .len-btn.active:active {
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
         }
 
         .num-large {
@@ -308,7 +302,7 @@
 
         /* --- POPUP STATISTICHE --- */
         #stats-popup {
-            display: none;
+            display: flex;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.5);
@@ -378,8 +372,6 @@
             color: var(--bg2);
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             transform: translateY(-1px);
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
         }
 
         .stat-len div {
@@ -423,10 +415,6 @@
             opacity: 1;
             text-decoration: underline;
         }
-        .github-link:active, .github-link:hover {
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-        }
 
         /* Nascondilo quando il gioco è attivo per non distrarre */
         #game-screen ~ .github-link {
@@ -455,8 +443,6 @@
 
         #user-avatar:active { 
             transform: scale(0.9); 
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
         }
 
         #user-dropdown {
@@ -498,11 +484,6 @@
             box-shadow: none;
         }
 
-        #user-dropdown button :active, #user-dropdown button:hover {
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
         /* Stile per i pulsanti disabilitati offline */
         .disabled-offline {
             cursor: not-allowed !important;
@@ -540,16 +521,11 @@
             font-family: inherit;
             box-sizing: border-box;
             font-weight: 600;
-            outline: none;
             transition: border-color 0.2s;
         }
         .custom-input:focus { border-color: var(--bg1); }
 
         .action-btn { width: 100%; height: 50px; font-size: 1rem; margin-bottom: 5px; }
-        .action-btn:hover, .action-btn:active {
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-        }
 
         /* --- STILI SPECIFICI PER POPUP LOGIN COLORATO E CENTRATO --- */
         /* Container specifico per il login per aumentare specificità */
@@ -625,10 +601,6 @@
             gap: 10px;
         }
         .google-btn:hover { background: #f8f9fa !important; }
-        .google-btn:hover, .google-btn:active {
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-        }
         
         .google-btn img { width: 20px; }
 
@@ -745,8 +717,6 @@
             background: transparent;
             color: rgba(255,255,255,0.7);
             transition: all 0.3s ease;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
         }
 
         /* Hover */
@@ -805,7 +775,7 @@
 
         /* --- SCHERMATA GIOCO --- */
         #game-screen {
-            display: none;
+            display: flex;
             flex-direction: column;
             width: 100%;
             height: calc(var(--vh, 1vh) * 100);
@@ -844,10 +814,6 @@
             box-shadow: 0 6px 15px rgba(0,0,0,.25);
             padding: 0;
         }
-        #back-btn:active, #back-btn:hover {
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-        }
 
         #hint-btn {
             position: absolute;
@@ -868,12 +834,6 @@
         }
         #hint-btn:active {
             transform: translateY(2px);
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        #hint-btn:hover {
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
         }
 
         /* GRIGLIA */
@@ -943,6 +903,7 @@
             font-weight: 800;
             font-size: 1.2rem;
             user-select: none;
+            position: relative;
             
             /* Effetto 3D "Keycap" */
             box-shadow: 0 5px 0 #bdc3c7; 
@@ -963,13 +924,73 @@
 
         .key:active {
             transform: translateY(4px); /* Si abbassa quasi del tutto */
-            box-shadow: 0 1px 0 #bdc3c7; /* La "profondità" sparisce */
+            box-shadow: 0 1px 0 #bdc3c7 !important; /* La "profondità" sparisce */
             background: #e2e8f0 !important; /* Diventa leggermente più scuro */
             filter: brightness(0.9);
         }
-        .key:focus, .key:active, .key:hover, .key-big:active, .key-big:hover {
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
+
+        @media (hover: hover) and (pointer: fine) {
+            .key:hover {
+                background: #f8f9fa;
+                transform: translateY(-2px);
+                box-shadow: 0 7px 0 #bdc3c7;
+            }
+        }
+
+        /* La bolla di anteprima */
+        .key-preview {
+            position: absolute;
+            top: -55px; /* La sposta sopra il tasto */
+            left: 50%;
+            transform: translateX(-50%) scale(0.5);
+            width: 50px;
+            height: 60px;
+            background: var(--key-bg, #ffffff); /* Colore di sfondo */
+            color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            border: 1px solid #595050;
+            border-radius: 8px 8px 4px 4px;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.2);
+            pointer-events: none; /* Fondamentale: il tocco deve passare attraverso */
+            opacity: 0;
+            transition: transform 0.05s ease-out, opacity 0.05s ease-out;
+            z-index: 100;
+        }
+        .green {
+            background: var(--green); /* Colore di sfondo */
+        }
+        .yellow {
+            background: var(--yellow); /* Colore di sfondo */
+        }
+        .gray {
+            background: var(--gray); /* Colore di sfondo */
+        }
+
+        /* Quando il tasto è premuto, mostra la bolla */
+        .key.pressed {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #bdc3c7;
+            filter: brightness(0.9);
+        }
+        .key.pressed .key-preview {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+
+        /* Punta della bolla (opzionale, per stile Gboard) */
+        .key-preview::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid #595050;
         }
 
         /* Tasti speciali (Enter/Back) un po' più larghi */
@@ -981,8 +1002,10 @@
             box-shadow: 0 5px 0 #a0aec0;
         }
 
-        .key-big:active {
+        .key-big:active, .key-big.pressed {
+            transform: translateY(4px); /* Si abbassa quasi del tutto */
             box-shadow: 0 1px 0 #a0aec0;
+            filter: brightness(0.9);
         }
 
         /* --- STATI COLORATI DELLA TASTIERA --- */
@@ -992,7 +1015,7 @@
             box-shadow: 0 5px 0 #388e3c !important; /* Verde scuro */
             border-color: #388e3c !important;
         }
-        .key.key-green:active { box-shadow: 0 1px 0 #388e3c !important; }
+        .key.key-green:active, .key.key-green.pressed { box-shadow: 0 1px 0 #388e3c !important; transform: translateY(4px); filter: brightness(0.9); }
 
         .key.key-yellow {
             background-color: var(--yellow) !important;
@@ -1000,7 +1023,7 @@
             box-shadow: 0 5px 0 #d49800 !important; /* Giallo/Arancio scuro */
             border-color: #d49800 !important;
         }
-        .key.key-yellow:active { box-shadow: 0 1px 0 #d49800 !important; }
+        .key.key-yellow:active, .key.key-yellow.pressed { box-shadow: 0 1px 0 #d49800 !important; transform: translateY(4px); filter: brightness(0.9); }
 
         .key.key-gray {
             background-color: var(--gray) !important;
@@ -1008,8 +1031,8 @@
             box-shadow: 0 5px 0 #787c7e !important; /* Grigio scuro (Wordle style) */
             border-color: #787c7e !important;
         }
-        .key.key-gray:active { box-shadow: 0 1px 0 #787c7e !important; }
-
+        .key.key-gray:active, .key.key-gray.pressed { box-shadow: 0 1px 0 #787c7e !important; transform: translateY(4px); filter: brightness(0.9); }
+        
         #toast-container {
             position: fixed;
             top: 50px; /* Distanza dall'alto */
@@ -1062,7 +1085,6 @@
             align-items: center;
             justify-content: center;
             z-index: 100;
-            display: none;
         }
 
         #popup-content {
@@ -1302,7 +1324,7 @@
         .modal-overlay, #end-popup {
             background: rgba(0, 0, 0, 0.4); /* Sfondo scurito */
             backdrop-filter: blur(8px); /* Sfocatura */
-            display: none; 
+            display: flex; 
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             justify-content: center;
@@ -1330,11 +1352,6 @@
                 height: 220px; /* Poco più alta della tastiera */
                 border-radius: 40px 40px 0 0; /* Arrotondata solo sopra */
                 bottom: 10px; /* Sollevata leggermente dal fondo */
-            }
-            .key:hover {
-                background: #f8f9fa;
-                transform: translateY(-2px);
-                box-shadow: 0 7px 0 #bdc3c7;
             }
         }
 
@@ -1621,7 +1638,7 @@
                 <button onclick="toggleMute()" class="menu-mute-btn">🔇 Musica: OFF</button>
             </div>
             
-            <div id="menu-logged-in" style="display:none;">
+            <div id="menu-logged-in" class="hidden">
                 <div id="menu-nickname">Ciao, Giocatore!</div>
                 <button onclick="openProfileModal()" class="online-only">⚙️ Modifica Profilo</button>
                 <button onclick="openStats()">📊 Statistiche</button>
@@ -1632,7 +1649,7 @@
         </div>
     </div>
 
-    <div id="login-popup" class="modal-overlay">
+    <div id="login-popup" class="modal-overlay hidden">
         <div class="stats-container login-modal">
             
             <h2 class="gradient-text">Accedi</h2>
@@ -1664,7 +1681,7 @@
         </div>
     </div>
 
-    <div id="profile-popup" class="modal-overlay">
+    <div id="profile-popup" class="modal-overlay hidden">
         <div class="stats-container login-modal">
             <h2 class="gradient-text">Il Tuo Profilo</h2>
 
@@ -1698,7 +1715,7 @@
         </div>
     </div>
 
-    <div id="game-screen">
+    <div id="game-screen" class='hidden'>
         <button id="back-btn" onclick="goHome()">&#x1F3E0</button>
         
         <button id="hint-btn" onclick="useHint()">💡 <span id="hint-count">0</span></button>
@@ -1712,7 +1729,7 @@
         <div id="keyboard"></div>
     </div>
 
-    <div id="stats-popup">
+    <div id="stats-popup" class="hidden">
         <div class="stats-container">
             <h2 id="st-title">Statistiche</h2>
 
@@ -1754,7 +1771,7 @@
         </div>
     </div>
 
-    <div id="challenge-init-modal" class="modal-overlay">
+    <div id="challenge-init-modal" class="modal-overlay hidden">
         <div class="stats-container login-modal" style="max-width: 450px; max-height: calc(var(--vh) * 90)">
             <h2 id="lobby-modal" class="gradient-text">Lobby Multigiocatore</h2>
             
@@ -1790,7 +1807,7 @@
             <button id="tab-best5" class="tab-btn" onclick="window.setLobbyType('best5')">Word Series x5</button>
         </div>
 
-        <button id="back-btn" class="lobbyExit" onclick="exitLobbyScreen()">
+        <button id="back-btn" class="lobbyExit" onclick="window.exitLobbyScreen()">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="black" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M15 8a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 0 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 7.5H14.5A.5.5 0 0 1 15 8z"/>
             </svg>
@@ -1852,22 +1869,45 @@
         </div>
     </div>
 
-    <div id="round-results-modal" class="modal-overlay" style="z-index: 10000;">
-        <div class="stats-container" style="max-width: 600px; padding: 20px 10px;">
-            <button onclick="window.acknowledgeRoundResults()" style="position: absolute; right: 15px; top: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer; box-shadow: none;">❌</button>
-            <h2 class="gradient-text" style="margin-bottom: 50px;">Risultati Round</h2>
-            
-            <div id="podium-container" style="display: flex; justify-content: center; align-items: flex-end; height: 180px; margin-top: 20px; gap: 10px;">
-                </div>
+    <div id="round-results-modal" class="modal-overlay hidden" style="z-index: 10000;">
+        <div class="stats-container" style="position: relative; max-width: 600px; width: 90%; padding: 30px 20px; background: white; border-radius: 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.2);">
 
-            <div style="max-height: 200px; overflow-y: auto; margin-top: 20px; border-radius: 10px; border: 1px solid #eee;">
+            <button id="scoring-help-btn" style="position: absolute; left: 20px; top: 20px; background: #8a2be2; color: white; border: none; font-size: 1.2rem; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(138, 43, 226, 0.4); display: flex; align-items: center; justify-content: center; z-index: 10; transition: transform 0.2s;">
+                ?
+            </button>
+
+            <button onclick="window.acknowledgeRoundResults()" style="position: absolute; right: 20px; top: 20px; background: #f1f5f9; color: #64748b; border: none; font-size: 1rem; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;">
+                ✖
+            </button>
+
+            <div id="scoring-info-popup" class="hidden" style="display: block; position: absolute; top: 60px; left: 20px; background: #1e293b; color: white; padding: 15px 20px; border-radius: 12px; width: 260px; z-index: 100; box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 0.85rem; text-align: left; line-height: 1.5; border: 1px solid #334155;">
+                <h4 style="margin: 0 0 10px 0; color: #c084fc; font-size: 1rem;">Regole Punteggio</h4>
+                <p style="margin: 0 0 5px 0;"><b>1.</b> Vince chi indovina più parole.</p>
+                <p style="margin: 0 0 5px 0;"><b>2.</b> A parità, vince chi ha usato meno tentativi.</p>
+                <p style="margin: 0 0 12px 0;"><b>3.</b> A parità, vince il più veloce.</p>
+                <div style="background: #334155; height: 1px; margin-bottom: 10px;"></div>
+                <p style="margin: 0 0 5px 0; color: #facc15; font-weight: bold;">Bonus MVP (+2pt):</p>
+                <p style="margin: 0 0 2px 0;">🎯 Precisione (meno tentativi assoluti)</p>
+                <p style="margin: 0 0 0 0;">⚡ Velocità (minor tempo assoluto)</p>
+            </div>
+
+            <h2 class="gradient-text" style="margin-top: 10px; margin-bottom: 50px; text-align: center; font-size: 1.8rem;">Risultati Round</h2>
+
+            <div id="podium-container" style="display: flex; justify-content: center; align-items: flex-end; height: 200px; margin-top: 20px; gap: 12px;">
+            </div>
+
+            <div style="max-height: 200px; overflow-y: auto; margin-top: 30px; border-radius: 12px; border: 1px solid #e2e8f0; background: #f8fafc; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
                 <table style="width: 100%; border-collapse: collapse; text-align: left;">
                     <tbody id="others-results-body">
-                        </tbody>
+                    </tbody>
                 </table>
             </div>
         </div>
     </div>
+    <div id="end-popup">
+        <div id="popup-content"></div>
+    </div>
+    <div id="toast-container"></div>
 
     <script>
         const isLocalhost =
@@ -2000,6 +2040,7 @@
         window.firebaseDB = null; 
         window.firebaseAuth = null;
         window.lobbyConfig = { lang: 'it', len: 5, mode: 'single' }; // Configurazione di default
+        window.temporaryLobbyCode = null;
         window.currentLobbyID = null;
         window.currentLobbyData = null;
         window.playingSfida = false;
@@ -2177,32 +2218,44 @@
             }
         };
 
-        let sfidaInPausa = false
+        let sfidaInPausa = false;
+        let playerstateoffline = false;
         document.addEventListener('visibilitychange', async () => {
             const gameScreen = document.getElementById('game-screen');
-            const isGameActive = gameScreen && gameScreen.style.display === 'flex';
+            const lobby = document.getElementById('lobby-screen');
 
             if (document.visibilityState === 'visible') {
                 // --- LOGICA RITORNO IN PAGINA ---
                 
-                if (window.playingSfida && isGameActive && sfidaInPausa) {
+                if (window.playingSfida && gameScreen.offsetParent !== null && sfidaInPausa) {
                     window.startSessionTimer();
+                    await window.updateplayerstate({online: true})
                     sfidaInPausa = false;
                 }
+                if (!lobby.classList.contains('hidden') && playerstateoffline) {
+                    await window.updateplayerstate({online: true});
+                    playerstateoffline = false;
+                }
                 
-                if (isGameActive) {
+                if (gameScreen.offsetParent !== null) {
                     await requestWakeLock();
                 }
 
             } else {
                 // --- LOGICA USCITA DALLA PAGINA (hidden) ---
-                if (window.playingSfida && window.localTimerStart && isGameActive) {
+                if (window.playingSfida && window.localTimerStart && gameScreen.offsetParent !== null) {
                     await window.stopSessionTimer();
+                    await window.updateplayerstate({online: false});
                     sfidaInPausa = true;
                 }
                 
-                if (isGameActive) {
+                if (gameScreen.offsetParent !== null) {
                     releaseWakeLock();
+                }
+
+                if (!lobby.classList.contains('hidden') && !playerstateoffline) {
+                    playerstateoffline = true;
+                    await window.updateplayerstate({online: false});
                 }
             }
         });
@@ -2361,7 +2414,7 @@
             // Reset interfaccia e avvio
             const gameScreen = document.getElementById('game-screen');
             document.getElementById('home-screen').classList.add('hidden');
-            gameScreen.style.display = 'flex';
+            gameScreen.classList.remove('hidden');
             gameScreen.classList.add('fade-in-up');
             const userProfile = document.getElementById('user-avatar');
             if (userProfile) userProfile.classList.add('hidden');
@@ -2601,6 +2654,7 @@
                 if(i === 2) { 
                     const btn = document.createElement('div');
                     btn.className = 'key key-big';
+                    btn.dataset.key = 'enter';
                     btn.innerText = 'ENTER';
                     btn.onclick = submitWord;
                     row.appendChild(btn);
@@ -2608,8 +2662,16 @@
 
                 rowStr.split('').forEach(char => {
                     const btn = document.createElement('div');
-                    btn.className = 'key'; 
-                    btn.innerText = char;
+                    btn.className = 'key';
+                    btn.dataset.key = char.toLowerCase();
+                    btn.innerHTML = `
+                        ${char.toUpperCase()}
+                        <div class="key-preview" id="key-${char.toLowerCase()}-preview">${char.toUpperCase()}</div>
+                    `;
+                    // Eventi per mostrare/nascondere la bolla
+                    btn.addEventListener('pointerdown', () => btn.classList.add('pressed'));
+                    btn.addEventListener('pointerup', () => btn.classList.remove('pressed'));
+                    btn.addEventListener('pointerleave', () => btn.classList.remove('pressed'));
                     // Usiamo il carattere originale per l'ID (gestisce correttamente ñ e ç)
                     btn.id = `key-${char.toLowerCase()}`;
                     btn.onclick = () => handleInput(char.toLowerCase());
@@ -2620,6 +2682,7 @@
                 if(i === 2) { 
                     const btn = document.createElement('div');
                     btn.className = 'key key-big';
+                    btn.dataset.key = 'backspace';
                     btn.innerText = '⌫';
                     btn.onclick = () => handleInput('backspace');
                     row.appendChild(btn);
@@ -2807,6 +2870,7 @@
                         clearGameState(); 
                     } else {
                         if (window.visualTimerInterval !== 'null' && window.syncInterval !== 'null') await window.stopSessionTimer();
+                        showEndPopup(false);
                         window.recordWordResult(false);
                     }
                 } else {
@@ -2815,9 +2879,8 @@
                     if (!window.playingSfida) {
                         saveGameState();
                     } else {
-                        window.saveSfidaState()
+                        window.saveSfidaState();
                     }
-                    
                     updateActiveTile();
                 }
             }, currentLen * 100 + 500);
@@ -2837,7 +2900,8 @@
         
         function updateSingleKey(char, status) {
             const key = document.getElementById(`key-${char}`);
-            if (!key) return;
+            const keyPreview = document.getElementById(`key-${char}-preview`);
+            if (!key || !keyPreview) return;
             
             // Rimuoviamo vecchi stili manuali nel caso siano rimasti da un vecchio salvataggio
             key.style.backgroundColor = ''; 
@@ -2846,11 +2910,16 @@
             if (status === 'green') {
                 key.classList.remove('key-yellow', 'key-gray');
                 key.classList.add('key-green');
+                keyPreview.classList.remove('yellow', 'gray');
+                keyPreview.classList.add('green');                
             } else if (status === 'yellow' && !key.classList.contains('key-green')) {
                 key.classList.remove('key-gray');
                 key.classList.add('key-yellow');
+                keyPreview.classList.remove('gray');
+                keyPreview.classList.add('yellow');
             } else if (status === 'gray' && !key.classList.contains('key-green') && !key.classList.contains('key-yellow')) {
                 key.classList.add('key-gray');
+                keyPreview.classList.add('gray');
             }
         }
 
@@ -2940,7 +3009,7 @@
             stLang = currentLang;
             stLen = currentLen;
             
-            document.getElementById('stats-popup').style.display = 'flex';
+            document.getElementById('stats-popup').classList.remove('hidden');
             document.getElementById('user-dropdown').classList.add('hidden');
             updateStatsTranslations();
             renderStatsUI();
@@ -3058,7 +3127,7 @@
         }
 
         function closeStats() {
-            document.getElementById('stats-popup').style.display = 'none';
+            document.getElementById('stats-popup').classList.add('hidden');
         }
 
         // Funzione fondamentale per recuperare i dati salvati (ora legge l'array)
@@ -3095,9 +3164,9 @@
             const content = document.getElementById('popup-content');
 
             content.innerText = message;
-            popup.style.display = 'flex';
+            popup.classList.remove('hidden');
 
-            setTimeout(() => popup.style.display = 'none', 2000);
+            setTimeout(() => popup.classList.add('hidden'), 2000);
         }
 
         function showEndPopup(win, gotHint = false) {
@@ -3110,9 +3179,11 @@
                 msg += TEXT[currentLang].hintEarned;
             }
 
-            clearGameState(); // Rimuoviamo il salvataggio a fine partita
             showPopup(msg);
-            setTimeout(startGame, 2200);
+            if (!window.playingSfida) {
+                clearGameState(); // Rimuoviamo il salvataggio a fine partita
+                setTimeout(startGame, 2200);
+            }
         }
 
         function updateStreak(win) {
@@ -3160,17 +3231,20 @@
 
                 // 3. Resettiamo l'interfaccia e torniamo alla lobby
                 window.playingSfida = false;
-                document.getElementById('game-screen').style.display = 'none'; // o add('hidden')
+                document.getElementById('game-screen').classList.add('hidden');
                 document.getElementById('lobby-screen').classList.remove('hidden');
                 document.getElementById('multiplayer-header').classList.add('hidden');
                 
                 if (toast) {
                     showToast("Sei tornato alla lobby. Il tempo è stato messo in pausa.");
+                    await window.updateplayerstate({state: 'lobby'})
                 }
                 releaseWakeLock();
                 
             } else {
-                window.history.back();
+                document.getElementById('game-screen').classList.add('hidden');
+                document.getElementById('home-screen').classList.remove('hidden');
+                document.getElementById('user-avatar').classList.remove('hidden');
             }
         }
 
@@ -3279,14 +3353,14 @@
 
         function openLoginModal() {
             document.getElementById('user-dropdown').classList.add('hidden');
-            document.getElementById('login-popup').style.display = 'flex';
+            document.getElementById('login-popup').classList.remove('hidden');
         }
 
         // Funzione da chiamare quando si clicca per aprire il profilo
         function openProfileModal(newUser = false) {
             let db = LocalDB.get();
             document.getElementById('user-dropdown').classList.add('hidden');
-            document.getElementById('profile-popup').style.display = 'flex';
+            document.getElementById('profile-popup').classList.remove('hidden');
             const nickInput = document.getElementById('profile-nickname');
             
             // 1. Inserisce il nickname attuale se esiste
@@ -3301,9 +3375,9 @@
         }
 
         function closeModals() {
-            document.getElementById('login-popup').style.display = 'none';
-            document.getElementById('profile-popup').style.display = 'none';
-            document.getElementById('challenge-init-modal').style.display = 'none';
+            document.getElementById('login-popup').classList.add('hidden');
+            document.getElementById('profile-popup').classList.add('hidden');
+            document.getElementById('challenge-init-modal').classList.add('hidden');
         }
 
         // Aggiorna il tasto mute nel nuovo menu
@@ -3465,10 +3539,32 @@
 
         // Ascolto tastiera fisica
         window.addEventListener('keydown', (e) => {
-            if(document.getElementById('game-screen').style.display === 'flex') {
-                if(e.key === 'Enter') submitWord();
-                else if(e.key === 'Backspace') handleInput('backspace');
-                else handleInput(e.key.toLowerCase());
+            // 1. Controllo se siamo nella schermata di gioco
+            const gameScreen = document.getElementById('game-screen');
+            if (gameScreen.offsetParent === null) return; 
+
+            const key = e.key.toLowerCase();
+
+            // 2. Cerchiamo il tasto corrispondente nella tastiera virtuale
+            const virtualKey = document.querySelector(`.key[data-key="${key}"]`);
+            
+            if (virtualKey) {
+                // Attiviamo l'effetto bolla
+                virtualKey.classList.add('pressed');
+                
+                // Lo rimuoviamo dopo 150ms per creare il "pop"
+                setTimeout(() => {
+                    virtualKey.classList.remove('pressed');
+                }, 150);
+            }
+
+            // 3. Logica di input esistente
+            if (e.key === 'Enter') {
+                submitWord();
+            } else if (e.key === 'Backspace') {
+                handleInput('backspace');
+            } else if (/^[a-zñç]$/.test(key)) {
+                handleInput(key);
             }
         });
 
@@ -3480,7 +3576,7 @@
         function openChallengeManager() {
             renderRecentLobbies();
             document.getElementById('user-dropdown').classList.add('hidden');
-            document.getElementById('challenge-init-modal').style.display = 'flex';
+            document.getElementById('challenge-init-modal').classList.remove('hidden');
         }
 
         // 5. Gestione Lobby Recenti (LocalDB)
@@ -3590,7 +3686,18 @@
             }
 
             // 3. (OPZIONALE) CHIUSURA MODALI GENERICI
-            // Se hai altri overlay, puoi aggiungere qui la logica 'click fuori'
+            const popup = document.getElementById('scoring-info-popup');
+            const btn = document.getElementById('scoring-help-btn');
+
+            if (!popup.classList.contains('hidden')) {
+                // Chiudi
+                popup.classList.add('hidden');
+            } else {
+                // Apri se il click È sul bottone
+                if (btn.contains(e.target)) {
+                    popup.classList.remove('hidden');
+                }
+            }
             
         }, true); // Manteniamo 'true' per intercettare tutto in fase di cattura
 
@@ -3598,15 +3705,18 @@
 
         let backPressedOnce = false;
 
-        window.addEventListener('popstate', (e) => {
+        window.addEventListener('popstate', async (e) => {
             // 1. PRIORITÀ MASSIMA: Chiudi eventuali modali aperti (Statistiche, Login, Profilo)
             const statsPopup = document.getElementById('stats-popup');
             const loginPopup = document.getElementById('login-popup');
             const profilePopup = document.getElementById('profile-popup');
+            const lobbyPopup = document.getElementById('challenge-init-modal');
+            const roundResultPopup = document.getElementById('round-results-modal');
             
-            if ((statsPopup && statsPopup.style.display === 'flex') || 
-                (loginPopup && loginPopup.style.display === 'flex') || 
-                (profilePopup && profilePopup.style.display === 'flex')) {
+            if ((statsPopup && !statsPopup.classList.contains('hidden')) || 
+                (loginPopup && !loginPopup.classList.contains('hidden')) || 
+                (profilePopup && !profilePopup.classList.contains('hidden')) ||
+                (profilePopup && !lobbyPopup.classList.contains('hidden'))) {
                 
                 closeStats();
                 closeModals();
@@ -3614,26 +3724,37 @@
                 window.history.pushState({ page: 'home' }, ''); 
                 return;
             }
+            if ((roundResultPopup && !roundResultPopup.classList.contains('hidden'))) {
+                window.acknowledgeRoundResults();
+                return;
+            }
 
             // 2. Controllo schermata di Gioco
             const gameScreen = document.getElementById('game-screen');
-            const isGameActive = gameScreen && gameScreen.style.display === 'flex';
+            const isGameActive = gameScreen && !gameScreen.classList.contains('hidden');
+            
+            const lobbyScreen = document.getElementById('lobby-screen');
+            const islobbyActive = gameScreen && !gameScreen.classList.contains('hidden');
 
-            if (isGameActive) {
+            if (isGameActive && !window.playingSfida) {
                 // L'utente ha premuto indietro mentre giocava: Torniamo alla Home!
                 saveGameState();
-                document.getElementById('game-screen').style.display = 'none';
-                document.getElementById('home-screen').style.display = 'flex';
+                document.getElementById('game-screen').classList.add('hidden');
+                document.getElementById('home-screen').classList.remove('hidden');
                 
                 const userProfile = document.getElementById('user-avatar');
                 if (userProfile && !userProfile.classList.contains('hidden')) {
-                    userProfile.style.display = 'flex';
+                    userProfile.classList.remove('hidden');
                 }
                 
                 currentRow = 0; currentCol = 0;
                 updateHomeStats();
                 releaseWakeLock();
                 
+            } else if (isGameActive && window.playingSfida) {
+                goHome();
+            } else if (islobbyActive) {
+                await window.exitLobbyScreen()
             } else {
                 // 3. L'utente ha premuto indietro mentre era GIA' sulla Home
                 if (backPressedOnce) {
@@ -3698,10 +3819,6 @@
         }
 
     </script>
-    <div id="end-popup" style="display:none">
-        <div id="popup-content"></div>
-    </div>
-    <div id="toast-container"></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
@@ -3748,15 +3865,15 @@
             db.profile.avatar = avatarId;
             LocalDB.save(db);
 
-            if (loggedOutMenu) loggedOutMenu.style.display = 'none';
-            if (loggedInMenu) loggedInMenu.style.display = 'block';
+            if (loggedOutMenu) loggedOutMenu.classList.add('hidden');
+            if (loggedInMenu) loggedInMenu.classList.remove('hidden');
             if (nickDisplay) nickDisplay.innerText = `Ciao, ${nickname}!`;
             if (avatarImg) avatarImg.src = `Avatar/${avatarId || 40}.png`;
         };
 
         function updateUIForLoggedOutUser() {
-            document.getElementById('menu-logged-out').style.display = 'block';
-            document.getElementById('menu-logged-in').style.display = 'none';
+            document.getElementById('menu-logged-out').classList.remove('hidden');
+            document.getElementById('menu-logged-in').classList.add('hidden');
             document.getElementById('user-avatar').src = `Avatar/40.png`;
         }
 
@@ -3775,6 +3892,12 @@
                         updateUIForLoggedInUser(currentUserDoc.account.nickname, currentUserDoc.account.avatarId);
                         closeModals();
                         showToast("Bentornato " + currentUserDoc.account.nickname + "!");
+                        setTimeout(() => {
+                            window.enterLobby(window.temporaryLobbyCode);
+                            setTimeout(() => {
+                                window.temporaryLobbyCode = null;
+                            }, 5000);
+                        }, 700);
                     } else {
                         // Loggato ma senza profilo compilato
                         closeModals();
@@ -3960,6 +4083,14 @@
                 LocalDB.save(dbLocal);
                 closeModals();
                 showToast("✅ Profilo salvato!");
+                if (window.temporaryLobbyCode) {
+                    setTimeout(() => {
+                        window.enterLobby(window.temporaryLobbyCode);
+                        setTimeout(() => {
+                            window.temporaryLobbyCode = null;
+                        }, 5000);
+                    }, 700);
+                }
             } catch (error) {
                 console.error(error);
                 showToast("❌ Errore di connessione.");
@@ -4187,9 +4318,6 @@
                 
                 // Inizializziamo il documento con la struttura corretta
                 const lobbyData = {
-                    createdAt: new Date().toISOString(),
-                    createdBy: user.uid,
-                    creatorName: localDB.profile.nickname,
                     admin: user.uid,
                     gameState: 'waiting',
                     lastUpdate: new Date().toISOString(),
@@ -4199,7 +4327,8 @@
                             name: localDB.profile.nickname,
                             avatar: localDB.profile.avatar,
                             totalScore: 0,
-                            inGame: true
+                            inGame: true,
+                            online: true
                         }
                     },
                     rounds: {} 
@@ -4234,9 +4363,29 @@
 
                 const newData = docSnap.data();
                 const oldState = window.currentLobbyData?.gameState;
+                const myUid = window.firebaseAuth.currentUser.uid;
                 
                 // Sincronizziamo i dati globali
                 window.currentLobbyData = newData;
+
+                // 1. Controlliamo se esistiamo ancora nella lobby e se il nostro stato è 'out'
+                if (newData.players && newData.players[myUid]) {
+                    if (newData.players[myUid].state === 'out' && !newData.players[myUid].inGame && oldState.players[myUid].inGame) {
+                        
+                        // Fermiamo subito l'ascolto dei cambiamenti per evitare loop
+                        if (window.lobbyUnsubscribe) {
+                            window.lobbyUnsubscribe();
+                            window.lobbyUnsubscribe = null;
+                        }
+
+                        // Avvisiamo l'utente e riportiamolo alla home
+                        showToast("Sei stato rimosso dalla lobby dall'host.", "error");
+                        
+                        // Pulizia della UI e ritorno alla Home
+                        window.forceExitAfterKick();
+                        return; // Interrompiamo l'esecuzione del resto della funzione
+                    }
+                }
 
                 // 1. Aggiorniamo l'interfaccia (lista nomi, pronti, ecc.)
                 if (typeof window.updateLobbyUI === "function") {
@@ -4249,21 +4398,22 @@
 
                 // 2. CONTROLLO TRANSIZIONE: Se l'host ha avviato la partita
                 if (newData.gameState === 'playing' && oldState !== 'playing') {
-                    console.log("🚀 Partita avviata dall'host!");
+                    showToast("Sfida avviata! Buona fortuna.");
                 }
                 
                 // --- NUOVO: CONTROLLO FINE ROUND E PODIO ---
                 if (newData.gameState && newData.gameState.startsWith('results_')) {
                     const roundNum = newData.gameState.split('_')[1];
-                    const myUid = window.firebaseAuth.currentUser.uid;
                     const myRoundData = newData.rounds[roundNum]?.players[myUid];
 
                     // Se abbiamo ancora "totalTime", significa che non abbiamo ancora cliccato la X
                     if (myRoundData && myRoundData.totalTime !== undefined) {
                         // Impediamo che il modal si apra 100 volte se Firebase fa micro-update
                         const modal = document.getElementById('round-results-modal');
-                        if (modal.style.display !== 'flex') {
-                            window.showRoundResultsModal(roundNum, newData);
+                        if (modal.classList.contains('hidden')) {
+                            setTimeout(() => {
+                                window.showRoundResultsModal(roundNum, newData);
+                            }, 3000); 
                         }
                     }
                 }
@@ -4277,7 +4427,12 @@
         window.enterLobby = async (code) => {
             code = code.toUpperCase().trim();
             const user = window.firebaseAuth.currentUser;
-            if (!user) return;
+            if (!user) {
+                window.temporaryLobbyCode = code;
+                showToast("Devi accedere per poter nella lobby");
+                openLoginModal()
+                return;
+            }
 
             const lobbyRef = doc(window.firebaseDB, 'lobbies', code);
             
@@ -4295,32 +4450,37 @@
 
                 const data = snap.data();
                 const localDB = LocalDB.get();
+                // 1. Inizializziamo l'oggetto con le modifiche sicure (comuni a tutti)
+                let updates = {
+                    'lastUpdate': new Date().toISOString()
+                };
 
-                // Se l'utente non è nella lobby, si aggiunge
+                // 2. Controlliamo se l'utente esiste già nella variabile locale 'data'
                 if (!data.players[user.uid]) {
-                    await updateDoc(lobbyRef, {
-                        [`players.${user.uid}`]: {
-                            name: localDB.profile.nickname,
-                            avatar: localDB.profile.avatar,
-                            totalScore: 0,
-                            inGame: true
-                        },
-                        ['lastUpdate']: new Date().toISOString()
-                    });
-                    data.players[user.uid] = {
+                    // UTENTE NUOVO: Creiamo l'oggetto completo
+                    // Qui usiamo la dot notation per non sovrascrivere l'intero campo 'players' della lobby
+                    updates[`players.${user.uid}`] = {
                         name: localDB.profile.nickname,
                         avatar: localDB.profile.avatar,
                         totalScore: 0,
-                        inGame: true
-                    }; // Aggiorniamo anche la variabile locale per evitare problemi di sincronizzazione immediata
-                } else if (!data.players[user.uid].inGame) {
-                    // Se l'utente era già nella lobby (es. refresh), assicuriamoci che sia marcato come online
-                    await updateDoc(lobbyRef, {
-                        [`players.${user.uid}.inGame`]: true,
-                        ['lastUpdate']: new Date().toISOString()
-                    });
-                    data.players[user.uid].inGame = true; // Aggiorniamo anche la variabile locale per evitare problemi di sincronizzazione immediata
+                        inGame: true,
+                        online: true
+                    };
+
+                    // Aggiorniamo la variabile locale
+                    data.players[user.uid] = { ...updates[`players.${user.uid}`] };
+                } else {
+                    // UTENTE ESISTENTE: Aggiorniamo solo i campi necessari (Dot Notation pura)
+                    updates[`players.${user.uid}.online`] = true;
+                    updates[`players.${user.uid}.inGame`] = true;
+
+                    // Aggiorniamo la variabile locale
+                    data.players[user.uid].online = true;
+                    data.players[user.uid].inGame = true;
                 }
+
+                // 3. Unico invio al database
+                await updateDoc(lobbyRef, updates);
 
                 window.currentLobbyID = code;
                 window.currentLobbyData = data; // Salviamo i dati attuali della lobby in memoria per accessi rapidi
@@ -4329,7 +4489,7 @@
                 window.updateLobbyUI();
                 
                 // Cambio Schermata
-                document.getElementById('challenge-init-modal').style.display = 'none';
+                document.getElementById('challenge-init-modal').classList.add('hidden');
                 document.getElementById('home-screen').classList.add('hidden');
                 document.getElementById('lobby-screen').classList.remove('hidden');
                 document.getElementById('lobby-code-display').innerText = code;
@@ -4347,16 +4507,32 @@
         // --- FUNZIONI DI GESTIONE LOBBY ---
 
         // 1. Esci dalla schermata (Tasto Indietro)
-        window.exitLobbyScreen = () => {
+        window.exitLobbyScreen = async () => {
+            const lobbyIdToExit = window.currentLobbyID; // Salva l'ID prima di fare qualsiasi cosa
+            
+            if (lobbyIdToExit) {
+                try {
+                    // Passa l'ID direttamente alla funzione
+                    await window.updateplayerstate({online: false, lobbyID: lobbyIdToExit});
+                } catch (e) {
+                    console.error("Non sono riuscito a mettermi offline, ma esco comunque...");
+                }
+            }
+
+            // Ora pulisci tutto il resto
             if (window.lobbyUnsubscribe) {
-                window.lobbyUnsubscribe(); // Smettiamo di ascoltare i cambiamenti su Firebase
+                window.lobbyUnsubscribe();
                 window.lobbyUnsubscribe = null;
             }
-            window.currentLobbyID = null;
+
+            // Cambio schermata...
             document.getElementById('lobby-screen').classList.add('hidden');
             document.getElementById('home-screen').classList.remove('hidden');
             document.getElementById('user-avatar').classList.remove('hidden');
+
             openChallengeManager();
+            
+            window.currentLobbyID = null;
         };
 
         // 2. Selettori delle opzioni Lobby
@@ -4444,17 +4620,29 @@
             }
 
             // 3. SINCRONIZZAZIONE STATO PARTITA E TASTO PRINCIPALE
+            const roundNum = window.getCurrentRoundNumber();
             const mainBtn = document.getElementById('main-lobby-action');
             const isPlaying = data.gameState === 'playing';
+            let isPlayerFinished = false
+            if (data.rounds) {
+                isPlayerFinished = data.rounds[roundNum]?.players[window.firebaseAuth.currentUser.uid].finished || false;
+            }
 
-            if (isPlaying) {
+            if (isPlaying && !isPlayerFinished) {
                 mainBtn.innerHTML = "ENTRA IN<br>GARA";
-                mainBtn.style.background = "green";
+                mainBtn.style.background = "blue";
+                mainBtn.classList.remove('no-effetti')
                 mainBtn.onclick = () => window.startLobbyGameplay(data); 
+            } else if (isPlaying && isPlayerFinished) {
+                mainBtn.innerHTML = "SFIDA<br>COMPLETATA";
+                mainBtn.style.background = "green";
+                mainBtn.classList.add('no-effetti')
+                mainBtn.onclick = () => 'none'; 
             } else {
                 mainBtn.innerHTML = "AVVIA<br>SFIDA";
                 mainBtn.style.background = "";
                 mainBtn.classList.add('main-gradient-btn');
+                mainBtn.classList.remove('no-effetti')
                 mainBtn.onclick = window.startChallengeRound;
             }
     
@@ -4475,38 +4663,67 @@
 
             // Trasforma l'oggetto players in un array e lo ordina per punteggio (maggiore = primo)
             const playersArray = Object.entries(data.players).sort((a, b) => (b[1].totalScore || 0) - (a[1].totalScore || 0));
+            const statusConfig = {
+                out:      { text: 'Out',         color: 'red'},
+                offline:  { text: 'Offline',     color: '#6b7280'},
+                finished: { text: 'Completato',  color: '#167813' },
+                playing:  { text: 'In partita',  color: '#3b82f6' },
+                lobby:    { text: 'Lobby',       color: '#eab308' }
+            };
 
             playersArray.forEach(([uid, p], index) => {
                 // Seleziona colore in base allo stato
                 let statusText = 'Offline';
                 let statusColor = '#6b7280';
+                const playerData = data.rounds[roundNum]?.players[uid];
                 if (!p.inGame) {
-                     statusText = 'Out';
-                     statusColor = 'red';
-                } else if (data.gameState === 'waiting') {
-                    statusText = 'In Attesa';
-                    statusColor = '#eab308';
+                    statusText = 'Out';
+                    statusColor = 'red';
+                } else if (!p.online) {
+                    const currentStatus = statusConfig['offline'] || statusConfig.lobby;
+                    statusText = currentStatus.text;
+                    statusColor = currentStatus.color;
+                } else if (data.gameState === 'waiting' && p.online) {
+                    const currentStatus = statusConfig['lobby'];
+                    statusText = currentStatus.text;
+                    statusColor = currentStatus.color;
                 } else if (data.gameState === 'playing') {
-                    statusText = p.finished ? 'In Attesa' : 'In Partita';
-                    statusColor = p.finished ? '#eab308' : '#3b82f6';
+                    const currentStatus = statusConfig[playerData.state] || statusConfig.lobby;
+                    statusText = currentStatus.text;
+                    statusColor = currentStatus.color;
                 } else if (data.gameState.toLowerCase().includes('results_')) {
                     // 1. Recuperiamo i dati dal giocatore (p)
                     const roundNumber = data.gameState.split('_')[1]; // Es. "results_2" -> roundNumber = 2
                     let tentativi = 0;
                     let secondiTotali = 0;
+                    let paroleTrovate = 0;
+                    let paroleTotali = 0;
                     data.rounds[roundNumber]?.players[uid].results.forEach((res, i) => {
+                        if (Math.floor(res / 100000) % 10 !== 9) paroleTrovate +=1;
                         tentativi += Math.floor(res / 100000) % 10;
                         secondiTotali += res % 100000;
+                        paroleTotali = i + 1;
                     });
 
                     // 2. Formattiamo il tempo (es. 125 secondi -> 2:05)
                     const m = Math.floor(secondiTotali / 60);
                     const s = String(secondiTotali % 60).padStart(2, '0');
                     const tempoFormattato = m > 0 ? `${m}:${s}` : `${secondiTotali}s`;
+                    const tentativiText = tentativi === 1 ? 'tentativo' : 'tentativi';
+                    const indovinateText = paroleTrovate === 1 ? 'indovinata' : 'indovinate';
 
                     // 3. Impostiamo il testo con <br> per l'invio a capo
-                    statusText = `${tentativi} tentativi<br>${tempoFormattato}`;
-                    statusColor = '#10b981'; // Verde smeraldo
+                    if (paroleTrovate === 0) {
+                        statusText = `0 indovinate<br>${tempoFormattato}`;
+                        statusColor = '#FA5F41'; // Rosso
+                    } else if (paroleTotali===1) {
+                        statusText = `${tentativi} ${tentativiText}<br>${tempoFormattato}`;
+                        statusColor = '#10b981'; // Verde smeraldo
+                    } else { // Sfida a 5
+                        statusText = `${paroleTrovate} ${indovinateText}<br>${tentativi} tentativi<br>${tempoFormattato}`;
+                        statusColor = '#10b981'; // Verde smeraldo
+                    }
+                    
                 }
 
                 let rankDisplay;
@@ -4555,6 +4772,44 @@
             return user && window.currentLobbyID && window.currentLobbyData && window.currentLobbyData.admin === user.uid;
         };
 
+        window.updateplayerstate = async ({online=null, stato=null, lobbyID = null, roundNumber = null} = {}) => {
+            const user = window.firebaseAuth.currentUser;
+            const ID = lobbyID || window.currentLobbyID;
+            const roundNum = roundNumber || window.getCurrentRoundNumber()
+
+            if (!ID || !user || !roundNum) return; // Sicurezza: evita crash se mancano i dati
+
+            // 1. Il riferimento deve essere al DOCUMENTO della lobby, non a una sotto-collezione
+            const lobbyRef = doc(window.firebaseDB, 'lobbies', ID);
+
+            let updates = null
+            if (online !== null) {
+                console.log('online:', online, 'stato:', stato)
+                updates = {
+                    [`players.${user.uid}.online`]: online,
+                }
+            } else if (stato !== null) {
+                updates = {
+                    [`rounds.${roundNum}.players.${user.uid}.state`]: stato,
+                }
+            } else if (online !== null && stato !== null) {
+                updates = {
+                    [`players.${user.uid}.online`]: online,
+                    [`rounds.${roundNum}.players.${user.uid}.state`]: stato,
+                }
+            } else {
+                return
+            }
+
+            try {
+                // 2. Usiamo la dot notation per colpire solo il campo 'state' di quel player
+                await updateDoc(lobbyRef, updates);
+            } catch (error) {
+                console.error("Errore durante l'aggiornamento stato:", error);
+                throw error; // Rilanciamo l'errore per farlo catturare dal try/catch di exitLobbyScreen
+            }
+        };
+
         window.removeRecentLobby = async (code) => {
             let db = LocalDB.get();
             db.recentLobbies = db.recentLobbies.filter(c => c !== code);
@@ -4570,6 +4825,7 @@
                 showToast("Solo il creatore della lobby può espellere i giocatori!");
                 return;
             }
+
             const playerName = window.currentLobbyData.players[uid]?.name || "Giocatore";
             const confermato = await askConfirm(
                 "Espelli " + playerName + "?",
@@ -4578,28 +4834,60 @@
             );
             if (!confermato) return;
 
+            // Riferimento alla lobby
+            const lobbyRef = doc(window.firebaseDB, 'lobbies', window.currentLobbyID);
+
             let update = {
+                [`players.${uid}.online`]: 'false',
                 [`players.${uid}.inGame`]: false,
                 ['lastUpdate']: new Date().toISOString()
             };
 
+            // Se stiamo giocando, marchiamolo come "finito" per non bloccare il round
             if (window.currentLobbyData.gameState === 'playing') {
-                roundNumber = window.getCurrentRoundNumber();
+                const roundNumber = window.getCurrentRoundNumber(); // Aggiunto const
                 update = {
                     ...update,
                     [`rounds.${roundNumber}.players.${uid}.finished`]: true,
+                    // Rimuoviamo eventuali dati parziali sui tentativi per pulizia
                     [`rounds.${roundNumber}.players.${uid}.attempts`]: deleteField()
                 };
             }
 
             try {
-                const lobbyRef = doc(window.firebaseDB, 'lobbies', window.currentLobbyID);
                 await updateDoc(lobbyRef, update);
                 showToast(playerName + " è stato espulso.");
+
+                // --- PUNTO CHIAVE ---
+                // Se eravamo in partita, controlliamo se il round deve finire ora che il player è fuori
+                if (window.currentLobbyData.gameState === 'playing') {
+                    await window.checkfinalizeRound(lobbyRef);
+                }
+
             } catch (e) {
                 console.error("Errore espulsione:", e);
                 showToast("Errore durante l'espulsione del giocatore.");
             }
+        };
+
+        window.forceExitAfterKick = () => {
+            // Nascondi tutte le schermate di gioco/lobby
+            document.getElementById('lobby-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.add('hidden'); // Se era in partita
+            
+            // Mostra la home
+            document.getElementById('home-screen').classList.remove('hidden');
+            document.getElementById('user-avatar').classList.remove('hidden');
+            
+            // Resetta le variabili globali di stato
+            window.currentLobbyID = null;
+            window.currentLobbyData = null;
+            
+            // Se avevi timer attivi, fermali
+            if (window.stopSessionTimer) window.stopSessionTimer();
+            
+            // Apri il manager delle sfide se necessario
+            if (typeof openChallengeManager === 'function') openChallengeManager();
         };
 
         window.setLobbyType = async (mode) => {
@@ -4690,30 +4978,34 @@
                 }
                 
                 const playersData = window.currentLobbyData?.players || {};
-                const initializedPlayers = Object.keys(playersData).reduce((acc, uid) => {
-                    acc[uid] = { 
-                        wordsPlayed: 0, 
-                        totalTime: 0,
-                        totalAttempts: 0,
-                        pointScore: 0,
-                        finished: false, 
-                        results: initialResults, 
-                        attempts: {
-                            targetWord: selectedWords[0],
-                            absentLetters: [], 
-                            knownLetters: Array(len).fill(""),
-                            wrongPositions: {}, 
-                            guesses: [],
-                            time: 0
-                        } 
-                    };
-                    return acc;
-                }, {});
+                const initializedPlayers = Object.keys(playersData)
+                    // 1. Filtriamo: teniamo solo gli UID dei giocatori che sono effettivamente in gioco
+                    .filter(uid => playersData[uid].inGame === true)
+                    // 2. Inizializziamo solo loro
+                    .reduce((acc, uid) => {
+                        acc[uid] = { 
+                            state: 'lobby',
+                            wordsPlayed: 0, 
+                            totalTime: 0,
+                            totalAttempts: 0,
+                            pointScore: 0,
+                            finished: false, 
+                            results: initialResults, 
+                            attempts: {
+                                targetWord: selectedWords[0],
+                                absentLetters: [], 
+                                knownLetters: Array(len).fill(""),
+                                wrongPositions: {}, 
+                                guesses: [],
+                                time: 0
+                            } 
+                        };
+                        return acc;
+                    }, {});
 
                 // Prepariamo l'oggetto del round per riutilizzarlo
                 const newRoundData = {
                     targetWords: selectedWords,
-                    state: 'playing',
                     config: { lang, len, mode },
                     startTime: new Date().toISOString(),
                     players: initializedPlayers
@@ -4731,8 +5023,6 @@
                 window.currentLobbyData.gameState = 'playing';
                 if (!window.currentLobbyData.rounds) window.currentLobbyData.rounds = {};
                 window.currentLobbyData.rounds[roundNumber] = newRoundData;
-
-                showToast("Sfida avviata! Buona fortuna.");
 
             } catch (e) {
                 console.error("Errore avvio:", e);
@@ -4754,7 +5044,7 @@
             return num; // Il numero del round è dato dal conteggio dei round già esistenti
         };
 
-        window.startLobbyGameplay = () => {
+        window.startLobbyGameplay = async () => {
             // Recuperiamo i dati utili
             const uid = window.firebaseAuth.currentUser.uid;
             const roundData = window.currentLobbyData.rounds[window.getCurrentRoundNumber()];
@@ -4775,7 +5065,7 @@
             // 3. AGGIORNAMENTO INTERFACCIA (Transizione e Nascondigli)
             document.getElementById('lobby-screen').classList.add('hidden');
             document.getElementById('home-screen').classList.add('hidden');
-            document.getElementById('game-screen').style.display = 'flex'; // o remove('hidden')
+            document.getElementById('game-screen').classList.remove('hidden');
             
             // Nascondiamo gli elementi del single-player
             document.getElementById('hint-btn').classList.add('hidden');
@@ -4791,6 +5081,7 @@
 
             // 6. AVVIO DEL TIMER
             window.startSessionTimer();
+            await window.updateplayerstate({stato: 'playing'})
         };
 
         function setupMultiplayerHeader() {
@@ -4881,13 +5172,11 @@
             const roundData = window.currentLobbyData.rounds[roundNum];
             const p = roundData.players[uid];
             const wordIdx = p.wordsPlayed; 
-            console.log(p.totalTime, p.totalAttempts);
             window.playerAttemptTime = window.baseTime - window.playerTotalTime
             
             // 2. Calcoli
             const attemptsUsed = isWin ? (currentRow + 1) : 9;
             const secondsUsed = Math.min(window.playerAttemptTime, 99999);
-            console.log("Tentativi usati:", attemptsUsed, "Secondi usati:", secondsUsed);
             
             const encodedResult = ((wordIdx + 1) * 1000000) + (attemptsUsed * 100000) + secondsUsed;
             
@@ -4928,6 +5217,7 @@
             try {
                 // 4. Invio a Firebase
                 await updateDoc(lobbyRef, {
+                    [`${updatePath}.state`] : isLastWord ? 'finished' : 'playing',
                     [`${updatePath}.results`]: newResults,
                     [`${updatePath}.wordsPlayed`]: p.wordsPlayed,
                     [`${updatePath}.totalAttempts`]: p.totalAttempts,
@@ -4937,13 +5227,15 @@
                 });
 
                 if (isLastWord) {
-                    let finish = await window.checkfinalizeRound(lobbyRef, roundNum);
-                    goHome(false);
-                    if (finish) {
-                        showToast("Sfida completata!");
-                    } else {
-                        showToast("Sfida completata! Aspetta gli altri giocatori.");
-                    }
+                    setTimeout(async () => {
+                        let finish = await window.checkfinalizeRound(lobbyRef, roundNum);
+                        goHome(false);
+                        if (finish) {
+                            showToast("Sfida completata!");
+                        } else {
+                            showToast("Sfida completata! Aspetta gli altri giocatori.");
+                        }
+                    }, 2000);
                 } else {
                     // Aggiorniamo subito le statistiche a video con i dati locali
                     if (typeof window.updateMultiplayerStatsDisplay === "function") {
@@ -4962,44 +5254,85 @@
         };
 
         window.checkfinalizeRound = async (lobbyRef, roundNum = null) => {
-            // 1. Leggiamo i dati FRESCHISSIMI da Firebase per evitare desincronizzazioni
             const freshSnap = await getDoc(lobbyRef);
             const freshData = freshSnap.data();
             if (!roundNum) roundNum = freshData.rounds ? Object.keys(freshData.rounds).length : 1;
             
             const playersArray = Object.entries(freshData.rounds[roundNum].players);
-            
-            // 2. Controlliamo se TUTTI hanno finito
             const allFinished = playersArray.every(([id, player]) => player.finished === true);
             
             if (allFinished && freshData.gameState === 'playing') {
-                console.log("🏁 Tutti i giocatori hanno finito! Calcolo i punteggi...");
                 
-                // 3. Ordiniamo i giocatori. 
-                // Prima per Tentativi (crescente), in caso di parità per Tempo (crescente)
+                // --- FUNZIONE DI SUPPORTO PER ESTRARRE I DATI ---
+                const getStats = (results) => {
+                    const resArray = results || [];
+                    let solved = 0;
+                    resArray.forEach(r => {
+                        if (!r) return;
+                        // Estraiamo la cifra dei tentativi (quella dei 100.000)
+                        const attempts = Math.floor((r % 1000000) / 100000);
+                        if (attempts > 0 && attempts < 9) solved++; // Se è 9, è persa
+                    });
+                    return solved;
+                };
+
+                // 1. Identifichiamo chi ha indovinato almeno una parola
+                const solvers = playersArray.filter(([id, p]) => getStats(p.results) > 0);
+                
+                let minAttempts = Infinity;
+                let minTime = Infinity;
+
+                if (solvers.length > 0) {
+                    minAttempts = Math.min(...solvers.map(([id, p]) => p.totalAttempts));
+                    minTime = Math.min(...solvers.map(([id, p]) => p.totalTime));
+                }
+
+                // 2. Ordinamento Classifica: Parole Vinte (Desc) > Tentativi (Asc) > Tempo (Asc)
                 playersArray.sort((a, b) => {
-                    if (a[1].totalAttempts !== b[1].totalAttempts) {
-                        return a[1].totalAttempts - b[1].totalAttempts;
-                    }
+                    const solvedA = getStats(a[1].results);
+                    const solvedB = getStats(b[1].results);
+
+                    if (solvedA !== solvedB) return solvedB - solvedA;
+                    if (a[1].totalAttempts !== b[1].totalAttempts) return a[1].totalAttempts - b[1].totalAttempts;
                     return a[1].totalTime - b[1].totalTime;
                 });
 
                 const puntiStruttura = [10, 7, 5, 4, 3, 2, 1];
                 let updates = {
-                    gameState: `results_${roundNum}`, // Nuovo stato che innesca il podio!
-                    [`rounds.${roundNum}.state`]: 'results',
+                    gameState: `results_${roundNum}`,
                     [`rounds.${roundNum}.config`]: deleteField()
                 };
 
-                // 4. Assegniamo i punti
+                // 3. Assegnazione Punti e Bonus
                 playersArray.forEach(([playerId, playerInfo], index) => {
-                    const puntiVinti = index < puntiStruttura.length ? puntiStruttura[index] : 0;
+                    const solvedCount = getStats(playerInfo.results);
                     
-                    updates[`rounds.${roundNum}.players.${playerId}.pointScore`] = puntiVinti;
-                    updates[`players.${playerId}.totalScore`] = increment(puntiVinti); // Somma al totale della lobby
+                    if (solvedCount === 0) {
+                        updates[`rounds.${roundNum}.players.${playerId}.pointScore`] = 0;
+                        updates[`rounds.${roundNum}.players.${playerId}.bonuses`] = [];
+                        return; 
+                    }
+
+                    let puntiRound = index < puntiStruttura.length ? puntiStruttura[index] : 0;
+                    let gainedBonus = [];
+                    
+                    // Bonus Precisione (🎯)
+                    if (playerInfo.totalAttempts === minAttempts) {
+                        puntiRound += 2;
+                        gainedBonus.push("🎯 Precisione");
+                    }
+                    
+                    // Bonus Velocità (⚡)
+                    if (playerInfo.totalTime === minTime) {
+                        puntiRound += 2;
+                        gainedBonus.push("⚡ Velocità");
+                    }
+
+                    updates[`rounds.${roundNum}.players.${playerId}.pointScore`] = puntiRound;
+                    updates[`rounds.${roundNum}.players.${playerId}.bonuses`] = gainedBonus;
+                    updates[`players.${playerId}.totalScore`] = increment(puntiRound);
                 });
 
-                // Invio il mega-aggiornamento a Firebase
                 await updateDoc(lobbyRef, updates);
                 return true;
             }
@@ -5009,9 +5342,8 @@
         window.showRoundResultsModal = (roundNum, data) => {
             const playersRaw = data.rounds[roundNum].players;
             
-            // Ordiniamo di nuovo per sicurezza per creare il podio
+            // Ordiniamo per creare il podio
             const sortedPlayers = Object.entries(playersRaw).sort((a, b) => {
-                // Se i punteggi sono stati calcolati, ordiniamo per punti, altrimenti per tentativi/tempo
                 if (a[1].pointScore !== undefined && b[1].pointScore !== undefined) {
                     return b[1].pointScore - a[1].pointScore; 
                 }
@@ -5024,34 +5356,65 @@
             podiumContainer.innerHTML = '';
             othersBody.innerHTML = '';
 
-            // Funzione per formattare il tempo
             const fmtTime = (sec) => {
                 if(!sec) return "0s";
                 let m = Math.floor(sec / 60);
                 let s = String(sec % 60).padStart(2, '0');
                 return m > 0 ? `${m}:${s}` : `${sec}s`;
             };
+            const getStats = (results) => {
+                const resArray = results || [];
+                let solved = 0;
+                resArray.forEach(r => {
+                    if (!r) return;
+                    // Estraiamo la cifra dei tentativi (quella dei 100.000)
+                    const attempts = Math.floor((r % 1000000) / 100000);
+                    if (attempts > 0 && attempts < 9) solved++; // Se è 9, è persa
+                });
+                return solved;
+            };
+            const fmtWins = (results, total) => {
+                let win = getStats(results)
+                return `${win}/${total}`;
+            };
 
             // Creiamo il Podio (Max 3)
             const top3 = sortedPlayers.slice(0, 3);
-            const ordiniCSS = [2, 1, 3]; // Il 1° al centro, il 2° a sx, il 3° a dx
-            const altezze = ["120px", "90px", "70px"];
+            const ordiniCSS = [2, 1, 3]; // 1° al centro, 2° a sx, 3° a dx
+            const altezze = ["130px", "100px", "80px"];
             const medaglie = ["🥇", "🥈", "🥉"];
-            const colori = ["#FFD700", "#C0C0C0", "#CD7F32"];
+            // Sfondi gradienti per un look più premium
+            const bgGradient = [
+                "linear-gradient(to top, #fef08a, #facc15)", // Oro
+                "linear-gradient(to top, #e2e8f0, #cbd5e1)", // Argento
+                "linear-gradient(to top, #fed7aa, #fb923c)"  // Bronzo
+            ];
+            const borderColors = ["#eab308", "#94a3b8", "#f97316"];
+            const numWords = data.rounds[roundNum].targetWords.length;
 
             top3.forEach((p, i) => {
                 const uid = p[0];
                 const playerInfo = data.players[uid];
                 const info = p[1];
+                
+                // Estrazione Icone Bonus (se presenti)
+                const bonusIcons = (info.bonuses || []).map(b => b.includes('Velocità') ? '⚡' : '🎯').join(' ');
+
                 const podioHTML = `
                     <div style="order: ${ordiniCSS[i]}; display: flex; flex-direction: column; align-items: center; width: 30%;">
-                        <div style="font-size: 1.5rem; margin-bottom: -5px; z-index: 2;">${medaglie[i]}</div>
-                        <img src="Avatar/${playerInfo.avatar}.png" style="width: 45px; height: 45px; border-radius: 50%; border: 3px solid ${colori[i]}; z-index: 2; background: white; margin-bottom: 5px;">
-                        <span style="font-weight: 800; font-size: 0.9rem; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;">${playerInfo.name}</span>
-                        <div style="background: ${colori[i]}80; width: 100%; height: ${altezze[i]}; border-radius: 10px 10px 0 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 5px; color: #333; box-shadow: 0 -5px 15px rgba(0,0,0,0.1);">
-                            <b style="font-size: 1.2rem;">+${info.pointScore || 0}</b>
-                            <span style="font-size: 0.7rem; line-height: 1;">${info.totalAttempts} T</span>
-                            <span style="font-size: 0.7rem; line-height: 1;">${fmtTime(info.totalTime)}</span>
+                        
+                        <div style="font-size: 1.8rem; margin-bottom: -8px; z-index: 2; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));">${medaglie[i]}</div>
+                        
+                        <img src="Avatar/${playerInfo.avatar}.png" style="width: 50px; height: 50px; border-radius: 50%; border: 3px solid ${borderColors[i]}; z-index: 2; background: white; margin-bottom: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                        
+                        <span style="font-weight: 800; font-size: 0.85rem; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; color: #334155;">${playerInfo.name}</span>
+                        
+                        <div style="background: ${bgGradient[i]}; width: 100%; height: ${altezze[i]}; border-radius: 12px 12px 0 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 8px; color: #1e293b; box-shadow: inset 0 2px 4px rgba(255,255,255,0.4), 0 -5px 15px rgba(0,0,0,0.05);">
+                            <b style="font-size: 1.3rem; margin-bottom: 2px;">+${info.pointScore || 0}</b>
+                            <div style="font-size: 0.8rem; margin-bottom: 2px;">${bonusIcons}</div>
+                            <span style="font-size: 0.7rem; font-weight: bold; opacity: 0.8;">${fmtWins(info.results, numWords)}</span>
+                            <span style="font-size: 0.7rem; font-weight: bold; opacity: 0.8;">${info.totalAttempts} T</span>
+                            <span style="font-size: 0.7rem; font-weight: bold; opacity: 0.8;">${fmtTime(info.totalTime)}</span>
                         </div>
                     </div>
                 `;
@@ -5064,23 +5427,30 @@
                 const uid = p[0];
                 const playerInfo = data.players[uid];
                 const info = p[1];
+                
+                const bonusIcons = (info.bonuses || []).map(b => b.includes('Velocità') ? '⚡' : '🎯').join(' ');
+
                 othersBody.innerHTML += `
-                    <tr style="border-bottom: 1px solid #eee; font-size: 0.85rem;">
-                        <td style="padding: 8px; font-weight: bold; color: #666;">${i + 4}°</td>
-                        <td style="padding: 8px;"><img src="Avatar/${playerInfo.avatar}.png" style="width:20px; height:20px; border-radius:50%; vertical-align:middle; margin-right:5px;">${playerInfo.name}</td>
-                        <td style="padding: 8px; text-align: center;">${info.totalAttempts} T</td>
-                        <td style="padding: 8px; text-align: center;">${fmtTime(info.totalTime)}</td>
-                        <td style="padding: 8px; font-weight: bold; color: var(--green); text-align: right;">+${info.pointScore || 0}</td>
+                    <tr style="border-bottom: 1px solid #e2e8f0; font-size: 0.9rem;">
+                        <td style="padding: 10px; font-weight: bold; color: #94a3b8; width: 30px; text-align: center;">${i + 4}°</td>
+                        <td style="padding: 10px; color: #334155; font-weight: 600;">
+                            <img src="Avatar/${playerInfo.avatar}.png" style="width:24px; height:24px; border-radius:50%; vertical-align:middle; margin-right:8px; border: 1px solid #cbd5e1;">
+                            ${playerInfo.name}
+                        </td>
+                        <td style="padding: 10px; text-align: center; font-size: 0.8rem; color: #64748b;">${fmtWins(info.results, numWords)}</td>
+                        <td style="padding: 10px; text-align: center; font-size: 0.8rem; color: #64748b;">${info.totalAttempts} T</td>
+                        <td style="padding: 10px; text-align: center; font-size: 0.8rem; color: #64748b;">${fmtTime(info.totalTime)}</td>
+                        <td style="padding: 10px; font-weight: 800; color: #10b981; text-align: right;">+${info.pointScore || 0} ${bonusIcons}</td>
                     </tr>
                 `;
             });
 
-            document.getElementById('round-results-modal').style.display = 'flex';
+            document.getElementById('round-results-modal').classList.remove('hidden');
         };
 
         // Funzione per chiudere e PULIRE I DATI su Firebase
         window.acknowledgeRoundResults = async () => {
-            document.getElementById('round-results-modal').style.display = 'none';
+            document.getElementById('round-results-modal').classList.add('hidden');
             const uid = window.firebaseAuth.currentUser.uid;
             
             // Dato che la stringa è "results_X"
@@ -5094,7 +5464,8 @@
                     [`${updatePath}.totalAttempts`]: deleteField(),
                     [`${updatePath}.totalTime`]: deleteField(),
                     [`${updatePath}.finished`]: deleteField(),
-                    [`${updatePath}.attempts`]: deleteField()
+                    [`${updatePath}.attempts`]: deleteField(),
+                    [`${updatePath}.state`]: deleteField()
                 });
                 console.log("Dati superflui puliti!");
             } catch (e) {
@@ -5136,7 +5507,7 @@
 
             try {
                 await updateDoc(lobbyRef, {
-                    [`${playerPath}.time`]: window.playerAttemptTime
+                    [`${playerPath}.attempts.time`]: window.playerAttemptTime
                 });
 
                 const player = window.currentLobbyData?.rounds?.[roundNum]?.players?.[uid];
