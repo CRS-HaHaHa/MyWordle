@@ -21,6 +21,9 @@
     <title>MyWordle</title>
     <style>
         :root {
+            --online: #22c55e;
+            --offline: #facc15;
+            --out: #ef4444;
             --green: #4CAF50;
             --yellow: #FFB703;
             --gray: #9E9E9E;
@@ -1199,13 +1202,20 @@
             margin: auto;height: auto;max-width: 200px;font-weight: 900;line-height: 1.2;font-size: 1.1rem;padding: 10px 10px;
         }
         .leaderboard-frame {
-            max-height: 400px;overflow-y: auto;background: rgba(245, 244, 246, 1);border-radius: 15px;box-shadow: var(--shadow);max-width: 850px;margin: auto;padding: 20px 20px;
+            max-height: 400px;background: rgba(245, 244, 246, 1);border-radius: 15px;box-shadow: var(--shadow);max-width: 850px;margin: auto;padding: 20px;
         }
+        #leaderboard-frame-contenitor {
+            max-height: calc(var(--vh, 1vh) * 100 - 440px);
+            overflow-y: auto;
+        }
+        #leaderboard-frame-contenitor::-webkit-scrollbar {width: 8px; background: rgb(208 214 252);}
+        #leaderboard-frame-contenitor::-webkit-scrollbar-thumb {background: #5753be; border-radius: 10px;}
         #lobby-leaderboard-header {
-            background: #798ce0eb;color: black;font-size: 1.2rem;line-height: 20px;
+            background: #7987db;color: black;font-size: 1.2rem;line-height: 20px; position: sticky; top: 0; z-index: 100;
         }
+        #lobby-leaderboard-header th {position: sticky; top: 0; }
         #lobby-position-header {
-            height: 50px; width: 60px; text-align: center; border-top-left-radius: 15px;
+            height: 50px; width: 60px; text-align: center;
         }
         #lobby-player-header {
             text-align: left; padding-left: 20px; width: auto;
@@ -1214,17 +1224,21 @@
             text-align: center; width: 90px;
         }
         #lobby-status-header {
-            text-align: center; border-top-right-radius: 15px; width: 120px;
+            text-align: center; width: 120px;
         }
+        td { border-bottom: 2px solid #7987db; border-right: 2px solid #7987db; }
+        tbody tr:nth-child(odd) { background: #d4d9f3; }
+        tbody tr:nth-child(even) { background: #a2afff; }
         #lobby-position {
             text-align: center; font-weight: bold;
         }
-        .first-place { filter: drop-shadow(0 0 4px gold); font-size: 1.4rem; }
-        .second-place { filter: drop-shadow(0 0 4px silver); font-size: 1.4rem; }
-        .third-place { filter: drop-shadow(0 0 4px bronze); font-size: 1.4rem; }
-        .other-place { color:#f2521f; }
-        #lobby-player { text-align:left; font-weight:bold; color: var(--text-color); display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; }
+        .first-place { filter: drop-shadow(0 0 4px gold); font-size: 1.4rem; z-index: 1; position: relative;}
+        .second-place { filter: drop-shadow(0 0 4px silver); font-size: 1.4rem; z-index: 1; position: relative;}
+        .third-place { filter: drop-shadow(0 0 4px #CD7F32); font-size: 1.4rem; z-index: 1; position: relative;}
+        .other-place { color:#000000; }
+        #lobby-player { text-align:left; font-weight:bold; color: var(--text-color); align-items: center; justify-content: space-between; padding: 10px 20px; }
         #lobby-player img { width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; background: #eee; }
+        #avatarBall { position: relative; bottom: 11px; right: 16px; width: 6px; height: 6px; border-radius: 50%; border: 1px solid #7987db; }
         .kick-btn {opacity: 0.6; background: radial-gradient(red, transparent); flex: none; padding: 5px;}
         #lobby-player .kick-btn img {background: none; margin: 2px 5px 0 5px; width: auto; height: 20px;}
         #lobby-points { text-align: center; font-weight: 900; font-size: 1.1rem; color: var(--primary-color); padding:13px; }
@@ -1239,6 +1253,12 @@
             padding: 10px;
             border-radius: 15px;
         }
+        #clasifPosition { padding: 10px; font-weight: bold; color: #94a3b8; width: 10%; text-align: center; }
+        #clasifName { padding: 10px; color: #334155; font-weight: 600;  width: 48%;}
+        #clasifIndovinate { padding: 10px; text-align: center; font-size: 0.8rem; color: #64748b;  width: 10%;}
+        #clasifPunteggi { padding: 10px; text-align: center; font-size: 0.8rem; color: #64748b; width: 17%;}
+        #clasifPunteggi span, #clasifPunti span {display: inline;}
+        #clasifPunti { padding: 10px; font-weight: 800; color: #10b981; text-align: center;  width: 15%;}
 
         @keyframes fadeInUp {
             from {
@@ -1547,7 +1567,7 @@
                 padding: 10px 0px;
             }
             .leaderboard-frame {
-                padding: 10px 10px;
+                padding: 10px;
             }
             #lobby-leaderboard-header {
                 font-size: 0.9rem;
@@ -1566,12 +1586,14 @@
             }
             #lobby-modal.gradient-text { margin-top: 0px; }
             #user-dropdown { top:50px; right: -8px; }
+            #leaderboard-frame-contenitor::-webkit-scrollbar { width: 5px;}
             .first-place { font-size: 0.9rem; }
             .second-place { font-size: 0.9rem; }
             .third-place { font-size: 0.9rem; }
             .other-place { font-size: 0.9rem; }
             #lobby-player { padding: 10px 4px; font-size: 0.9rem; }
             #lobby-player img { width: 23px; height: 23px; margin-right: 5px; }
+            #avatarBall {bottom: 10px; right: 11px;}
             #lobby-points { font-weight: 800; font-size: 0.9rem; }
             #lobby-status { font-size: 0.7rem; padding: 4px 3px; }
             #multiplayer-header {
@@ -1579,6 +1601,11 @@
                 right: 0px;
                 border-radius: 15px 0 15px 15px;
             }
+            #clasifPosition { padding:13px 0; }
+            #clasifPunteggi, #clasifIndovinate { padding:0; }
+            #clasifPunteggi span, #clasifPunyi span {display: block;}
+            #clasifPunti {padding: 0; width: 12%;}
+            #clasifName {padding: 0; width: 51%;}
         }
     </style>
 </head>
@@ -1853,23 +1880,29 @@
             </div>
 
             <div class="leaderboard-frame">
-                <table style="width: 100%;border-color: red;background-color: var(--bg2);border-radius: 15px 15px 0px 0px;">
-                    <thead id="lobby-leaderboard-header">
-                        <tr>
-                            <th id="lobby-position-header">#</th>
-                            <th id="lobby-player-header">Giocatore</th>
-                            <th id="lobby-points-header">Punti</th>
-                            <th id="lobby-status-header">Stato</th>
-                        </tr>
-                    </thead>
-                    <tbody id="lobby-leaderboard-body" style="border: 2px solid #6f63c3;">
-                        </tbody>
-                </table>
+                <div style="background: #7987db; border-radius: 15px; padding: 1px;">
+                    <div style="border-radius: 15px; overflow: hidden;">
+                        <div id="leaderboard-frame-contenitor">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead id="lobby-leaderboard-header">
+                                    <tr>
+                                        <th id="lobby-position-header">#</th>
+                                        <th id="lobby-player-header">Giocatore</th>
+                                        <th id="lobby-points-header">Punti</th>
+                                        <th id="lobby-status-header">Stato</th>
+                                    </tr>
+                                </thead>
+                            
+                                <tbody id="lobby-leaderboard-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="round-results-modal" class="modal-overlay hidden" style="z-index: 10000;">
+    <div id="round-results-modal" class="modal-overlay hidden" style="z-index: 10000; margin: 0 10px;">
         <div class="stats-container" style="position: relative; max-width: 600px; width: 90%; padding: 30px 20px; background: white; border-radius: 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.2);">
 
             <button id="scoring-help-btn" style="position: absolute; left: 20px; top: 20px; background: #8a2be2; color: white; border: none; font-size: 1.2rem; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(138, 43, 226, 0.4); display: flex; align-items: center; justify-content: center; z-index: 10; transition: transform 0.2s;">
@@ -4714,20 +4747,19 @@
 
             playersArray.forEach(([uid, p], index) => {
                 // Seleziona colore in base allo stato
-                let statusText = 'Offline';
-                let statusColor = '#6b7280';
+                let statusText = 'Lobby';
+                let statusColor = '#eab308';
+                let avatarBallColor = 'offline';
                 const playerData = data.rounds[roundNum]?.players[uid];
                 if (!p.inGame) {
-                    statusText = 'Out';
-                    statusColor = 'red';
+                    avatarBallColor = 'out';
                 } else if (!p.online) {
-                    const currentStatus = statusConfig['offline'] || statusConfig.lobby;
-                    statusText = currentStatus.text;
-                    statusColor = currentStatus.color;
-                } else if (data.gameState === 'waiting' && p.online) {
-                    const currentStatus = statusConfig['lobby'];
-                    statusText = currentStatus.text;
-                    statusColor = currentStatus.color;
+                    avatarBallColor = 'offline';
+                } else { avatarBallColor = 'online'; }
+
+                if (data.gameState === 'waiting') {
+                    statusText = 'Lobby';
+                    statusColor = '#eab308';
                 } else if (data.gameState === 'playing') {
                     const currentStatus = statusConfig[playerData.state] || statusConfig.lobby;
                     statusText = currentStatus.text;
@@ -4788,11 +4820,12 @@
                 if (window.isLobbyAdmin() && p.inGame && uid !== window.firebaseAuth.currentUser.uid) cacciare = true;
 
                 tbody.innerHTML += `
-                    <tr style="background: rgba(245, 244, 246, 1);">
+                    <tr>
                         <td id="lobby-position" class="${classStyle}">${rankDisplay}</td>
                         <td id="lobby-player">
-                            <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="display: flex; align-items: center;">
                                 <img src="Avatar/${p.avatar}.png" style="width: 30px; height: 30px; border-radius: 50%;">
+                                <div id="avatarBall" style="background: var(--${avatarBallColor});"></div>
                                 <span>${p.name}</span>
                             </div>
                             ${cacciare ? `<button class="kick-btn" title="Espelli giocatore" onclick="window.kickPlayer('${uid}')"><img src="https://cdn.jsdelivr.net/npm/heroicons@2.0.18/24/outline/user-minus.svg"></button>` : ''}
@@ -5397,26 +5430,36 @@
             podiumContainer.innerHTML = '';
             othersBody.innerHTML = '';
 
-            const fmtTime = (sec) => {
-                if(!sec) return "0s";
-                let m = Math.floor(sec / 60);
-                let s = String(sec % 60).padStart(2, '0');
-                return m > 0 ? `${m}:${s}` : `${sec}s`;
+            const fmtTime = (results) => {
+                const {tempo} = getStats(results);
+                let m = Math.floor(tempo / 60);
+                let s = String(tempo % 60).padStart(2, '0');
+                return m > 0 ? `${m}:${s}` : `${tempo}s`;
             };
             const getStats = (results) => {
                 const resArray = results || [];
                 let solved = 0;
+                let totalAttempts = 0;
+                let tempo = 0;
                 resArray.forEach(r => {
                     if (!r) return;
                     // Estraiamo la cifra dei tentativi (quella dei 100.000)
                     const attempts = Math.floor((r % 1000000) / 100000);
+                    const sec = Math.floor(r % 100000);
+                    totalAttempts += attempts;
+                    tempo += sec;
                     if (attempts > 0 && attempts < 9) solved++; // Se è 9, è persa
                 });
-                return solved;
+                return { totalAttempts, solved, tempo };
             };
             const fmtWins = (results, total) => {
-                let win = getStats(results)
-                return `${win}/${total}`;
+                const { solved } = getStats(results);
+                return `${solved}/${total}`;
+            };
+
+            const fmtAttempts = (results) => {
+                const { totalAttempts } = getStats(results);
+                return `${totalAttempts} Tent`;
             };
 
             // Creiamo il Podio (Max 3)
@@ -5451,11 +5494,10 @@
                         <span style="font-weight: 800; font-size: 0.85rem; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; color: #334155;">${playerInfo.name}</span>
                         
                         <div style="background: ${bgGradient[i]}; width: 100%; height: ${altezze[i]}; border-radius: 12px 12px 0 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 8px; color: #1e293b; box-shadow: inset 0 2px 4px rgba(255,255,255,0.4), 0 -5px 15px rgba(0,0,0,0.05);">
-                            <b style="font-size: 1.3rem; margin-bottom: 2px;">+${info.pointScore || 0}</b>
-                            <div style="font-size: 0.8rem; margin-bottom: 2px;">${bonusIcons}</div>
+                            <b style="font-size: 1.3rem; margin-bottom: opx;">+${info.pointScore || 0}</b>
+                            <div style="font-size: 1rem; margin-bottom: 2px; padding-left: 1px;">${bonusIcons}</div>
                             <span style="font-size: 0.7rem; font-weight: bold; opacity: 0.8;">${fmtWins(info.results, numWords)}</span>
-                            <span style="font-size: 0.7rem; font-weight: bold; opacity: 0.8;">${info.totalAttempts} T</span>
-                            <span style="font-size: 0.7rem; font-weight: bold; opacity: 0.8;">${fmtTime(info.totalTime)}</span>
+                            <span style="font-size: 0.7rem; font-weight: bold; opacity: 0.8;">${fmtAttempts(info.results)} - ${fmtTime(info.results)}</span>
                         </div>
                     </div>
                 `;
@@ -5473,15 +5515,20 @@
 
                 othersBody.innerHTML += `
                     <tr style="border-bottom: 1px solid #e2e8f0; font-size: 0.9rem;">
-                        <td style="padding: 10px; font-weight: bold; color: #94a3b8; width: 30px; text-align: center;">${i + 4}°</td>
-                        <td style="padding: 10px; color: #334155; font-weight: 600;">
+                        <td id="clasifPosition">${i + 4}°</td>
+                        <td id="clasifName">
                             <img src="Avatar/${playerInfo.avatar}.png" style="width:24px; height:24px; border-radius:50%; vertical-align:middle; margin-right:8px; border: 1px solid #cbd5e1;">
                             ${playerInfo.name}
                         </td>
-                        <td style="padding: 10px; text-align: center; font-size: 0.8rem; color: #64748b;">${fmtWins(info.results, numWords)}</td>
-                        <td style="padding: 10px; text-align: center; font-size: 0.8rem; color: #64748b;">${info.totalAttempts} T</td>
-                        <td style="padding: 10px; text-align: center; font-size: 0.8rem; color: #64748b;">${fmtTime(info.totalTime)}</td>
-                        <td style="padding: 10px; font-weight: 800; color: #10b981; text-align: right;">+${info.pointScore || 0} ${bonusIcons}</td>
+                        <td id="clasifIndovinate">${fmtWins(info.results, numWords)}</td>
+                        <td id="clasifPunteggi">
+                            <span>${fmtAttempts(info.results)}</span>
+                            <span>${fmtTime(info.results)}</span>
+                        </td>
+                        <td id="clasifPunti">
+                            <span>+${info.pointScore || 0}</span>
+                            <span>${bonusIcons}</span>
+                        </td>
                     </tr>
                 `;
             });
