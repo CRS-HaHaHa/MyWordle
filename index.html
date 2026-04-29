@@ -2724,10 +2724,32 @@
                     btn.dataset.key = 'backspace';
                     btn.innerText = '⌫';
                     
+                    // Funzione per fermare la cancellazione
+                    const stopDeleting = () => {
+                        clearTimeout(backspaceTimer);
+                        clearInterval(backspaceInterval);
+                        btn.classList.remove('pressed');
+                    };
+
                     btn.addEventListener('pointerdown', (e) => {
                         e.preventDefault();
+                        btn.classList.add('pressed');
+
+                        // 1. Cancella subito la prima lettera (feedback immediato)
                         handleInput('backspace');
+
+                        // 2. Aspetta mezzo secondo (500ms) per vedere se è una pressione lunga
+                        backspaceTimer = setTimeout(() => {
+                            // 3. Se il dito è ancora giù, inizia a cancellare ogni 100ms
+                            backspaceInterval = setInterval(() => {
+                                handleInput('backspace');
+                            }, 100);
+                        }, 500);
                     });
+
+                    // Fermiamo tutto se il dito si alza o esce dal tasto
+                    btn.addEventListener('pointerup', stopDeleting);
+                    btn.addEventListener('pointerleave', stopDeleting);
                     
                     row.appendChild(btn);
                 }
