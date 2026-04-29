@@ -905,7 +905,6 @@
             cursor: pointer;
             font-weight: 800;
             font-size: 1.2rem;
-            user-select: none;
             position: relative;
             
             /* Effetto 3D "Keycap" */
@@ -923,6 +922,8 @@
 
             /* 3. Impedisce la selezione del testo se si preme velocemente */
             user-select: none;
+            -webkit-user-select: none; /* Per Safari su iPhone */
+            touch-action: manipulation;
         }
 
         .key:active {
@@ -2660,8 +2661,7 @@
             let row2 = "ASDFGHJKL";
             let row3 = "ZXCVBNM";
 
-            // 2. Aggiungiamo il carattere speciale alla seconda riga in base alla lingua
-            // Assumo che currentLang sia 'es' per spagnolo e 'fr' per francese
+            // 2. Gestione lingua (già ottima nel tuo codice!)
             if (currentLang === 'es') {
                 row2 += "Ñ";
             } else if (currentLang === 'fr') {
@@ -2676,41 +2676,59 @@
                 const row = document.createElement('div');
                 row.className = 'kb-row';
                 
-                // Terza riga: aggiungi tasto ENTER a sinistra
+                // --- TASTO ENTER (Terza riga) ---
                 if(i === 2) { 
                     const btn = document.createElement('div');
                     btn.className = 'key key-big';
                     btn.dataset.key = 'enter';
                     btn.innerText = 'ENTER';
-                    btn.onclick = submitWord;
+                    
+                    // Usiamo pointerdown per reattività immediata
+                    btn.addEventListener('pointerdown', (e) => {
+                        e.preventDefault(); // Evita conflitti con altri eventi
+                        submitWord();
+                    });
+                    
                     row.appendChild(btn);
                 }
 
+                // --- TASTI LETTERE ---
                 rowStr.split('').forEach(char => {
                     const btn = document.createElement('div');
                     btn.className = 'key';
                     btn.dataset.key = char.toLowerCase();
+                    btn.id = `key-${char.toLowerCase()}`;
                     btn.innerHTML = `
                         ${char.toUpperCase()}
                         <div class="key-preview" id="key-${char.toLowerCase()}-preview">${char.toUpperCase()}</div>
                     `;
-                    // Eventi per mostrare/nascondere la bolla
-                    btn.addEventListener('pointerdown', () => btn.classList.add('pressed'));
+
+                    // Unifichiamo logica visiva e logica di input in pointerdown
+                    btn.addEventListener('pointerdown', (e) => {
+                        e.preventDefault(); 
+                        btn.classList.add('pressed');
+                        // Chiamiamo la funzione di input qui!
+                        handleInput(char.toLowerCase());
+                    });
+
                     btn.addEventListener('pointerup', () => btn.classList.remove('pressed'));
                     btn.addEventListener('pointerleave', () => btn.classList.remove('pressed'));
-                    // Usiamo il carattere originale per l'ID (gestisce correttamente ñ e ç)
-                    btn.id = `key-${char.toLowerCase()}`;
-                    btn.onclick = () => handleInput(char.toLowerCase());
+                    
                     row.appendChild(btn);
                 });
 
-                // Terza riga: aggiungi tasto DELETE a destra
+                // --- TASTO DELETE (Terza riga) ---
                 if(i === 2) { 
                     const btn = document.createElement('div');
                     btn.className = 'key key-big';
                     btn.dataset.key = 'backspace';
                     btn.innerText = '⌫';
-                    btn.onclick = () => handleInput('backspace');
+                    
+                    btn.addEventListener('pointerdown', (e) => {
+                        e.preventDefault();
+                        handleInput('backspace');
+                    });
+                    
                     row.appendChild(btn);
                 }
                 kb.appendChild(row);
