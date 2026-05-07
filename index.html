@@ -1948,66 +1948,79 @@
         }
 
         const ConnectionMonitor = {
-            isStable: false,
-            checkInterval: 30000, // millisecondi - Controlla ogni 30 secondi
-
+            isStable: navigator.onLine,
+            lastCheck: Date.now(),
+            
             async check() {
-                // Se il browser dice già che siamo offline, non proviamo nemmeno il fetch
+                // 1. Se il sistema dice già che siamo offline, non serve il ping
                 if (!navigator.onLine) {
-                    this.isStable = false;
-                    this.updateUI();
+                    this.setStable(false);
                     return false;
                 }
 
                 try {
-                    // Usiamo un endpoint che non restituisce quasi nulla (204 No Content)
-                    // 'no-cors' evita problemi di permessi, 'cache: no-store' evita falsi positivi
+                    // 2. Usiamo un timeout molto più aggressivo (2.5 secondi)
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 2500);
+
                     await fetch("https://clients3.google.com/generate_204", {
                         mode: "no-cors",
                         cache: "no-store",
-                        signal: AbortSignal.timeout(5000) // Se dopo 5 secondi non risponde, è troppo lento
+                        signal: controller.signal
                     });
-                    this.isStable = true;
-                } catch (e) {
-                    this.isStable = false;
-                }
 
-                this.updateUI();
-                return this.isStable;
+                    clearTimeout(timeoutId);
+                    this.setStable(true);
+                    return true;
+                } catch (e) {
+                    // Se fallisce il fetch o va in timeout, consideriamo instabile
+                    this.setStable(false);
+                    return false;
+                }
+            },
+
+            setStable(status) {
+                if (this.isStable !== status) {
+                    this.isStable = status;
+                    console.log(status ? "🌐 Connessione Ripristinata" : "📡 Modalità Offline");
+                    this.updateUI();
+                }
             },
 
             updateUI() {
+                // Gestione classi CSS
+                document.body.classList.toggle('is-offline', !this.isStable);
+                
                 const onlineElements = document.querySelectorAll('.online-only');
-
                 onlineElements.forEach(el => {
-
-                    // 🔹 Se non ha ancora il wrapper, lo creiamo
-                    if (!el.querySelector('.content')) {
-                        const wrapper = document.createElement('span');
-                        wrapper.classList.add('content');
-
-                        // sposta tutto dentro
-                        wrapper.innerHTML = el.innerHTML;
-                        el.innerHTML = '';
-                        el.appendChild(wrapper);
-                    }
-
-                    // 🔹 Stato online/offline
-                    if (this.isStable) {
-                        el.classList.remove('disabled-offline');
-                    } else {
-                        el.classList.add('disabled-offline');
-                    }
+                    el.style.opacity = this.isStable ? "1" : "0.5";
+                    el.style.pointerEvents = this.isStable ? "auto" : "none";
+                    el.title = this.isStable ? "" : "Richiede connessione internet";
                 });
+
+                // Feedback visivo (opzionale)
+                if (!this.isStable) {
+                    showToast("⚠️ Connessione debole o assente. Alcune funzioni disabilitate.", 3000);
+                }
             },
 
             start() {
+                // Controlli immediati
                 this.check();
-                setInterval(() => this.check(), this.checkInterval);
                 
-                // Ascolta anche gli eventi di sistema per reagire istantaneamente
+                // Eventi di sistema (reattività immediata)
                 window.addEventListener('online', () => this.check());
                 window.addEventListener('offline', () => this.check());
+
+                // Controllo periodico più intelligente (ogni 15s se instabile, 60s se stabile)
+                const runInterval = () => {
+                    const delay = this.isStable ? 60000 : 15000;
+                    setTimeout(async () => {
+                        await this.check();
+                        runInterval();
+                    }, delay);
+                };
+                runInterval();
             }
         };
 
@@ -2064,6 +2077,7 @@
         let knownLetters = [];  // Memorizza le lettere corrette nelle posizioni esatte
         let wrongPositions = {}; // Memorizza le lettere presenti nella parola ma nella posizione sbagliata
         let absentLetters = new Set(); // Memorizza le lettere che NON esistono nella parola
+        let pausaInserimento = true;
         window.firebaseDB = null; 
         window.firebaseAuth = null;
         window.lobbyConfig = { lang: 'it', len: 5, mode: 'single' }; // Configurazione di default
@@ -2076,6 +2090,8 @@
         window.baseTime = 0;
         window.visualTimerInterval = null
         window.syncInterval = null
+        let backspaceTimer = null
+        let backspaceInterval = null
         // Disabilita il tentativo del browser di ricordare dove avevi scrollato 
         // prima di ricaricare la pagina (previene layout rotti dopo un update)
         if ('scrollRestoration' in history) {
@@ -2425,6 +2441,30 @@
             return vars;
         }
 
+        /**
+         * Normalizza una stringa: rimuove gli accenti comuni e converte in minuscolo,
+         * ma preserva l'identità di caratteri speciali come Ñ e Ç.
+         */
+        function normalizeString(str) {
+            if (!str) return "";
+
+            return str
+                .normalize("NFD") // Scompone i caratteri (es: á -> a + ´)
+                .replace(/[\u0300-\u036f]/g, (match, offset, string) => {
+                    // Recuperiamo il carattere precedente a quello che stiamo per rimuovere
+                    const charPrecedente = string[offset - 1];
+                    
+                    // Se il segno diacritico appartiene a 'n', 'N', 'c' o 'C', lo conserviamo
+                    if (/[ncNC]/.test(charPrecedente)) {
+                        return match; 
+                    }
+                    // Altrimenti, lo eliminiamo (restituendo una stringa vuota)
+                    return "";
+                })
+                .normalize("NFC") // Ricompone i caratteri rimasti (es: n + ~ -> ñ)
+                .toLowerCase();   // Converte tutto in minuscolo
+        }
+
         function startGame() {
             if (window.playingSfida) {
                 if (!history.state || history.state.page !== 'sfida') {
@@ -2513,6 +2553,7 @@
             }
 
             console.log("Parola target:", targetWord.toUpperCase()); // Per debug, rimuovi in produzione
+            pausaInserimento = false;
             updateActiveTile();
         }
 
@@ -2520,7 +2561,12 @@
             const statuses = getLetterStatuses(guess, targetWord);
             statuses.forEach((s, colIndex) => {
                 const tile = document.getElementById(`tile-${rowIndex}-${colIndex}`);
-                tile.innerText = guess[colIndex].toUpperCase();
+                // Se la lettera è corretta (verde), mostriamo quella originale del dizionario (accentata)
+                if (s === 'green') {
+                    tile.innerText = targetWord[colIndex].toUpperCase();
+                } else {
+                    tile.innerText = guess[colIndex].toUpperCase();
+                }
                 tile.style.backgroundColor = `var(--${s})`;
                 tile.style.borderColor = `var(--${s})`;
                 
@@ -2556,10 +2602,14 @@
         }
 
         function getLetterStatuses(guess, target) {
-            let n = target.length;
+            // Trasformiamo tutto in minuscolo e senza accenti per il confronto logico
+            const nGuess = normalizeString(guess.toLowerCase());
+            const nTarget = normalizeString(target.toLowerCase());
+
+            let n = nTarget.length;
             let statuses = Array(n).fill('gray');
-            let targetArr = target.split('');
-            let guessArr = guess.split('');
+            let targetArr = nTarget.split('');
+            let guessArr = nGuess.split('');
 
             // 1. Primo passaggio: Trova i VERDI (corrispondenza esatta)
             for (let i = 0; i < n; i++) {
@@ -2726,8 +2776,8 @@
                     
                     // Funzione per fermare la cancellazione
                     const stopDeleting = () => {
-                        clearTimeout(backspaceTimer);
-                        clearInterval(backspaceInterval);
+                        if (backspaceTimer) clearTimeout(backspaceTimer);
+                        if (backspaceInterval) clearInterval(backspaceInterval);
                         btn.classList.remove('pressed');
                     };
 
@@ -2768,7 +2818,19 @@
             } else if (/^[a-zñç]$/.test(key)) {
                 if (currentCol < currentLen) {
                     const tile = document.getElementById(`tile-${currentRow}-${currentCol}`);
-                    tile.innerText = key.toUpperCase();
+                    
+                    // Se abbiamo già indovinato la lettera in questa posizione (verde),
+                    // usiamo la lettera originale del targetWord (che potrebbe essere accentata)
+                    let letterToShow = key;
+                    const normalizedKey = normalizeString(key.toLowerCase());
+                    if (knownLetters[currentCol] !== null) {
+                        // Se la lettera digitata (senza accento) corrisponde alla lettera target (senza accento)
+                        if (normalizedKey === normalizeString(targetWord[currentCol].toLowerCase())) {
+                            letterToShow = targetWord[currentCol];
+                        }
+                    }
+
+                    tile.innerText = letterToShow.toUpperCase();
 
                     // Rimuove e riaggiunge la classe per resettare l'animazione
                     tile.classList.remove('tile-pop');
@@ -2778,11 +2840,11 @@
                     tile.classList.remove('preview-green', 'preview-gray');
 
                     // LOGICA DI COLORAZIONE ANTEPRIMA
-                    if (knownLetters[currentCol] === key) {
+                    if (knownLetters[currentCol] && normalizeString(knownLetters[currentCol]) === normalizedKey) {
                         tile.classList.add('preview-green');
-                    } else if (wrongPositions[key] && wrongPositions[key].includes(currentCol)) {
+                    } else if (wrongPositions[normalizedKey] && wrongPositions[normalizedKey].includes(currentCol)) {
                     tile.classList.add('preview-gray')
-                    } else if (absentLetters.has(key)) {
+                    } else if (absentLetters.has(normalizedKey)) {
                         tile.classList.add('preview-gray');
                     }
                     
@@ -2812,6 +2874,7 @@
             for(let i=0; i<currentLen; i++) {
                 guess += document.getElementById(`tile-${currentRow}-${i}`).innerText.toLowerCase();
             }
+            guess = normalizeString(guess);
 
             if (guess.length !== currentLen) return;
 
@@ -2850,6 +2913,7 @@
         }
 
         function checkWord(guess) {
+            pausaInserimento = true;
             const rowTiles = [];
             for(let i=0; i<currentLen; i++) rowTiles.push(document.getElementById(`tile-${currentRow}-${i}`));
 
@@ -2914,7 +2978,7 @@
 
             // 3. Logica di fine riga o fine partita
             setTimeout(async () => {
-                if (guess === targetWord) {
+                if (normalizeString(guess) === normalizeString(targetWord)) {
                     if (window.playingSfida && window.visualTimerInterval !== 'null' && window.syncInterval !== 'null') await window.stopSessionTimer();
                     launchConfetti();
                     rowTiles.forEach((tile, i) => {
@@ -2927,6 +2991,7 @@
                         setTimeout(() => showEndPopup(true, gotHint), 1800);
                         clearGameState();
                     } else {
+                        setTimeout(() => showEndPopup(true), 1800);
                         window.recordWordResult(true);
                     }
                 } else if (currentRow === currentLen) {
@@ -2948,6 +3013,7 @@
                         window.saveSfidaState();
                     }
                     updateActiveTile();
+                    pausaInserimento = false;
                 }
             }, currentLen * 100 + 500);
         }
@@ -2965,6 +3031,7 @@
         }
         
         function updateSingleKey(char, status) {
+            char = normalizeString(char)
             const key = document.getElementById(`key-${char}`);
             const keyPreview = document.getElementById(`key-${char}-preview`);
             if (!key || !keyPreview) return;
@@ -3011,8 +3078,9 @@
 
             let randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
             let letter = targetWord[randomIndex];
-            knownLetters[randomIndex] = letter;
-            absentLetters.delete(letter); 
+            let normalizedLetter = normalizeString(letter);
+            knownLetters[randomIndex] = normalizedLetter;
+            absentLetters.delete(normalizedLetter); 
 
             // Aggiorniamo il LocalDB
             db.account.hints--;
@@ -3023,7 +3091,7 @@
             if (window.saveHintsToCloud) window.saveHintsToCloud(db.account.hints);
 
             showPopup(TEXT[currentLang].hintRevealed.replace('{N}', randomIndex + 1).replace('{L}', letter.toUpperCase()));
-            updateSingleKey(letter, 'green');
+            updateSingleKey(normalizedLetter, 'green');
             saveGameState();
         }
 
@@ -3236,9 +3304,16 @@
         }
 
         function showEndPopup(win, gotHint = false) {
-            let msg = win
-                ? TEXT[currentLang].win
-                : TEXT[currentLang].lose + targetWord.toUpperCase();
+            let msg = null
+            if (window.playingSfida) {
+                msg = win
+                    ? '🎉 HAI INDOVINATO!' 
+                    : '😭 LA PAROLA ERA ' + targetWord.toUpperCase();
+            } else {
+                msg = win
+                    ? TEXT[currentLang].win
+                    : TEXT[currentLang].lose + targetWord.toUpperCase();
+            }            
 
             // Se ha vinto l'aiuto, aggiungiamo la frase sotto "HAI VINTO"
             if (gotHint) {
@@ -3289,6 +3364,7 @@
         }
 
         async function goHome(toast = true) {
+            pausaInserimento = true;
             if (window.playingSfida) {
                 // --- LOGICA USCITA DA MULTIPLAYER ---
                 
@@ -3607,9 +3683,12 @@
         // Ascolto tastiera fisica
         window.addEventListener('keydown', (e) => {
             // 1. Controllo se siamo nella schermata di gioco
+            if (pausaInserimento) return;
             const gameScreen = document.getElementById('game-screen');
             if (gameScreen.offsetParent === null) return; 
-
+            const endPopup = document.getElementById('end-popup');
+            if (endPopup && !endPopup.classList.contains('hidden')) return; // Esci dalla funzione e non fare nulla
+            
             const key = e.key.toLowerCase();
 
             // 2. Cerchiamo il tasto corrispondente nella tastiera virtuale

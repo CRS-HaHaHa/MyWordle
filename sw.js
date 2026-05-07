@@ -1,4 +1,4 @@
-const VERSION = 'v1.1.173';
+const VERSION = 'v1.1.177';
 const CACHE_NAME = `MyWordle-cache-${VERSION}`;
 
 const ASSETS = [
@@ -58,63 +58,93 @@ self.addEventListener('install', (e) => {
   self.skipWaiting();
 
   e.waitUntil(
-    caches.open(CACHE_NAME).then(cache =>
-      cache.addAll(ASSETS.map(url => new Request(url, { cache: 'reload' })))
-    )
+    caches.open(CACHE_NAME).then(async (newCache) => {
+      // 1. Apriamo la vecchia cache (se esiste)
+      const allCacheNames = await caches.keys();
+      const oldCacheName = allCacheNames.find(name => name !== CACHE_NAME);
+      let oldCache = null;
+      if (oldCacheName) oldCache = await caches.open(oldCacheName);
+
+      // 2. Processiamo ogni asset in modo intelligente
+      const promises = ASSETS.map(async (url) => {
+        try {
+          // Controlliamo se abbiamo già il file nella vecchia cache
+          const cachedResponse = oldCache ? await oldCache.match(url) : null;
+
+          if (cachedResponse) {
+            // --- LOGICA INTELLIGENTE ---
+            // Facciamo una richiesta "condizionale" al server.
+            // Il browser userà l'header "If-Modified-Since" o "ETag" automaticamente
+            // grazie all'opzione cache: 'no-cache'
+            const networkResponse = await fetch(new Request(url, { cache: 'no-cache' }));
+
+            if (networkResponse.ok) {
+              // Se il server manda un file nuovo (200 OK), lo salviamo
+              return newCache.put(url, networkResponse);
+            } else {
+              // Se il server dice "non è cambiato" (304), ricicliamo la vecchia cache
+              return newCache.put(url, cachedResponse);
+            }
+          } else {
+            // Se non è in cache (nuovo file in assoluto), scarichiamo normalmente
+            const response = await fetch(new Request(url, { cache: 'reload' }));
+            if (response.ok) return newCache.put(url, response);
+          }
+        } catch (err) {
+          console.warn("Impossibile aggiornare l'asset, uso cache precedente se disponibile:", url);
+          // In caso di errore (es: offline), proviamo a recuperare comunque dalla vecchia cache
+          const fallback = oldCache ? await oldCache.match(url) : null;
+          if (fallback) return newCache.put(url, fallback);
+        }
+      });
+
+      return Promise.all(promises);
+    })
   );
 });
 
-  // altri file → cache first
-self.addEventListener('fetch', e => {
-  const url = new URL(e.request.url);
-
-  // 1. ESCLUDI FIREBASE E GOOGLE AUTH
-  // Se l'URL contiene googleapis o firebase, non usare la cache e vai diretto in rete
-  if (url.hostname.includes('googleapis.com') || url.hostname.includes('firebase')) {
-      return; // Esce e lascia che il browser gestisca la richiesta normalmente
-  }
-
-  // 2. LOGICA STANDARD PER IL RESTO (Cache-first)
-  e.respondWith(
-      caches.match(e.request).then(res => {
-          return res || fetch(e.request).catch(() => {
-              // Opzionale: qui potresti ritornare una pagina offline se la rete fallisce
-              console.warn("Rete non disponibile per:", e.request.url);
-          });
-      })
-  );
-});
-
+// --- ATTIVAZIONE E PULIZIA ---
 self.addEventListener('activate', (e) => {
   e.waitUntil(
-    caches.keys().then(keys =>
+    caches.keys().then(keys => 
       Promise.all(keys.map(key => key !== CACHE_NAME && caches.delete(key)))
     )
   );
-
   self.clients.claim();
 });
 
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
-});
+// --- GESTIONE FETCH ---
+self.addEventListener('fetch', e => {
+  const url = new URL(e.request.url);
+  
+  // Escludi Firebase/Google
+  if (url.hostname.includes('googleapis.com') || url.hostname.includes('firebase')) return;
 
-// Forza il controllo immediato dei client
-self.addEventListener('activate', (event) => {
-  event.waitUntil(clients.claim());
-});
-
-self.addEventListener('fetch', (e) => {
-  // HTML → network first (evita versioni vecchie)
+  // Strategia per HTML: Network-first per essere sicuri di avere l'ultima versione
   if (e.request.url.includes('generate_204')) {
         return; 
     }
   if (e.request.mode === 'navigate') {
     e.respondWith(
-      fetch(e.request).catch(() => caches.match('./index.html'))
+      // Prova prima la cache: avvio istantaneo!
+      caches.match('./index.html').then((cachedResponse) => {
+        // Se è in cache, la diamo subito al browser
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        // Se non è in cache (prima volta assoluta), vai in rete
+        return fetch(e.request);
+      })
     );
     return;
   }
+
+  // Per gli altri asset (immagini, js), usiamo la logica standard
+  e.respondWith(
+    caches.match(e.request).then(res => res || fetch(e.request))
+  );
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
