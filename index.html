@@ -783,7 +783,7 @@
             width: 100%;
             height: calc(var(--vh, 1vh) * 100);
             max-width: 800px;
-            padding-top: 80px;
+            padding-top: 70px;
             box-sizing: border-box;
             align-items: center;
             position: relative; /* Questo crea il "muro" su cui si attacca la bandiera */
@@ -839,24 +839,34 @@
             transform: translateY(2px);
         }
 
-        /* GRIGLIA */
+        /* --- GRIGLIA DINAMICA --- */
         .grid {
             display: flex;
             flex-direction: column;
             justify-content: center;
             gap: 6px;
-            margin-top: 0;
+            margin-top: 10px;
+            flex: 1; /* Prende tutto lo spazio disponibile... */
+            min-height: 0; /* ...ma permette il restringimento! */
+            width: 100%;
+            padding: 0 10px;
+            box-sizing: border-box;
         }
 
         .row {
             display: flex;
             justify-content: center;
             gap: 6px;
+            flex: 1; /* Si schiaccia dinamicamente */
+            min-height: 0;
+            max-height: 60px; /* Non diventa gigantesca su schermi lunghi */
         }
 
         .tile {
-            width: 52px;
-            height: 52px;
+            height: 100%; /* Si adatta all'altezza della riga */
+            aspect-ratio: 1; /* Mantiene la forma quadrata automaticamente */
+            max-width: 60px; /* Limite massimo larghezza */
+            /* Nota: rimosso width fisso! */
             background: white;
             border-radius: 10px;
             display: flex;
@@ -870,21 +880,48 @@
             transition: border-color 0.2s, transform 0.1s;
         }
 
+        /* --- WRAPPER TASTIERA E BANDIERA --- */
+        #keyboard-wrapper {
+            position: relative;
+            width: 100%;
+            margin-top: 10px;
+            padding-top: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden; /* Taglia la bandiera se sborda */
+        }
+
+        #keyboard-bg-flag {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 95vw;
+            max-width: 700px;
+            height: 95%;
+            z-index: 2;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.8;
+            filter: blur(5px);
+            pointer-events: none;
+            transition: background-image 0.5s ease;
+            border-radius: 15px 15px 0 0;
+        }
+
+        #keyboard {
+            position: relative;
+            z-index: 2; /* Sopra la bandiera */
+            width: 90%;
+            max-width: 900px;
+            padding: 15px;
+        }
+
         /* Evidenzia il quadratino dove l'utente scriverà la prossima lettera */
         .tile-active {
             border-color: var(--bg2) !important;
             box-shadow: 0 0 8px rgba(102, 126, 234, 0.3);
-        }
-
-        /* --- TASTIERA A "V" (PIRAMIDE) --- */
-        #keyboard {
-            position: relative;
-            z-index: 10; /* Molto più alto della bandiera (che è 2) */
-            width: 100%;
-            max-width: 900px;
-            padding: 5px;
-            margin-top: auto; /* Spinge la tastiera verso il basso */
-            margin-bottom: 10px;
         }
 
         .kb-row {
@@ -1102,23 +1139,6 @@
             text-align: center;
             white-space: pre-wrap; /* Rispetta gli "invio" \n presenti nelle stringhe TEXT */
             line-height: 1.4;
-        }
-
-        /* --- BANDIERA SFONDO TASTIERA --- */
-        #keyboard-bg-flag {
-            position: absolute;
-            bottom: 0; /* Attaccata al fondo */
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100vw; /* Larga tutto lo schermo di base */
-            height: 250px; /* Altezza di base, la regoleremo */
-            z-index: 2; /* Dietro la tastiera */
-            background-size: cover;
-            background-position: center;
-            opacity: 0.8; /* Molto soffusa per non disturbare la vista dei tasti */
-            filter: blur(5px); /* Leggermente sfocata per un effetto elegante */
-            pointer-events: none; /* Non deve bloccare i click sui tasti */
-            transition: background-image 0.5s ease;
         }
 
         /* Colori sfumati per l'anteprima durante la digitazione */
@@ -1388,16 +1408,6 @@
             animation: popupEntrance 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
 
-        /* Regolazione per Computer (schermi larghi) */
-        @media (min-width: 900px) {
-            #keyboard-bg-flag {
-                width: 650px; /* Poco più larga della tastiera (che è 700px) */
-                height: 220px; /* Poco più alta della tastiera */
-                border-radius: 40px 40px 0 0; /* Arrotondata solo sopra */
-                bottom: 10px; /* Sollevata leggermente dal fondo */
-            }
-        }
-
         /* --- MOBILE --- */
         @media (max-width: 600px) {
             #home-screen {
@@ -1436,7 +1446,7 @@
 
             #user-menu-container {
             position: absolute;
-            top: 38px;
+            top: 5vh;
             right: 17px;
             }
 
@@ -1517,8 +1527,27 @@
             }
 
             /* Altri aggiustamenti griglia/tastiera (già presenti nel tuo codice) */
-            .tile { width: 44px; height: 44px; font-size: 1.6rem; }
-            #keyboard { width: 95%; padding: 2px; margin-bottom: 10px;}
+            /* REGOLE MOBILE */
+            .tile { 
+                height: 100%; 
+                width: auto; 
+                font-size: 1.6rem; 
+                max-width: 50px; 
+            }
+            
+            .grid-7-letters .tile {
+                height: 100%;
+                width: auto;
+                font-size: 1.4rem;
+                max-width: 42px;
+            }
+
+            /* Rimuovi le altezze fisse da #keyboard-bg-flag (ora è 100% in automatico) */
+            #keyboard-bg-flag {
+                width: 100vw;
+                filter: blur(3px);
+            }
+            #keyboard { padding: 12px; width: 95%;}
             .kb-row { gap: 3px; margin-bottom: 15px; }
             .key { 
                 height: 52px; 
@@ -1527,21 +1556,7 @@
                 max-width: none;
             }
             .key-big { width: 14%; font-size: 0.8rem; }
-            #keyboard-bg-flag {
-                width: 100%;
-                height: 240px;
-                bottom: 0;
-                border-radius: 0;
-                filter: blur(3px);
-            }
             #game-screen { justify-content: space-between; /* Aiuta a distribuire gli elementi tra top e tastiera */ }
-
-            /* Regola per rimpicciolire i quadratini se la parola è lunga */
-            .grid-7-letters .tile {
-                width: 38px;  /* Più piccoli dei 44px standard */
-                height: 38px;
-                font-size: 1.4rem;
-            }
             
             .grid-7-letters .row { gap: 4px; /* Stringiamo anche lo spazio tra le lettere */ }
             #lobby-modal .gradient-text { margin-top: 0px; }
@@ -1738,16 +1753,15 @@
 
     <div id="game-screen" class='hidden'>
         <button id="back-btn" onclick="goHome()">&#x1F3E0</button>
-        
         <button id="hint-btn" onclick="useHint()">💡 <span id="hint-count">0</span></button>
-        
         <div id="stats-display">🔥 0  🏆 0</div>
 
         <div class="grid" id="grid"></div>
 
-        <div id="keyboard-bg-flag"></div>
-
-        <div id="keyboard"></div>
+        <div id="keyboard-wrapper">
+            <div id="keyboard-bg-flag"></div>
+            <div id="keyboard"></div>
+        </div>
     </div>
 
     <div id="stats-popup" class="hidden">
@@ -2638,28 +2652,16 @@
             const grid = document.getElementById('grid');
             const isMobile = window.innerWidth <= 600;
             
-            // Rimuoviamo eventuali classi di layout precedenti
+            // Reset Layout
             grid.classList.remove('grid-7-letters');
-            grid.style.marginTop = "0"; // Reset iniziale
+            grid.style.flexDirection = ''; 
+            grid.style.gap = '';
+            grid.innerHTML = '';
 
-            // 1. GESTIONE MARGINI (PC vs MOBILE)
-            if (isMobile) {
-                // Parametri per Telefono
-                if (currentLen === 5) grid.style.marginTop = "20px";
-                else if (currentLen === 6) grid.style.marginTop = "10px";
-                else if (currentLen === 7) {
-                    grid.style.marginTop = "5px";
-                    grid.classList.add('grid-7-letters'); // Attiva i quadratini piccoli
-                }
-            } else {
-                // Parametri per PC (quelli che avevi prima)
-                if (currentLen <= 5) grid.style.marginTop = "-10px";
-                else if (currentLen === 6) grid.style.marginTop = "-55px";
-                else grid.style.marginTop = "60px";
+            if (isMobile && currentLen === 7) {
+                grid.classList.add('grid-7-letters');
             }
 
-            // 2. LOGICA DI CREAZIONE GRIGLIA (il resto rimane simile)
-            grid.innerHTML = '';
             const maxTries = currentLen + 1;
 
             // Gestione speciale PC per 7 lettere (due colonne)
@@ -2668,10 +2670,13 @@
                 grid.style.gap = '40px';
                 const col1 = document.createElement('div');
                 const col2 = document.createElement('div');
+                
                 [col1, col2].forEach(col => {
                     col.style.display = 'flex';
                     col.style.flexDirection = 'column';
                     col.style.gap = '10px';
+                    col.style.flex = '1';
+                    col.style.minHeight = '0';
                 });
 
                 for (let i = 0; i < maxTries; i++) {
@@ -2687,7 +2692,7 @@
                 }
                 grid.append(col1, col2);
             } else {
-                // Layout standard (una colonna) per 5, 6 lettere e per 7 su Mobile
+                // Layout standard (una colonna)
                 grid.style.flexDirection = 'column';
                 grid.style.gap = isMobile ? '6px' : '8px';
 

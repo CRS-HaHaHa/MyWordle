@@ -1,4 +1,4 @@
-const VERSION = 'v1.1.177';
+const VERSION = 'v1.1.179';
 const CACHE_NAME = `MyWordle-cache-${VERSION}`;
 
 const ASSETS = [
