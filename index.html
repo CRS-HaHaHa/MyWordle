@@ -2073,9 +2073,10 @@
                 window.history.replaceState({ page: 'home' }, document.title, window.location.pathname);
                 
                 // Diamo tempo all'interfaccia di caricarsi e poi entriamo
+                showToast('Caricamento Lobby...')
                 setTimeout(() => {
                     window.enterLobby(lobbyCodeFromUrl);
-                }, 1000);
+                }, 2000);
             }
         });
 
@@ -3732,13 +3733,17 @@
         // 5. Gestione Lobby Recenti (LocalDB)
         function saveLobbyToRecent(code) {
             let db = LocalDB.get();
-            if (!db.recentLobbies) db.recentLobbies = [];
             
-            if (!db.recentLobbies.includes(code)) {
-                db.recentLobbies.unshift(code);
-                LocalDB.save(db);
-                window.saveLobbyToCloud(code); // Sincronizza con il cloud
+            // Se non esiste, o se è ancora un vecchio array, lo trasformiamo in oggetto
+            if (!db.recentLobbies || Array.isArray(db.recentLobbies)) {
+                db.recentLobbies = {};
             }
+            
+            // Aggiorniamo o creiamo la lobby assegnando il tempo attuale
+            db.recentLobbies[code] = Date.now();
+            LocalDB.save(db);
+            
+            if (window.saveLobbyToCloud) window.saveLobbyToCloud(code, db.recentLobbies[code]);
         }
 
         function joinWithCode() {
@@ -3754,12 +3759,19 @@
         function renderRecentLobbies() {
             const db = LocalDB.get();
             const container = document.getElementById('recent-lobbies-list');
-            if (!db.recentLobbies || db.recentLobbies.length === 0) {
+            
+            // Controllo se i dati sono vuoti o se sono rimasti nel vecchio formato Array
+            if (!db.recentLobbies || Array.isArray(db.recentLobbies) || Object.keys(db.recentLobbies).length === 0) {
                 container.innerHTML = `<p style="font-size: 0.8rem; color: #888;">Nessuna lobby recente</p>`;
                 return;
             }
 
-            container.innerHTML = db.recentLobbies.map(code => `
+            // Convertiamo il dizionario in array, ordiniamo per timestamp decrescente e prendiamo solo i codici
+            const sortedLobbies = Object.entries(db.recentLobbies)
+                .sort((a, b) => b[1] - a[1]) // b[1] e a[1] sono i timestamp
+                .map(entry => entry[0]); // entry[0] è il codice della lobby
+
+            container.innerHTML = sortedLobbies.map(code => `
                 <div class="recent-lobby-item" style="display:flex;justify-content: normal;align-items: center;background:#f4f4f4;border-radius:10px;margin: 4px;border: 2px solid gainsboro; height: 44px;">
                     <span onclick="enterLobby('${code}')" style="cursor:pointer;font-weight:bold;padding: 11px 0px 11px 20px;text-align: left;flex: 1;">Lobby ${code}</span>
                     <button onclick="window.removeRecentLobby('${code}')" class="no-effetti" style="background:none;cursor:pointer;color: red;padding: 3px 10px;font-size: 1.6rem;max-width: fit-content;margin-right: 10px; margin-top: 6px;">
@@ -3780,9 +3792,25 @@
             const link = `${window.location.origin}${window.location.pathname}?lobby=${window.currentLobbyID}`;
             navigator.clipboard.writeText(link).then(() => showToast("Link copiato!"));
         }
+        function copyLobbyLink() {
+            // Rimuoviamo 'index.html' o stringhe duplicate dal path per sicurezza
+            let cleanPath = window.location.pathname.replace(/(index\.html)+$/, '');
+            // Se il path non finisce con una barra, la aggiungiamo per corretta formattazione
+            if (!cleanPath.endsWith('/')) {
+                cleanPath += '/';
+            }
+            const link = `${window.location.origin}${cleanPath}?lobby=${window.currentLobbyID}`;
+            navigator.clipboard.writeText(link).then(() => showToast("Link copiato!"));
+        }
 
         function shareLobbyLink() {
-            const link = `${window.location.origin}${window.location.pathname}?lobby=${window.currentLobbyID}`;
+            // Rimuoviamo 'index.html' o stringhe duplicate dal path per sicurezza
+            let cleanPath = window.location.pathname.replace(/(index\.html)+$/, '');
+            // Se il path non finisce con una barra, la aggiungiamo per corretta formattazione
+            if (!cleanPath.endsWith('/')) {
+                cleanPath += '/';
+            }
+            const link = `${window.location.origin}${cleanPath}?lobby=${window.currentLobbyID}`;
 
             if (navigator.share) {
                 navigator.share({
@@ -4018,7 +4046,7 @@
             onAuthStateChanged, getAdditionalUserInfo 
         } from 'https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js';
         import { 
-            initializeFirestore, persistentLocalCache, persistentMultipleTabManager, doc, setDoc, getDoc, onSnapshot, arrayUnion, arrayRemove, updateDoc, collection, query, where, increment, deleteField
+            initializeFirestore, persistentLocalCache, persistentMultipleTabManager, doc, setDoc, getDoc, getDocs, onSnapshot, arrayUnion, arrayRemove, updateDoc, collection, query, where, increment, deleteField
         } from 'https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js';
 
         // 1. Configurazione
@@ -4041,6 +4069,44 @@
         });
 
         let currentUserDoc = null; // Variabile per tenere in memoria i dati del profilo
+
+        // Sovrascriviamo console.error solo se in produzione
+        if (!isLocalhost) {
+            console.error = async function (...args) {
+                // Uniamo gli argomenti per formare il testo dell'errore
+                const errMsg = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ');
+                
+                try {
+                    if (!window.firebaseDB) return; // Se il DB non è ancora pronto, ignoriamo
+                    
+                    const errorsRef = collection(window.firebaseDB, 'errors');
+                    // Cerchiamo se questo errore esiste già
+                    const q = query(errorsRef, where("message", "==", errMsg));
+                    const querySnapshot = await getDocs(q);
+                    
+                    if (!querySnapshot.empty) {
+                        // L'errore esiste già: incrementiamo il contatore
+                        const docId = querySnapshot.docs[0].id;
+                        await updateDoc(doc(window.firebaseDB, 'errors', docId), {
+                            count: increment(1),
+                            lastSeen: new Date().toISOString()
+                        });
+                    } else {
+                        // Errore nuovo: creiamo il documento
+                        const newDocRef = doc(collection(window.firebaseDB, 'errors'));
+                        await setDoc(newDocRef, {
+                            message: errMsg,
+                            count: 1,
+                            firstSeen: new Date().toISOString(),
+                            lastSeen: new Date().toISOString()
+                        });
+                    }
+                } catch(e) {
+                    // Se Firebase fallisce, salviamo localmente l'errore
+                    console.log("Errore nel salvataggio del log:", e);
+                }
+            };
+        }
 
         // 3. Funzione di Aggiornamento UI
         // Aggiorna anche il salvataggio Profilo per riflettere il nuovo DB Locale
@@ -4339,16 +4405,16 @@
             }
         };
 
-        window.saveLobbyToCloud = async (LobbyCode) => {
+        window.saveLobbyToCloud = async (LobbyCode, timestamp) => {
             const user = window.firebaseAuth.currentUser;
             if (!user || !LobbyCode) return;
 
             try {
                 const userRef = doc(window.firebaseDB, 'users', user.uid);
                 
+                // Usiamo la notazione punto per aggiornare un dizionario su Firebase
                 await updateDoc(userRef, {
-                    // Aggiunge il codice all'array 'Lobby' solo se non esiste già
-                    "Lobby": arrayUnion(LobbyCode),
+                    [`Lobby.${LobbyCode}`]: timestamp || Date.now(),
                     "account.lastSync": new Date().toISOString()
                 });
                 
@@ -4357,6 +4423,7 @@
                 console.error("Errore salvataggio lobby nel cloud:", e);
             }
         };
+
         window.removeLobbyFromCloud = async (LobbyCode) => {
             const user = window.firebaseAuth.currentUser;
             if (!user || !LobbyCode) return;
@@ -4365,16 +4432,14 @@
             try {
                 const userRef = doc(window.firebaseDB, 'users', user.uid);
                 
+                // deleteField() rimuove solo quella specifica chiave dal dizionario
                 await updateDoc(userRef, {
-                    // Rimuove il codice specifico dall'array 'Lobby' se presente
-                    "Lobby": arrayRemove(LobbyCode),
+                    [`Lobby.${LobbyCode}`]: deleteField(),
                     "account.lastSync": ora
                 });
 
                 const lobbyRef = doc(window.firebaseDB, 'lobbies', LobbyCode);
-                
                 await updateDoc(lobbyRef, {
-                    // Rimuove il codice specifico dall'array 'Lobby' se presente
                     [`players.${user.uid}.inGame`]: false,
                     "lastUpdate": ora
                 });
@@ -4435,9 +4500,10 @@
                             if (typeof updateHomeStats === "function") updateHomeStats();
                         }
 
-                        if (cloudData.Lobby && Array.isArray(cloudData.Lobby)) {
-                            localDB.recentLobbies = cloudData.Lobby.slice().reverse();
-                        }
+                        // Diamo priorità al nuovo sistema a dizionario
+                        if (cloudData.Lobby && typeof cloudData.Lobby === 'object') {
+                            localDB.recentLobbies = cloudData.Lobby;
+                        } 
 
                         // 3. Salva tutto nel LocalStorage (Senza sovrascrivere con Firebase!)
                         LocalDB.save(localDB);
@@ -4829,7 +4895,7 @@
                 mainBtn.classList.add('no-effetti')
                 mainBtn.onclick = () => 'none'; 
             } else {
-                mainBtn.innerHTML = "AVVIA<br>SFIDA";
+                mainBtn.innerHTML = window.isLobbyAdmin() ? "AVVIA<br>SFIDA" : "ATTESA<br>AVVIO";
                 mainBtn.style.background = "";
                 mainBtn.classList.add('main-gradient-btn');
                 mainBtn.classList.remove('no-effetti')
