@@ -429,7 +429,7 @@
             position: absolute;
             top: 25px;
             right: 25px;
-            z-index: 2000;
+            z-index: 200;
         }
 
         #user-avatar {
@@ -1232,7 +1232,7 @@
         #leaderboard-frame-contenitor::-webkit-scrollbar, #classificaRound-container::-webkit-scrollbar {width: 8px; background: rgb(208 214 252);}
         #leaderboard-frame-contenitor::-webkit-scrollbar-thumb, #classificaRound-container::-webkit-scrollbar-thumb {background: #5753be; border-radius: 10px;}
         #lobby-leaderboard-header {
-            background: #7987db;color: black;font-size: 1.2rem;line-height: 20px; position: sticky; top: 0; z-index: 100;
+            background: #7987db;color: black;font-size: 1.2rem;line-height: 20px; position: sticky; top: 0; z-index: 101;
         }
         #lobby-leaderboard-header th {position: sticky; top: 0; }
         #lobby-position-header {
@@ -1360,7 +1360,7 @@
         }
         .confetti {
             position: fixed; width: 10px; height: 10px;
-            top: -10px; z-index: 9999;
+            top: -10px; z-index: 999;
             animation: confetti-fall 3s linear forwards;
         }
 
@@ -1835,7 +1835,7 @@
         </div>
     </div>
 
-    <div id="lobby-screen" class="screen hidden" style="background: var(--bg-color); min-height: 100vh; position: fixed; top:0; left:0; width: 100%; z-index: 9999; overflow-y: auto;">
+    <div id="lobby-screen" class="screen hidden" style="background: var(--bg-color); min-height: 100vh; position: fixed; top:0; left:0; width: 100%; z-index: 200; overflow-y: auto;">
         <div class="mode-tabs">
             <button id="tab-single" class="tab-btn active" onclick="window.setLobbyType('single')">Word Solo</button>
             <button id="tab-best5" class="tab-btn" onclick="window.setLobbyType('best5')">Word Series x5</button>
@@ -1909,10 +1909,10 @@
         </div>
     </div>
 
-    <div id="round-results-modal" class="modal-overlay hidden" style="z-index: 10000;">
+    <div id="round-results-modal" class="modal-overlay hidden" style="z-index: 1000;">
         <div class="stats-container" style="position: relative; max-width: 600px; width: 90%; padding: 30px 20px; background: white; border-radius: 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); margin: 0 10px;">
 
-            <button id="scoring-help-btn" style="position: absolute; left: 20px; top: 20px; background: #8a2be2; color: white; border: none; font-size: 1.2rem; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(138, 43, 226, 0.4); display: flex; align-items: center; justify-content: center; z-index: 10; transition: transform 0.2s;">
+            <button id="scoring-help-btn" style="position: absolute; left: 20px; top: 20px; background: #8a2be2; color: white; border: none; font-size: 1.2rem; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(138, 43, 226, 0.4); display: flex; align-items: center; justify-content: center; z-index: 2000; transition: transform 0.2s;">
                 ?
             </button>
 
@@ -1920,7 +1920,7 @@
                 ✖
             </button>
 
-            <div id="scoring-info-popup" class="hidden" style="display: block; position: absolute; top: 60px; left: 20px; background: #1e293b; color: white; padding: 15px 20px; border-radius: 12px; width: 260px; z-index: 100; box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 0.85rem; text-align: left; line-height: 1.5; border: 1px solid #334155;">
+            <div id="scoring-info-popup" class="hidden" style="display: block; position: absolute; top: 60px; left: 20px; background: #1e293b; color: white; padding: 15px 20px; border-radius: 12px; width: 260px; z-index:2100; box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 0.85rem; text-align: left; line-height: 1.5; border: 1px solid #334155;">
                 <h4 style="margin: 0 0 10px 0; color: #c084fc; font-size: 1rem;">Regole Punteggio</h4>
                 <p style="margin: 0 0 5px 0;"><b>1.</b> Vince chi indovina più parole.</p>
                 <p style="margin: 0 0 5px 0;"><b>2.</b> A parità, vince chi ha usato meno tentativi.</p>
