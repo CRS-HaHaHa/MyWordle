@@ -11,6 +11,7 @@
     <link rel="apple-touch-icon" href="https://crs-hahaha.github.io/MyWordle/Imgs/MyWordle.png">
     <meta property="og:title" content="MyWordle - Sfida Multilingua">
     <meta property="og:description" content="Gioca a Wordle in 4 lingue con parole da 5, 6 o 7 lettere. Gratuito e senza pubblicità!">
+    <meta property="og:type" content="website">
     <meta property="og:image" content="https://crs-hahaha.github.io/MyWordle/Imgs/MyWordle_thumbnail.jpg">
     <meta property="og:image:type" content="image/jpg" />
     <meta property="og:image:width" content="1200">
@@ -1953,12 +1954,6 @@
         const isLocalhost =
         window.location.hostname === "localhost" ||
         window.location.hostname === "127.0.0.1";
-
-        if (!isLocalhost) {
-        console.log = function () {};
-        console.warn = function () {};
-        console.error = function () {};
-        }
 
         const ConnectionMonitor = {
             isStable: navigator.onLine,
@@ -4070,42 +4065,63 @@
 
         let currentUserDoc = null; // Variabile per tenere in memoria i dati del profilo
 
-        // Sovrascriviamo console.error solo se in produzione
-        if (!isLocalhost) {
-            console.error = async function (...args) {
-                // Uniamo gli argomenti per formare il testo dell'errore
-                const errMsg = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ');
+        // Salviamo l'errore originale del browser per usarlo in localhost
+        const originalConsoleError = console.error;
+
+        // Funzione centralizzata per inviare l'errore a Firestore
+        async function reportErrorToFirebase(errMsg) {
+            try {
+                if (!window.firebaseDB || !window.firebaseAuth.currentUser) return; // Se Firebase non è pronto, usciamo
                 
-                try {
-                    if (!window.firebaseDB) return; // Se il DB non è ancora pronto, ignoriamo
-                    
-                    const errorsRef = collection(window.firebaseDB, 'errors');
-                    // Cerchiamo se questo errore esiste già
-                    const q = query(errorsRef, where("message", "==", errMsg));
-                    const querySnapshot = await getDocs(q);
-                    
-                    if (!querySnapshot.empty) {
-                        // L'errore esiste già: incrementiamo il contatore
-                        const docId = querySnapshot.docs[0].id;
-                        await updateDoc(doc(window.firebaseDB, 'errors', docId), {
-                            count: increment(1),
-                            lastSeen: new Date().toISOString()
-                        });
-                    } else {
-                        // Errore nuovo: creiamo il documento
-                        const newDocRef = doc(collection(window.firebaseDB, 'errors'));
-                        await setDoc(newDocRef, {
-                            message: errMsg,
-                            count: 1,
-                            firstSeen: new Date().toISOString(),
-                            lastSeen: new Date().toISOString()
-                        });
-                    }
-                } catch(e) {
-                    // Se Firebase fallisce, salviamo localmente l'errore
-                    console.log("Errore nel salvataggio del log:", e);
+                const errorsRef = collection(window.firebaseDB, 'errors');
+                const q = query(errorsRef, where("message", "==", errMsg));
+                const querySnapshot = await getDocs(q);
+                
+                if (!querySnapshot.empty) {
+                    // Errore già visto: incrementiamo il contatore
+                    const docId = querySnapshot.docs[0].id;
+                    await updateDoc(doc(window.firebaseDB, 'errors', docId), {
+                        count: increment(1),
+                        lastSeen: new Date().toISOString()
+                    });
+                } else {
+                    // Nuovo errore: creiamo il documento
+                    const newDocRef = doc(collection(window.firebaseDB, 'errors'));
+                    await setDoc(newDocRef, {
+                        message: errMsg,
+                        count: 1,
+                        firstSeen: new Date().toISOString(),
+                        lastSeen: new Date().toISOString()
+                    });
                 }
+            } catch(e) {
+                originalConsoleError("Impossibile salvare il log su Firebase:", e);
+            }
+        }
+
+        // SE SIAMO IN PRODUZIONE, ATTIVIAMO I TRACCIATORI GLOBARE
+        if (!isLocalhost) {
+            console.log = function () {};
+            console.warn = function () {};
+            
+            // 1. Intercettiamo i console.error manuali
+            console.error = function (...args) {
+                const errMsg = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ');
+                reportErrorToFirebase(`[Console.Error] ${errMsg}`);
             };
+
+            // 2. Intercettiamo i crash improvvisi del browser (come il tuo TypeError)
+            window.addEventListener('error', function(event) {
+                // Creiamo un messaggio pulito che ti dice anche in che file e riga è successo!
+                const errMsg = `[Crash] ${event.message} in ${event.filename} alla riga ${event.lineno}:${event.colno}`;
+                reportErrorToFirebase(errMsg);
+            });
+
+            // 3. Intercettiamo le Promise fallite e non gestite (es. chiamate di rete asincrone rotte)
+            window.addEventListener('unhandledrejection', function(event) {
+                const errMsg = `[Unhandled Promise] ${event.reason}`;
+                reportErrorToFirebase(errMsg);
+            });
         }
 
         // 3. Funzione di Aggiornamento UI
