@@ -1295,13 +1295,13 @@
             padding: 10px;
             border-radius: 15px;
         }
-        #clasifPosition { padding: 10px; font-weight: bold; color: #94a3b8; width: 10%; text-align: center; }
-        #clasifName { padding: 10px; color: #334155; font-weight: 600;  width: 48%;}
-        #clasifName img {width:24px; height:24px; border-radius:50%; vertical-align:middle; margin-right:8px; border: 1px solid #cbd5e1; margin-left: 0;}
-        #clasifIndovinate { padding: 10px; text-align: center; font-size: 0.8rem; color: #64748b;  width: 10%;}
-        #clasifPunteggi { padding: 10px; text-align: center; font-size: 0.8rem; color: #64748b; width: 17%;}
-        #clasifPunteggi span, #clasifPunti span {display: inline;}
-        #clasifPunti { padding: 10px; font-weight: 800; color: #10b981; text-align: center;  width: 15%;}
+        .clasif-position { padding: 10px; font-weight: bold; color: #94a3b8; width: 10%; text-align: center; }
+        .clasif-name { padding: 10px; color: #334155; font-weight: 600;  width: 48%;}
+        .clasif-name img {width:24px; height:24px; border-radius:50%; vertical-align:middle; margin-right:8px; border: 1px solid #cbd5e1; margin-left: 0;}
+        .clasif-indovinate { padding: 10px; text-align: center; font-size: 0.8rem; color: #64748b;  width: 10%;}
+        .clasif-punteggi { padding: 10px; text-align: center; font-size: 0.8rem; color: #64748b; width: 17%;}
+        .clasif-punteggi span, .clasif-punti span {display: inline;}
+        .clasif-punti { padding: 10px; font-weight: 800; color: #10b981; text-align: center;  width: 15%;}
 
         @keyframes fadeInUp {
             from {
@@ -1611,10 +1611,10 @@
                 right: 0px;
                 border-radius: 15px 0 15px 15px;
             }
-            #clasifPosition { padding:13px 0; }
-            #clasifName, #clasifPunteggi, #clasifIndovinate, #clasifPunti { padding:0; }
-            #clasifPunteggi span, #clasifPunyi span {display: block;}
-            #clasifName img {margin-right: 0; margin-left: 6px;}
+            .clasif-position { padding:13px 0; }
+            .clasif-name, .clasif-punteggi, .clasif-indovinate, .clasif-punti { padding:0; }
+            .clasif-punteggi span, .clasif-punti span {display: block;}
+            .clasif-name img {margin-right: 0; margin-left: 6px;}
         }
     </style>
 </head>
@@ -2778,11 +2778,16 @@
                     const stopDeleting = () => {
                         if (backspaceTimer) clearTimeout(backspaceTimer);
                         if (backspaceInterval) clearInterval(backspaceInterval);
+                        backspaceTimer = null;
+                        backspaceInterval = null;
                         btn.classList.remove('pressed');
                     };
 
                     btn.addEventListener('pointerdown', (e) => {
                         e.preventDefault();
+                        // Prima di avviare nuovi timer fermiamo sempre quelli vecchi:
+                        // altrimenti restano intervalli "orfani" che cancellano all'infinito
+                        stopDeleting();
                         btn.classList.add('pressed');
 
                         // 1. Cancella subito la prima lettera (feedback immediato)
@@ -2800,6 +2805,10 @@
                     // Fermiamo tutto se il dito si alza o esce dal tasto
                     btn.addEventListener('pointerup', stopDeleting);
                     btn.addEventListener('pointerleave', stopDeleting);
+                    btn.addEventListener('pointercancel', stopDeleting); // il browser può annullare il tocco (scroll, gesti, popup...)
+                    window.addEventListener('pointerup', stopDeleting);
+                    window.addEventListener('pointercancel', stopDeleting);
+                    window.addEventListener('blur', stopDeleting);
                     
                     row.appendChild(btn);
                 }
@@ -2808,6 +2817,7 @@
         }
 
         function handleInput(key) {
+            if (pausaInserimento) return; // niente input durante animazioni / controllo parola
             if (key === 'backspace') {
                 if (currentCol > 0) {
                     currentCol--;
@@ -2870,6 +2880,7 @@
         }
 
         function submitWord() {
+            if (pausaInserimento) return; // evita doppio invio (doppio click/tap su ENTER)
             let guess = "";
             for(let i=0; i<currentLen; i++) {
                 guess += document.getElementById(`tile-${currentRow}-${i}`).innerText.toLowerCase();
@@ -2879,6 +2890,7 @@
             if (guess.length !== currentLen) return;
 
             if (!dictionary.includes(guess)) {
+                pausaInserimento = true; // blocchiamo l'input finché l'animazione di errore non è finita
                 const currentRowEl = document.querySelectorAll('.row')[currentRow];
                 
                 // 1. Inizia lo scuotimento
@@ -2900,9 +2912,10 @@
                         } else {
                             currentCol = 0;
                             clearInterval(interval);
+                            pausaInserimento = false;
+                            updateActiveTile();
                         }
                     }, 50); // Cancella una lettera ogni 50ms
-                    currentCol = 0; // Reset della posizione al primo quadratino
                     
                 }, 400);
 
@@ -2939,13 +2952,14 @@
 
                     // 1. Memorizziamo la posizione errata SOLO SE la lettera esiste nella parola
                     // (Serve per le lettere doppie, es: scrivi 'ANNA' ma c'è solo una 'A')
-                    if (targetWord.includes(char)) {
+                    const nTargetWord = normalizeString(targetWord);
+                    if (nTargetWord.includes(char)) {
                         if (!wrongPositions[char]) wrongPositions[char] = [];
                         if (!wrongPositions[char].includes(i)) wrongPositions[char].push(i);
                     }
 
                     // 2. Controllo Esaurimento (Velo grigio intelligente)
-                    const totalInTarget = targetWord.split('').filter(c => c === char).length;
+                    const totalInTarget = nTargetWord.split('').filter(c => c === char).length;
                     const greensFound = knownLetters.filter(c => c === char).length;
                     
                     // Se le istanze verdi trovate sono uguali al totale nella parola,
@@ -2970,6 +2984,9 @@
                         tile.style.borderColor = `var(--${s})`;
                         tile.style.color = "black"; // Più leggibile sul colore
 
+                        // Se la lettera è verde mostriamo quella originale della soluzione (con accento)
+                        if (s === 'green') tile.innerText = targetWord[i].toUpperCase();
+
                         // Aggiorna tastiera
                         updateSingleKey(char, s);
                     }, 250);
@@ -2979,7 +2996,7 @@
             // 3. Logica di fine riga o fine partita
             setTimeout(async () => {
                 if (normalizeString(guess) === normalizeString(targetWord)) {
-                    if (window.playingSfida && window.visualTimerInterval !== 'null' && window.syncInterval !== 'null') await window.stopSessionTimer();
+                    if (window.playingSfida && window.visualTimerInterval && window.syncInterval) await window.stopSessionTimer();
                     launchConfetti();
                     rowTiles.forEach((tile, i) => {
                         setTimeout(() => tile.classList.add('tile-winner'), i * 100);
@@ -3000,7 +3017,7 @@
                         showEndPopup(false);
                         clearGameState(); 
                     } else {
-                        if (window.visualTimerInterval !== 'null' && window.syncInterval !== 'null') await window.stopSessionTimer();
+                        if (window.visualTimerInterval && window.syncInterval) await window.stopSessionTimer();
                         showEndPopup(false);
                         window.recordWordResult(false);
                     }
@@ -3117,7 +3134,7 @@
             fr: {
                 win: "🎉 VOUS AVEZ GAGNÉ!", lose: "😭 LE MOT ÉTAIT ", notInList: "❌ Ce mot n'est pas dans la liste",
                 dataError: "⚠️ Erreur : Données non trouvées", hintEarned: "\n\n🎁 +1 Indice 💡",
-                noHints: "❌ Zéro indice!\nGagne encore {N} parties per ne obtenir un", allKnown: "😎 Tu sais déjà tout!", hintRevealed: "💡 Lettre {N}: {L}",
+                noHints: "❌ Zéro indice!\nGagne encore {N} parties pour en obtenir un", allKnown: "😎 Tu sais déjà tout!", hintRevealed: "💡 Lettre {N}: {L}",
                 // TRADUZIONI STATISTICHE
                 stTitle: "Statistiques", stSpec: "Spécifique", stGlob: "Globales",
                 stPlay: "Jouées", stWon: "Gagnées", stWinP: "% Victoire", stAvg: "Moyenne des Tentatives",
@@ -3684,12 +3701,14 @@
         window.addEventListener('keydown', (e) => {
             // 1. Controllo se siamo nella schermata di gioco
             if (pausaInserimento) return;
+            if (e.ctrlKey || e.metaKey || e.altKey) return; // non intercettare Ctrl+R, Ctrl+C, ecc.
             const gameScreen = document.getElementById('game-screen');
             if (gameScreen.offsetParent === null) return; 
             const endPopup = document.getElementById('end-popup');
             if (endPopup && !endPopup.classList.contains('hidden')) return; // Esci dalla funzione e non fare nulla
             
-            const key = e.key.toLowerCase();
+            // Le lettere accentate (è, à, ò...) vengono ricondotte alla lettera base
+            const key = e.key.length === 1 ? normalizeString(e.key) : e.key.toLowerCase();
 
             // 2. Cerchiamo il tasto corrispondente nella tastiera virtuale
             const virtualKey = document.querySelector(`.key[data-key="${key}"]`);
@@ -5695,7 +5714,7 @@
                         <span style="font-weight: 800; font-size: 0.85rem; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; color: #334155;">${playerInfo.name}</span>
                         
                         <div style="background: ${bgGradient[i]}; width: 100%; height: ${altezze[i]}; border-radius: 12px 12px 0 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 8px; color: #1e293b; box-shadow: inset 0 2px 4px rgba(255,255,255,0.4), 0 -5px 15px rgba(0,0,0,0.05);">
-                            <b style="font-size: 1.3rem; margin-bottom: opx;">+${info.pointScore || 0}</b>
+                            <b style="font-size: 1.3rem; margin-bottom: 0;">+${info.pointScore || 0}</b>
                             <div style="font-size: 1rem; margin-bottom: 2px; padding-left: 1px;">${bonusIcons}</div>
                             <span style="font-size: 0.7rem; font-weight: bold; opacity: 0.8;">${solved}/${numWords}</span>
                             <span style="font-size: 0.7rem; font-weight: bold; opacity: 0.8;">${totalAttempts} ${tentativiText} - ${fmtTime(tempo)}</span>
@@ -5718,17 +5737,17 @@
 
                 othersBody.innerHTML += `
                     <tr style="border-bottom: 1px solid #e2e8f0; font-size: 0.9rem; background: white;">
-                        <td id="clasifPosition">${i + 4}°</td>
-                        <td id="clasifName">
+                        <td class="clasif-position">${i + 4}°</td>
+                        <td class="clasif-name">
                             <img src="Avatar/${playerInfo.avatar}.png">
                             ${playerInfo.name}
                         </td>
-                        <td id="clasifIndovinate">${solved}/${numWords}</td>
-                        <td id="clasifPunteggi">
+                        <td class="clasif-indovinate">${solved}/${numWords}</td>
+                        <td class="clasif-punteggi">
                             <span>${totalAttempts} ${tentativiText} </span>
                             <span>${fmtTime(tempo)}</span>
                         </td>
-                        <td id="clasifPunti">
+                        <td class="clasif-punti">
                             <span>+${info.pointScore || 0} </span>
                             <span>${bonusIcons}</span>
                         </td>
@@ -5813,6 +5832,7 @@
             window.visualTimerInterval = null
             clearInterval(window.syncInterval);
             window.syncInterval = null
+            window.removeEventListener("beforeunload", window.syncSessionTime);
 
             await window.syncSessionTime();
         };
